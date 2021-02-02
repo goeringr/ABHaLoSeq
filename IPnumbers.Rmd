@@ -1,0 +1,36 @@
+---
+title: "IPHaLoEnrichments"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(cowplot)
+```
+
+## IP data
+
+```{r data}
+new <- tibble(year = c(2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020,2020),
+                 halo = c("NKHH","NKHH","NKHH","NKHH","NKHH","NKHH","NKHH","NKHH","P65","P65","P65","P65","P65","P65","P65","P65","GHH","GHH","GHH","GHH","GHH","GHH","GHH","GHH","OHH","OHH","OHH","OHH","OHH","OHH"),
+                 fluor = c("DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF"),
+                 input = c(22.75,22.75,13.35,13.35,4.15,4.15,23.95,23.95,29.65,29.65,38.45,38.45,29.35,29.35,16.45,16.45,33.3,33.3,32.3,32.3,48.9,48.9,43.5,43.5,65.5,65.5,87.5,87.5,68.1,68.1),
+                 eluate = c(29.2,0,0,0,38,0,42,0,58.2,0,105,0,140,0,62.6,0,53.4,0,50,0,63.6,0,22,0,117,56.2,74.6,0,84,46))
+
+old <- tibble(year = c(2019,2019,2019,2019,2019,2019,2019,2019,2019,2019,2019,2019,2019,2019,2019,2019,2019,2019),
+                 halo = c("NKHH","NKHH","NKHH","NKHH","NKHH","NKHH","P65","P65","P65","P65","P65","P65","GHH","GHH","GHH","GHH","GHH","GHH"),
+                 fluor = c("DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF","DBF","noDBF"),
+              input = c(65,65,80,80,65,65,65,65,80,80,65,65,65,65,80,80,65,65),
+                 eluate = c(238,40,306,58.4,366,57.8,1080,20,1020,93,1320,65.8,144,46,246,87.4,350,130))
+
+IP <- rbind(new,old) %>% mutate(year = as.character(year))
+```
+
+```{r, }
+
+IP %>% ggplot(aes(x = input, y = eluate, col = year, shape = fluor)) + geom_point(size = 3) + theme_cowplot() + facet_grid(.~halo)
+
+
+IP %>% mutate(percent_enriched = eluate / (input * 10)) %>% ggplot(aes(x = input, y = percent_enriched, col = year, shape = fluor)) + geom_point(size = 3) + theme_cowplot() + facet_grid(.~halo)
+```

@@ -1,0 +1,565 @@
+HGNC ID	Approved symbol	Approved name	Status	Locus type	Previous symbols	Synonyms	Chromosome	NCBI Gene ID	Ensembl gene ID	Vega gene ID	Group ID	Group name
+HGNC:32555	SCARNA1	small Cajal body-specific RNA 1	Approved	RNA, small nucleolar		ACA35	1p35.3	677774	ENSG00000252947		847	Small Cajal body-specific RNAs
+HGNC:32567	SCARNA10	small Cajal body-specific RNA 10	Approved	RNA, small nucleolar		U85	12p13.31	692148	ENSG00000239002	OTTHUMG00000169160	847	Small Cajal body-specific RNAs
+HGNC:32568	SCARNA11	small Cajal body-specific RNA 11	Approved	RNA, small nucleolar		ACA57	12p13.31	677780	ENSG00000251898		847	Small Cajal body-specific RNAs
+HGNC:32569	SCARNA12	small Cajal body-specific RNA 12	Approved	RNA, small nucleolar		U89	12p13.31	677777	ENSG00000238795		847	Small Cajal body-specific RNAs
+HGNC:32570	SCARNA13	small Cajal body-specific RNA 13	Approved	RNA, small nucleolar		U93	14q32.12	677768	ENSG00000252481		847	Small Cajal body-specific RNAs
+HGNC:32571	SCARNA14	small Cajal body-specific RNA 14	Approved	RNA, small nucleolar		U100	15q22.31	692149	ENSG00000252712		847	Small Cajal body-specific RNAs
+HGNC:32572	SCARNA15	small Cajal body-specific RNA 15	Approved	RNA, small nucleolar		ACA45	15q25.2	677778	ENSG00000277864		847	Small Cajal body-specific RNAs
+HGNC:32573	SCARNA16	small Cajal body-specific RNA 16	Approved	RNA, small nucleolar		ACA47	17q25.2	677781	ENSG00000275143		847	Small Cajal body-specific RNAs
+HGNC:32574	SCARNA17	small Cajal body-specific RNA 17	Approved	RNA, small nucleolar		mgU12-22/U4-8, U91	18q21.1	677769	ENSG00000251992	OTTHUMG00000179829	847	Small Cajal body-specific RNAs
+HGNC:32559	SCARNA18	small Cajal body-specific RNA 18	Approved	RNA, small nucleolar		U109, SCARNA18A	5q14.2	677765	ENSG00000238835		847	Small Cajal body-specific RNAs
+HGNC:32558	SCARNA2	small Cajal body-specific RNA 2	Approved	RNA, small nucleolar		mgU2-25/61, HBII-382	1q13.1	677766	ENSG00000278249	OTTHUMG00000184013	847	Small Cajal body-specific RNAs
+HGNC:32578	SCARNA20	small Cajal body-specific RNA 20	Approved	RNA, small nucleolar		ACA66	17q23.2	677681	ENSG00000252577		847	Small Cajal body-specific RNAs
+HGNC:32579	SCARNA21	small Cajal body-specific RNA 21	Approved	RNA, small nucleolar		ACA68, SCARNA21A	17p13.1	677763	ENSG00000252835		847	Small Cajal body-specific RNAs
+HGNC:32580	SCARNA22	small Cajal body-specific RNA 22	Approved	RNA, small nucleolar		ACA11	4p16.3	677770	ENSG00000249784	OTTHUMG00000161833	847	Small Cajal body-specific RNAs
+HGNC:32581	SCARNA23	small Cajal body-specific RNA 23	Approved	RNA, small nucleolar		ACA12	Xp22.11	677773	ENSG00000251869		847	Small Cajal body-specific RNAs
+HGNC:50385	SCARNA26A	small Cajal body-specific RNA 26A	Approved	RNA, small nucleolar			1q22	106633810			847	Small Cajal body-specific RNAs
+HGNC:51394	SCARNA26B	small Cajal body-specific RNA 26B	Approved	RNA, small nucleolar			1q22	106633816			847	Small Cajal body-specific RNAs
+HGNC:33614	SCARNA27	small Cajal body-specific RNA 27	Approved	RNA, small nucleolar			6p24.3	100124533			847	Small Cajal body-specific RNAs
+HGNC:50388	SCARNA28	small Cajal body-specific RNA 28	Approved	RNA, small nucleolar		ZL1	7q22.1	106633801			847	Small Cajal body-specific RNAs
+HGNC:32577	SCARNA3	small Cajal body-specific RNA 3	Approved	RNA, small nucleolar		HBI-100	1q25.1	677679	ENSG00000252906		847	Small Cajal body-specific RNAs
+HGNC:32560	SCARNA4	small Cajal body-specific RNA 4	Approved	RNA, small nucleolar		ACA26	1q22	677771	ENSG00000280466		847	Small Cajal body-specific RNAs
+HGNC:32561	SCARNA5	small Cajal body-specific RNA 5	Approved	RNA, small nucleolar		U87	2q37.1	677775	ENSG00000252010		847	Small Cajal body-specific RNAs
+HGNC:32562	SCARNA6	small Cajal body-specific RNA 6	Approved	RNA, small nucleolar		U88	2q37.1	677772	ENSG00000251791		847	Small Cajal body-specific RNAs
+HGNC:32563	SCARNA7	small Cajal body-specific RNA 7	Approved	RNA, small nucleolar		U90	3q25.22	677767	ENSG00000238741		847	Small Cajal body-specific RNAs
+HGNC:32564	SCARNA8	small Cajal body-specific RNA 8	Approved	RNA, small nucleolar		U92	9p22.1	677776	ENSG00000251733		847	Small Cajal body-specific RNAs
+HGNC:32566	SCARNA9	small Cajal body-specific RNA 9	Approved	RNA, small nucleolar		mgU2-19/30, Z32	11q21	619383	ENSG00000254911	OTTHUMG00000167450	847	Small Cajal body-specific RNAs
+HGNC:33559	SCARNA9L	small Cajal body-specific RNA 9 like	Approved	pseudogene			Xp22.12	100158262			847	Small Cajal body-specific RNAs
+HGNC:32706	SNORD10	small nucleolar RNA, C/D box 10	Approved	RNA, small nucleolar		mgU6-77	17p13.1	652966	ENSG00000238917		845	Small nucleolar RNAs, C/D box
+HGNC:32763	SNORD100	small nucleolar RNA, C/D box 100	Approved	RNA, small nucleolar		HBII-429	6q23.2	594838	ENSG00000221500		845	Small nucleolar RNAs, C/D box
+HGNC:32764	SNORD101	small nucleolar RNA, C/D box 101	Approved	RNA, small nucleolar		U101	6q23.2	594837	ENSG00000206754		845	Small nucleolar RNAs, C/D box
+HGNC:10099	SNORD102	small nucleolar RNA, C/D box 102	Approved	RNA, small nucleolar	RNU102	U102	13q12.2	26771	ENSG00000207500		845	Small nucleolar RNAs, C/D box
+HGNC:32766	SNORD103A	small nucleolar RNA, C/D box 103A	Approved	RNA, small nucleolar		U103	1p35.2	692234			845	Small nucleolar RNAs, C/D box
+HGNC:32767	SNORD103B	small nucleolar RNA, C/D box 103B	Approved	RNA, small nucleolar		U103B	1p35.2	692235			845	Small nucleolar RNAs, C/D box
+HGNC:32744	SNORD103C	small nucleolar RNA, C/D box 103C	Approved	RNA, small nucleolar	SNORD85	HBII-251	1p35.2	692200			845	Small nucleolar RNAs, C/D box
+HGNC:32768	SNORD104	small nucleolar RNA, C/D box 104	Approved	RNA, small nucleolar		U104	17q23.3	692227	ENSG00000199753		845	Small nucleolar RNAs, C/D box
+HGNC:32769	SNORD105	small nucleolar RNA, C/D box 105	Approved	RNA, small nucleolar		U105	19p13.2	692229	ENSG00000209645		845	Small nucleolar RNAs, C/D box
+HGNC:33572	SNORD105B	small nucleolar RNA, C/D box 105B	Approved	RNA, small nucleolar			2q33.1	100113382	ENSG00000238531		845	Small nucleolar RNAs, C/D box
+HGNC:32771	SNORD107	small nucleolar RNA, C/D box 107	Approved	RNA, small nucleolar		HBII-436	15q11.2	91380	ENSG00000276314		845	Small nucleolar RNAs, C/D box
+HGNC:32772	SNORD108	small nucleolar RNA, C/D box 108	Approved	RNA, small nucleolar		HBII-437	15q11.2	338427	ENSG00000239014		845	Small nucleolar RNAs, C/D box
+HGNC:32773	SNORD109A	small nucleolar RNA, C/D box 109A	Approved	RNA, small nucleolar		HBII-438a	15q11.2	338428	ENSG00000274640		845	Small nucleolar RNAs, C/D box
+HGNC:32774	SNORD109B	small nucleolar RNA, C/D box 109B	Approved	RNA, small nucleolar		HBII-438b	15q11.2	338429	ENSG00000239169		845	Small nucleolar RNAs, C/D box
+HGNC:32707	SNORD11	small nucleolar RNA, C/D box 11	Approved	RNA, small nucleolar		HBII-95	2q33.1	692058	ENSG00000238317		845	Small nucleolar RNAs, C/D box
+HGNC:32775	SNORD110	small nucleolar RNA, C/D box 110	Approved	RNA, small nucleolar		HBII-55	20p13	692213	ENSG00000221116		845	Small nucleolar RNAs, C/D box
+HGNC:32776	SNORD111	small nucleolar RNA, C/D box 111	Approved	RNA, small nucleolar		HBII-82	16q22.1	692214	ENSG00000221066		845	Small nucleolar RNAs, C/D box
+HGNC:33579	SNORD111B	small nucleolar RNA, C/D box 111B	Approved	RNA, small nucleolar	MIR3647	hsa-mir-3647	16q22.1	100113402	ENSG00000221514		845	Small nucleolar RNAs, C/D box
+HGNC:32777	SNORD112	small nucleolar RNA, C/D box 112	Approved	RNA, small nucleolar		14q(0)	14q32.31	692215	ENSG00000275662		845	Small nucleolar RNAs, C/D box
+HGNC:32980	SNORD113-1	small nucleolar RNA, C/D box 113-1	Approved	RNA, small nucleolar		14q(I-1)	14q32.31	767561	ENSG00000202191		845	Small nucleolar RNAs, C/D box
+HGNC:32981	SNORD113-2	small nucleolar RNA, C/D box 113-2	Approved	RNA, small nucleolar		14q(I-2)	14q32.31	767562	ENSG00000212384		845	Small nucleolar RNAs, C/D box
+HGNC:32982	SNORD113-3	small nucleolar RNA, C/D box 113-3	Approved	RNA, small nucleolar		14q(I-3)	14q32.31	767563	ENSG00000201700		845	Small nucleolar RNAs, C/D box
+HGNC:32983	SNORD113-4	small nucleolar RNA, C/D box 113-4	Approved	RNA, small nucleolar		14q(I-4)	14q32.31	767564	ENSG00000201672		845	Small nucleolar RNAs, C/D box
+HGNC:32984	SNORD113-5	small nucleolar RNA, C/D box 113-5	Approved	RNA, small nucleolar		14q(I-5)	14q32.31	767565	ENSG00000272474		845	Small nucleolar RNAs, C/D box
+HGNC:32985	SNORD113-6	small nucleolar RNA, C/D box 113-6	Approved	RNA, small nucleolar		14q(I-6)	14q32.31	767566	ENSG00000200215		845	Small nucleolar RNAs, C/D box
+HGNC:32986	SNORD113-7	small nucleolar RNA, C/D box 113-7	Approved	RNA, small nucleolar		14q(I-7)	14q32.31	767567	ENSG00000200632		845	Small nucleolar RNAs, C/D box
+HGNC:32987	SNORD113-8	small nucleolar RNA, C/D box 113-8	Approved	RNA, small nucleolar		14q(I-8)	14q32.31	767568	ENSG00000200367		845	Small nucleolar RNAs, C/D box
+HGNC:32988	SNORD113-9	small nucleolar RNA, C/D box 113-9	Approved	RNA, small nucleolar		14q(I-9)	14q32.31	767569	ENSG00000201950		845	Small nucleolar RNAs, C/D box
+HGNC:32989	SNORD114-1	small nucleolar RNA, C/D box 114-1	Approved	RNA, small nucleolar		14q(II-1)	14q32.31	767577	ENSG00000199575		845	Small nucleolar RNAs, C/D box
+HGNC:32990	SNORD114-2	small nucleolar RNA, C/D box 114-2	Approved	RNA, small nucleolar		14q(II-2)	14q32.31	767578	ENSG00000200823		845	Small nucleolar RNAs, C/D box
+HGNC:32991	SNORD114-3	small nucleolar RNA, C/D box 114-3	Approved	RNA, small nucleolar		14q(II-3)	14q32.31	767579	ENSG00000201839		845	Small nucleolar RNAs, C/D box
+HGNC:32992	SNORD114-4	small nucleolar RNA, C/D box 114-4	Approved	RNA, small nucleolar		14q(II-4)	14q32.31	767580	ENSG00000200832		845	Small nucleolar RNAs, C/D box
+HGNC:32993	SNORD114-5	small nucleolar RNA, C/D box 114-5	Approved	RNA, small nucleolar		14q(II-5)	14q32.31	767581	ENSG00000199798		845	Small nucleolar RNAs, C/D box
+HGNC:32994	SNORD114-6	small nucleolar RNA, C/D box 114-6	Approved	RNA, small nucleolar		14q(II-6)	14q32.31	767582	ENSG00000201263		845	Small nucleolar RNAs, C/D box
+HGNC:32995	SNORD114-7	small nucleolar RNA, C/D box 114-7	Approved	RNA, small nucleolar		14q(II-7)	14q32.31	767583	ENSG00000199390		845	Small nucleolar RNAs, C/D box
+HGNC:32996	SNORD114-8	small nucleolar RNA, C/D box 114-8	Approved	RNA, small nucleolar		14q(II-8)	14q32.31	767584			845	Small nucleolar RNAs, C/D box
+HGNC:32997	SNORD114-9	small nucleolar RNA, C/D box 114-9	Approved	RNA, small nucleolar		14q(II-9)	14q32.31	767585	ENSG00000201240		845	Small nucleolar RNAs, C/D box
+HGNC:32998	SNORD114-10	small nucleolar RNA, C/D box 114-10	Approved	RNA, small nucleolar		14q(II-10)	14q32.31	767588	ENSG00000200279		845	Small nucleolar RNAs, C/D box
+HGNC:32999	SNORD114-11	small nucleolar RNA, C/D box 114-11	Approved	RNA, small nucleolar		14q(II-11)	14q32.31	767589	ENSG00000200608		845	Small nucleolar RNAs, C/D box
+HGNC:33000	SNORD114-12	small nucleolar RNA, C/D box 114-12	Approved	RNA, small nucleolar		14q(II-12)	14q32.31	767590	ENSG00000202270		845	Small nucleolar RNAs, C/D box
+HGNC:33001	SNORD114-13	small nucleolar RNA, C/D box 114-13	Approved	RNA, small nucleolar		14q(II-13)	14q32.31	767591	ENSG00000201247		845	Small nucleolar RNAs, C/D box
+HGNC:33002	SNORD114-14	small nucleolar RNA, C/D box 114-14	Approved	RNA, small nucleolar		14q(II-14)	14q32.31	767592	ENSG00000199593		845	Small nucleolar RNAs, C/D box
+HGNC:33003	SNORD114-15	small nucleolar RNA, C/D box 114-15	Approved	RNA, small nucleolar		14q(II-15)	14q32.31	767593	ENSG00000201557		845	Small nucleolar RNAs, C/D box
+HGNC:33004	SNORD114-16	small nucleolar RNA, C/D box 114-16	Approved	RNA, small nucleolar		14q(II-16)	14q32.31	767594	ENSG00000199914		845	Small nucleolar RNAs, C/D box
+HGNC:33005	SNORD114-17	small nucleolar RNA, C/D box 114-17	Approved	RNA, small nucleolar		14q(II-17)	14q32.31	767595	ENSG00000201569		845	Small nucleolar RNAs, C/D box
+HGNC:33006	SNORD114-18	small nucleolar RNA, C/D box 114-18	Approved	RNA, small nucleolar		14q(II-18)	14q32.31	767596	ENSG00000202142		845	Small nucleolar RNAs, C/D box
+HGNC:33007	SNORD114-19	small nucleolar RNA, C/D box 114-19	Approved	RNA, small nucleolar		14q(II-19)	14q32.31	767597	ENSG00000199942		845	Small nucleolar RNAs, C/D box
+HGNC:33008	SNORD114-20	small nucleolar RNA, C/D box 114-20	Approved	RNA, small nucleolar		14q(II-20)	14q32.31	767598	ENSG00000202048		845	Small nucleolar RNAs, C/D box
+HGNC:33009	SNORD114-21	small nucleolar RNA, C/D box 114-21	Approved	RNA, small nucleolar		14q(II-21)	14q32.31	767599	ENSG00000272344		845	Small nucleolar RNAs, C/D box
+HGNC:33010	SNORD114-22	small nucleolar RNA, C/D box 114-22	Approved	RNA, small nucleolar		14q(II-22)	14q32.31	767600	ENSG00000202293		845	Small nucleolar RNAs, C/D box
+HGNC:33011	SNORD114-23	small nucleolar RNA, C/D box 114-23	Approved	RNA, small nucleolar		14q(II-23)	14q32.31	767603	ENSG00000200406		845	Small nucleolar RNAs, C/D box
+HGNC:33012	SNORD114-24	small nucleolar RNA, C/D box 114-24	Approved	RNA, small nucleolar		14q(II-24)	14q32.31	767604	ENSG00000201899		845	Small nucleolar RNAs, C/D box
+HGNC:33013	SNORD114-25	small nucleolar RNA, C/D box 114-25	Approved	RNA, small nucleolar		14q(II-25)	14q32.31	767605	ENSG00000200612		845	Small nucleolar RNAs, C/D box
+HGNC:33014	SNORD114-26	small nucleolar RNA, C/D box 114-26	Approved	RNA, small nucleolar		14q(II-26)	14q32.31	767606	ENSG00000200413		845	Small nucleolar RNAs, C/D box
+HGNC:33015	SNORD114-27	small nucleolar RNA, C/D box 114-27	Approved	RNA, small nucleolar		14q(II-27)	14q32.31	767608	ENSG00000200636		845	Small nucleolar RNAs, C/D box
+HGNC:33016	SNORD114-28	small nucleolar RNA, C/D box 114-28	Approved	RNA, small nucleolar		14q(II-28)	14q32.31	767609	ENSG00000200480		845	Small nucleolar RNAs, C/D box
+HGNC:33017	SNORD114-29	small nucleolar RNA, C/D box 114-29	Approved	RNA, small nucleolar		14q(II-29)	14q32.31	767610	ENSG00000201689		845	Small nucleolar RNAs, C/D box
+HGNC:33018	SNORD114-30	small nucleolar RNA, C/D box 114-30	Approved	RNA, small nucleolar		14q(II-30)	14q32.31	767611	ENSG00000201318		845	Small nucleolar RNAs, C/D box
+HGNC:33019	SNORD114-31	small nucleolar RNA, C/D box 114-31	Approved	RNA, small nucleolar		14q(II-31)	14q32.31	767612	ENSG00000200089		845	Small nucleolar RNAs, C/D box
+HGNC:33020	SNORD115-1	small nucleolar RNA, C/D box 115-1	Approved	RNA, small nucleolar		HBII-52-1	15q11.2	338433	ENSG00000201831		845	Small nucleolar RNAs, C/D box
+HGNC:33029	SNORD115-10	small nucleolar RNA, C/D box 115-10	Approved	RNA, small nucleolar		HBII-52-10	15q11.2	100033447	ENSG00000201943		845	Small nucleolar RNAs, C/D box
+HGNC:33030	SNORD115-11	small nucleolar RNA, C/D box 115-11	Approved	RNA, small nucleolar		HBII-52-11	15q11.2	100033448	ENSG00000200486		845	Small nucleolar RNAs, C/D box
+HGNC:33031	SNORD115-12	small nucleolar RNA, C/D box 115-12	Approved	RNA, small nucleolar		HBII-52-12	15q11.2	100033449	ENSG00000199453		845	Small nucleolar RNAs, C/D box
+HGNC:33032	SNORD115-13	small nucleolar RNA, C/D box 115-13	Approved	RNA, small nucleolar		HBII-52-13	15q11.2	100033450	ENSG00000273835		845	Small nucleolar RNAs, C/D box
+HGNC:33033	SNORD115-14	small nucleolar RNA, C/D box 115-14	Approved	RNA, small nucleolar		HBII-52-14	15q11.2	100033451	ENSG00000199960		845	Small nucleolar RNAs, C/D box
+HGNC:33034	SNORD115-15	small nucleolar RNA, C/D box 115-15	Approved	RNA, small nucleolar		HBII-52-15	15q11.2	100033453	ENSG00000201679		845	Small nucleolar RNAs, C/D box
+HGNC:33035	SNORD115-16	small nucleolar RNA, C/D box 115-16	Approved	RNA, small nucleolar		HBII-52-16	15q11.2	100033454	ENSG00000200757		845	Small nucleolar RNAs, C/D box
+HGNC:33036	SNORD115-17	small nucleolar RNA, C/D box 115-17	Approved	RNA, small nucleolar		HBII-52-17	15q11.2	100033455	ENSG00000201482		845	Small nucleolar RNAs, C/D box
+HGNC:33037	SNORD115-18	small nucleolar RNA, C/D box 115-18	Approved	RNA, small nucleolar		HBII-52-18	15q11.2	100033456	ENSG00000200163		845	Small nucleolar RNAs, C/D box
+HGNC:33038	SNORD115-19	small nucleolar RNA, C/D box 115-19	Approved	RNA, small nucleolar		HBII-52-19	15q11.2	100033458	ENSG00000199968		845	Small nucleolar RNAs, C/D box
+HGNC:33021	SNORD115-2	small nucleolar RNA, C/D box 115-2	Approved	RNA, small nucleolar		HBII-52-2	15q11.2	100033437	ENSG00000199712		845	Small nucleolar RNAs, C/D box
+HGNC:33039	SNORD115-20	small nucleolar RNA, C/D box 115-20	Approved	RNA, small nucleolar		HBII-52-20	15q11.2	100033460	ENSG00000201969		845	Small nucleolar RNAs, C/D box
+HGNC:33040	SNORD115-21	small nucleolar RNA, C/D box 115-21	Approved	RNA, small nucleolar		HBII-52-21	15q11.2	100033603	ENSG00000199833		845	Small nucleolar RNAs, C/D box
+HGNC:33041	SNORD115-22	small nucleolar RNA, C/D box 115-22	Approved	RNA, small nucleolar		HBII-52-22	15q11.2	100033799	ENSG00000201326		845	Small nucleolar RNAs, C/D box
+HGNC:33042	SNORD115-23	small nucleolar RNA, C/D box 115-23	Approved	RNA, small nucleolar		HBII-52-23	15q11.2	100033800	ENSG00000201331		845	Small nucleolar RNAs, C/D box
+HGNC:33043	SNORD115-24	small nucleolar RNA, C/D box 115-24	Approved	RNA, small nucleolar		HBII-52-24	15q11.2	100036563	ENSG00000200398		845	Small nucleolar RNAs, C/D box
+HGNC:33044	SNORD115-25	small nucleolar RNA, C/D box 115-25	Approved	RNA, small nucleolar		HBII-52-25	15q11.2	100033801	ENSG00000199489		845	Small nucleolar RNAs, C/D box
+HGNC:33045	SNORD115-26	small nucleolar RNA, C/D box 115-26	Approved	RNA, small nucleolar		HBII-52-26	15q11.2	100033802	ENSG00000275524		845	Small nucleolar RNAs, C/D box
+HGNC:33046	SNORD115-27	small nucleolar RNA, C/D box 115-27	Approved	RNA, small nucleolar		HBII-52-27	15q11.2	100036564	ENSG00000201300		845	Small nucleolar RNAs, C/D box
+HGNC:33047	SNORD115-28	small nucleolar RNA, C/D box 115-28	Approved	RNA, small nucleolar		HBII-52-28	15q11.2	100036565	ENSG00000200801		845	Small nucleolar RNAs, C/D box
+HGNC:33048	SNORD115-29	small nucleolar RNA, C/D box 115-29	Approved	RNA, small nucleolar		HBII-52-29	15q11.2	100033803	ENSG00000199704		845	Small nucleolar RNAs, C/D box
+HGNC:33022	SNORD115-3	small nucleolar RNA, C/D box 115-3	Approved	RNA, small nucleolar		HBII-52-3	15q11.2	100033440	ENSG00000199970		845	Small nucleolar RNAs, C/D box
+HGNC:33049	SNORD115-30	small nucleolar RNA, C/D box 115-30	Approved	RNA, small nucleolar		HBII-52-30	15q11.2	100033804	ENSG00000200987		845	Small nucleolar RNAs, C/D box
+HGNC:33050	SNORD115-31	small nucleolar RNA, C/D box 115-31	Approved	RNA, small nucleolar		HBII-52-31	15q11.2	100033805	ENSG00000202188		845	Small nucleolar RNAs, C/D box
+HGNC:33051	SNORD115-32	small nucleolar RNA, C/D box 115-32	Approved	RNA, small nucleolar		HBII-52-32	15q11.2	100033806	ENSG00000200949		845	Small nucleolar RNAs, C/D box
+HGNC:33052	SNORD115-33	small nucleolar RNA, C/D box 115-33	Approved	RNA, small nucleolar		HBII-52-33	15q11.2	100033807	ENSG00000200593		845	Small nucleolar RNAs, C/D box
+HGNC:33053	SNORD115-34	small nucleolar RNA, C/D box 115-34	Approved	RNA, small nucleolar		HBII-52-34	15q11.2	100033808	ENSG00000199311		845	Small nucleolar RNAs, C/D box
+HGNC:33054	SNORD115-35	small nucleolar RNA, C/D box 115-35	Approved	RNA, small nucleolar		HBII-52-35	15q11.2	100033809	ENSG00000201992		845	Small nucleolar RNAs, C/D box
+HGNC:33055	SNORD115-36	small nucleolar RNA, C/D box 115-36	Approved	RNA, small nucleolar		HBII-52-36	15q11.2	100033810	ENSG00000202499		845	Small nucleolar RNAs, C/D box
+HGNC:33056	SNORD115-37	small nucleolar RNA, C/D box 115-37	Approved	RNA, small nucleolar		HBII-52-37	15q11.2	100033811	ENSG00000200638		845	Small nucleolar RNAs, C/D box
+HGNC:33057	SNORD115-38	small nucleolar RNA, C/D box 115-38	Approved	RNA, small nucleolar		HBII-52-38	15q11.2	100033812	ENSG00000201907		845	Small nucleolar RNAs, C/D box
+HGNC:33058	SNORD115-39	small nucleolar RNA, C/D box 115-39	Approved	RNA, small nucleolar		HBII-52-39	15q11.2	100033813	ENSG00000200564		845	Small nucleolar RNAs, C/D box
+HGNC:33023	SNORD115-4	small nucleolar RNA, C/D box 115-4	Approved	RNA, small nucleolar		HBII-52-4	15q11.2	100033441	ENSG00000200680		845	Small nucleolar RNAs, C/D box
+HGNC:33059	SNORD115-40	small nucleolar RNA, C/D box 115-40	Approved	RNA, small nucleolar		HBII-52-40	15q11.2	100033814	ENSG00000272460		845	Small nucleolar RNAs, C/D box
+HGNC:33060	SNORD115-41	small nucleolar RNA, C/D box 115-41	Approved	RNA, small nucleolar		HBII-52-41	15q11.2	100033815	ENSG00000200478		845	Small nucleolar RNAs, C/D box
+HGNC:33061	SNORD115-42	small nucleolar RNA, C/D box 115-42	Approved	RNA, small nucleolar		HBII-52-42	15q11.2	100033816	ENSG00000201143		845	Small nucleolar RNAs, C/D box
+HGNC:33062	SNORD115-43	small nucleolar RNA, C/D box 115-43	Approved	RNA, small nucleolar		HBII-52-43	15q11.2	100033817	ENSG00000202373		845	Small nucleolar RNAs, C/D box
+HGNC:33063	SNORD115-44	small nucleolar RNA, C/D box 115-44	Approved	RNA, small nucleolar		HBII-52-44	15q11.2	100033818	ENSG00000202261		845	Small nucleolar RNAs, C/D box
+HGNC:33064	SNORD115-45	small nucleolar RNA, C/D box 115-45	Approved	RNA, small nucleolar		HBII-52-45, SNORD115-48	15q11.2	100036566	ENSG00000212380		845	Small nucleolar RNAs, C/D box
+HGNC:42798	SNORD115-46	small nucleolar RNA, C/D box 115-46	Approved	RNA, small nucleolar		HBII-52-46	15q11.2 not on reference assembly	100873857	ENSG00000276844		845	Small nucleolar RNAs, C/D box
+HGNC:33065	SNORD115-47	small nucleolar RNA, C/D box 115-47	Approved	RNA, small nucleolar		HBII-52-47	15q11.2	100036567	ENSG00000212528		845	Small nucleolar RNAs, C/D box
+HGNC:33343	SNORD115-48	small nucleolar RNA, C/D box 115-48	Approved	RNA, small nucleolar		HBII-52-48	15q11.2	100033822	ENSG00000201634		845	Small nucleolar RNAs, C/D box
+HGNC:33024	SNORD115-5	small nucleolar RNA, C/D box 115-5	Approved	RNA, small nucleolar		HBII-52-5	15q11.2	100033442	ENSG00000200503		845	Small nucleolar RNAs, C/D box
+HGNC:33025	SNORD115-6	small nucleolar RNA, C/D box 115-6	Approved	RNA, small nucleolar		HBII-52-6	15q11.2	100033443	ENSG00000200812		845	Small nucleolar RNAs, C/D box
+HGNC:33026	SNORD115-7	small nucleolar RNA, C/D box 115-7	Approved	RNA, small nucleolar		HBII-52-7	15q11.2	100033444	ENSG00000278089		845	Small nucleolar RNAs, C/D box
+HGNC:33027	SNORD115-8	small nucleolar RNA, C/D box 115-8	Approved	RNA, small nucleolar		HBII-52-8	15q11.2	100033445	ENSG00000200726		845	Small nucleolar RNAs, C/D box
+HGNC:33028	SNORD115-9	small nucleolar RNA, C/D box 115-9	Approved	RNA, small nucleolar		HBII-52-9	15q11.2	100033446	ENSG00000199782		845	Small nucleolar RNAs, C/D box
+HGNC:33067	SNORD116-1	small nucleolar RNA, C/D box 116-1	Approved	RNA, small nucleolar		HBII-85-1	15q11.2	100033413	ENSG00000207063		845	Small nucleolar RNAs, C/D box
+HGNC:33076	SNORD116-10	small nucleolar RNA, C/D box 116-10	Approved	RNA, small nucleolar		HBII-85-10	15q11.2	100033422	ENSG00000200661		845	Small nucleolar RNAs, C/D box
+HGNC:33077	SNORD116-11	small nucleolar RNA, C/D box 116-11	Approved	RNA, small nucleolar		HBII-85-11	15q11.2	100033423	ENSG00000206609		845	Small nucleolar RNAs, C/D box
+HGNC:33078	SNORD116-12	small nucleolar RNA, C/D box 116-12	Approved	RNA, small nucleolar		HBII-85-12	15q11.2	100033424	ENSG00000207197		845	Small nucleolar RNAs, C/D box
+HGNC:33079	SNORD116-13	small nucleolar RNA, C/D box 116-13	Approved	RNA, small nucleolar		HBII-85-13	15q11.2	100033425	ENSG00000207137		845	Small nucleolar RNAs, C/D box
+HGNC:33080	SNORD116-14	small nucleolar RNA, C/D box 116-14	Approved	RNA, small nucleolar		HBII-85-14	15q11.2	100033426	ENSG00000206621		845	Small nucleolar RNAs, C/D box
+HGNC:33081	SNORD116-15	small nucleolar RNA, C/D box 116-15	Approved	RNA, small nucleolar		HBII-85-15	15q11.2	100033427	ENSG00000207174		845	Small nucleolar RNAs, C/D box
+HGNC:33082	SNORD116-16	small nucleolar RNA, C/D box 116-16	Approved	RNA, small nucleolar		HBII-85-16	15q11.2	100033428	ENSG00000207263		845	Small nucleolar RNAs, C/D box
+HGNC:33083	SNORD116-17	small nucleolar RNA, C/D box 116-17	Approved	RNA, small nucleolar		HBII-85-17	15q11.2	100033429	ENSG00000206656		845	Small nucleolar RNAs, C/D box
+HGNC:33084	SNORD116-18	small nucleolar RNA, C/D box 116-18	Approved	RNA, small nucleolar		HBII-85-18	15q11.2	100033430	ENSG00000206688		845	Small nucleolar RNAs, C/D box
+HGNC:33085	SNORD116-19	small nucleolar RNA, C/D box 116-19	Approved	RNA, small nucleolar		HBII-85-19	15q11.2	727708	ENSG00000207460		845	Small nucleolar RNAs, C/D box
+HGNC:33068	SNORD116-2	small nucleolar RNA, C/D box 116-2	Approved	RNA, small nucleolar		HBII-85-2	15q11.2	100033414	ENSG00000207001		845	Small nucleolar RNAs, C/D box
+HGNC:33086	SNORD116-20	small nucleolar RNA, C/D box 116-20	Approved	RNA, small nucleolar		HBII-85-20	15q11.2	100033431	ENSG00000278715		845	Small nucleolar RNAs, C/D box
+HGNC:33087	SNORD116-21	small nucleolar RNA, C/D box 116-21	Approved	RNA, small nucleolar		HBII-85-21	15q11.2	100033432	ENSG00000277785		845	Small nucleolar RNAs, C/D box
+HGNC:33088	SNORD116-22	small nucleolar RNA, C/D box 116-22	Approved	RNA, small nucleolar		HBII-85-22	15q11.2	100033433	ENSG00000275127		845	Small nucleolar RNAs, C/D box
+HGNC:33089	SNORD116-23	small nucleolar RNA, C/D box 116-23	Approved	RNA, small nucleolar		HBII-85-23	15q11.2	100033434	ENSG00000207375		845	Small nucleolar RNAs, C/D box
+HGNC:33090	SNORD116-24	small nucleolar RNA, C/D box 116-24	Approved	RNA, small nucleolar		HBII-85-24	15q11.2	100033435	ENSG00000207279		845	Small nucleolar RNAs, C/D box
+HGNC:33091	SNORD116-25	small nucleolar RNA, C/D box 116-25	Approved	RNA, small nucleolar		HBII-85-25	15q11.2	100033436	ENSG00000252326		845	Small nucleolar RNAs, C/D box
+HGNC:33092	SNORD116-26	small nucleolar RNA, C/D box 116-26	Approved	RNA, small nucleolar		HBII-85-26	15q11.2	100033438	ENSG00000251815		845	Small nucleolar RNAs, C/D box
+HGNC:33093	SNORD116-27	small nucleolar RNA, C/D box 116-27	Approved	RNA, small nucleolar		HBII-85-27	15q11.2	100033439	ENSG00000251896		845	Small nucleolar RNAs, C/D box
+HGNC:33347	SNORD116-28	small nucleolar RNA, C/D box 116-28	Approved	RNA, small nucleolar		HBII-85-28	15q11.2	100033820	ENSG00000278123		845	Small nucleolar RNAs, C/D box
+HGNC:33348	SNORD116-29	small nucleolar RNA, C/D box 116-29	Approved	RNA, small nucleolar		HBII-85-29	15q11.2	100033821	ENSG00000207245		845	Small nucleolar RNAs, C/D box
+HGNC:33069	SNORD116-3	small nucleolar RNA, C/D box 116-3	Approved	RNA, small nucleolar		HBII-85-3	15q11.2	100033415	ENSG00000207014		845	Small nucleolar RNAs, C/D box
+HGNC:42797	SNORD116-30	small nucleolar RNA, C/D box 116-30	Approved	RNA, small nucleolar		HBII-85-30	15q11.2	100873856	ENSG00000252277		845	Small nucleolar RNAs, C/D box
+HGNC:33070	SNORD116-4	small nucleolar RNA, C/D box 116-4	Approved	RNA, small nucleolar		HBII-85-4	15q11.2	100033416	ENSG00000275529		845	Small nucleolar RNAs, C/D box
+HGNC:33071	SNORD116-5	small nucleolar RNA, C/D box 116-5	Approved	RNA, small nucleolar		HBII-85-5	15q11.2	100033417	ENSG00000207191		845	Small nucleolar RNAs, C/D box
+HGNC:33072	SNORD116-6	small nucleolar RNA, C/D box 116-6	Approved	RNA, small nucleolar		HBII-85-6	15q11.2	100033418	ENSG00000207442		845	Small nucleolar RNAs, C/D box
+HGNC:33073	SNORD116-7	small nucleolar RNA, C/D box 116-7	Approved	RNA, small nucleolar		HBII-85-7	15q11.2	100033419	ENSG00000207133		845	Small nucleolar RNAs, C/D box
+HGNC:33074	SNORD116-8	small nucleolar RNA, C/D box 116-8	Approved	RNA, small nucleolar		HBII-85-8	15q11.2	100033420	ENSG00000207093		845	Small nucleolar RNAs, C/D box
+HGNC:33075	SNORD116-9	small nucleolar RNA, C/D box 116-9	Approved	RNA, small nucleolar		HBII-85-9	15q11.2	100033421	ENSG00000206727		845	Small nucleolar RNAs, C/D box
+HGNC:32742	SNORD117	small nucleolar RNA, C/D box 117	Approved	RNA, small nucleolar		U83	6p21.33	692233	ENSG00000201785		845	Small nucleolar RNAs, C/D box
+HGNC:32952	SNORD118	small nucleolar RNA, C/D box 118	Approved	RNA, small nucleolar		U8	17p13.1	727676	ENSG00000200463		845	Small nucleolar RNAs, C/D box
+HGNC:33558	SNORD119	small nucleolar RNA, C/D box 119	Approved	RNA, small nucleolar			20p13	100113378			845	Small nucleolar RNAs, C/D box
+HGNC:33571	SNORD11B	small nucleolar RNA, C/D box 11B	Approved	RNA, small nucleolar			2q33.1	100113392	ENSG00000271852		845	Small nucleolar RNAs, C/D box
+HGNC:32708	SNORD12	small nucleolar RNA, C/D box 12	Approved	RNA, small nucleolar	MIR1259, MIRN1259	HBII-99, hsa-mir-1259	20q13.13	692057	ENSG00000212304		845	Small nucleolar RNAs, C/D box
+HGNC:33560	SNORD121A	small nucleolar RNA, C/D box 121A	Approved	RNA, small nucleolar			9p13.3	100113379	ENSG00000238886		845	Small nucleolar RNAs, C/D box
+HGNC:33569	SNORD121B	small nucleolar RNA, C/D box 121B	Approved	RNA, small nucleolar			9p13.3	101340252	ENSG00000238300		845	Small nucleolar RNAs, C/D box
+HGNC:33562	SNORD123	small nucleolar RNA, C/D box 123	Approved	RNA, small nucleolar			5p15.2	100113384	ENSG00000239112		845	Small nucleolar RNAs, C/D box
+HGNC:33563	SNORD124	small nucleolar RNA, C/D box 124	Approved	RNA, small nucleolar			17q21.1	101340251	ENSG00000238793		845	Small nucleolar RNAs, C/D box
+HGNC:33564	SNORD125	small nucleolar RNA, C/D box 125	Approved	RNA, small nucleolar			22q12.2	100113380	ENSG00000239127		845	Small nucleolar RNAs, C/D box
+HGNC:33565	SNORD126	small nucleolar RNA, C/D box 126	Approved	RNA, small nucleolar	MIR1201, MIRN1201	hsa-mir-1201	14q11.2	100113391	ENSG00000238344		845	Small nucleolar RNAs, C/D box
+HGNC:33555	SNORD127	small nucleolar RNA, C/D box 127	Approved	RNA, small nucleolar			14q21.3	100113389	ENSG00000239043		845	Small nucleolar RNAs, C/D box
+HGNC:50409	SNORD128	small nucleolar RNA, C/D box 128	Approved	RNA, small nucleolar		ZL43	1p36.23	106632271			845	Small nucleolar RNAs, C/D box
+HGNC:50410	SNORD129	small nucleolar RNA, C/D box 129	Approved	RNA, small nucleolar			10p14	106635547			845	Small nucleolar RNAs, C/D box
+HGNC:33573	SNORD12B	small nucleolar RNA, C/D box 12B	Approved	RNA, small nucleolar			19p13.2	100113393	ENSG00000222365		845	Small nucleolar RNAs, C/D box
+HGNC:10105	SNORD12C	small nucleolar RNA, C/D box 12C	Approved	RNA, small nucleolar	RNU106, SNORD106	U106	20q13.13	26765	ENSG00000209042		845	Small nucleolar RNAs, C/D box
+HGNC:32711	SNORD13	small nucleolar RNA, C/D box 13	Approved	RNA, small nucleolar		U13, RNU13, SNORD13A	8p12	692084	ENSG00000239039		845	Small nucleolar RNAs, C/D box
+HGNC:50411	SNORD130	small nucleolar RNA, C/D box 130	Approved	RNA, small nucleolar			10p12.1	106635548			845	Small nucleolar RNAs, C/D box
+HGNC:50412	SNORD131	small nucleolar RNA, C/D box 131	Approved	RNA, small nucleolar			11p15.5	106635549			845	Small nucleolar RNAs, C/D box
+HGNC:50413	SNORD132	small nucleolar RNA, C/D box 132	Approved	RNA, small nucleolar			2q13	106635550			845	Small nucleolar RNAs, C/D box
+HGNC:50414	SNORD133	small nucleolar RNA, C/D box 133	Approved	RNA, small nucleolar		ZL42, ggn68	12q13.12	106633800			845	Small nucleolar RNAs, C/D box
+HGNC:50415	SNORD134	small nucleolar RNA, C/D box 134	Approved	RNA, small nucleolar		ZL12	17q25.3	106633803			845	Small nucleolar RNAs, C/D box
+HGNC:50416	SNORD135	small nucleolar RNA, C/D box 135	Approved	RNA, small nucleolar		ZL2	19p13.2	106633804			845	Small nucleolar RNAs, C/D box
+HGNC:50417	SNORD136	small nucleolar RNA, C/D box 136	Approved	RNA, small nucleolar		ZL26	3p21.1	106633805			845	Small nucleolar RNAs, C/D box
+HGNC:50419	SNORD137	small nucleolar RNA, C/D box 137	Approved	RNA, small nucleolar			9p23	106635615			845	Small nucleolar RNAs, C/D box
+HGNC:50420	SNORD138	small nucleolar RNA, C/D box 138	Approved	RNA, small nucleolar	MIR3607	hsa-mir-3607	5q14.3	109623460	ENSG00000284078		845	Small nucleolar RNAs, C/D box
+HGNC:50421	SNORD139	small nucleolar RNA, C/D box 139	Approved	RNA, small nucleolar			22q13.1	116936			845	Small nucleolar RNAs, C/D box
+HGNC:52250	SNORD13B-1	small nucleolar RNA, C/D box 13B-1	Approved	RNA, small nucleolar			5q13.2	109617019			845	Small nucleolar RNAs, C/D box
+HGNC:52251	SNORD13B-2	small nucleolar RNA, C/D box 13B-2	Approved	RNA, small nucleolar			5q13.2	109617021			845	Small nucleolar RNAs, C/D box
+HGNC:52252	SNORD13C	small nucleolar RNA, C/D box 13C	Approved	RNA, small nucleolar			1q21.2	109616989			845	Small nucleolar RNAs, C/D box
+HGNC:52253	SNORD13D	small nucleolar RNA, C/D box 13D	Approved	RNA, small nucleolar			15q21.3	109616990	ENSG00000239035		845	Small nucleolar RNAs, C/D box
+HGNC:52254	SNORD13E	small nucleolar RNA, C/D box 13E	Approved	RNA, small nucleolar			15q22.31	109617020	ENSG00000238311		845	Small nucleolar RNAs, C/D box
+HGNC:52245	SNORD13F	small nucleolar RNA, C/D box 13F	Approved	RNA, small nucleolar			11q13.1	109616986			845	Small nucleolar RNAs, C/D box
+HGNC:52246	SNORD13G	small nucleolar RNA, C/D box 13G	Approved	RNA, small nucleolar			13q32.1	109616987			845	Small nucleolar RNAs, C/D box
+HGNC:52247	SNORD13H	small nucleolar RNA, C/D box 13H	Approved	RNA, small nucleolar			16q22.1	109617018			845	Small nucleolar RNAs, C/D box
+HGNC:52248	SNORD13I	small nucleolar RNA, C/D box 13I	Approved	RNA, small nucleolar			11q22.1	109616988			845	Small nucleolar RNAs, C/D box
+HGNC:52249	SNORD13J	small nucleolar RNA, C/D box 13J	Approved	RNA, small nucleolar			3p21.31	109617025			845	Small nucleolar RNAs, C/D box
+HGNC:51405	SNORD140	small nucleolar RNA, C/D box 140	Approved	RNA, small nucleolar			22q13.2	106635682			845	Small nucleolar RNAs, C/D box
+HGNC:51406	SNORD141A	small nucleolar RNA, C/D box 141A	Approved	RNA, small nucleolar			9q34.13	106635683			845	Small nucleolar RNAs, C/D box
+HGNC:51407	SNORD141B	small nucleolar RNA, C/D box 141B	Approved	RNA, small nucleolar			5p15.2	106635684			845	Small nucleolar RNAs, C/D box
+HGNC:50389	SNORD142	small nucleolar RNA, C/D box 142	Approved	RNA, small nucleolar	SNORA85, SNORD174	ZL68	10p15.2	106633806			845	Small nucleolar RNAs, C/D box
+HGNC:50400	SNORD143	small nucleolar RNA, C/D box 143	Approved	RNA, small nucleolar	SNORA96, SNORD171	ZL5	4q21.22	106633808			845	Small nucleolar RNAs, C/D box
+HGNC:50401	SNORD144	small nucleolar RNA, C/D box 144	Approved	RNA, small nucleolar	SNORA97	ZL6	4q21.22	106633809			845	Small nucleolar RNAs, C/D box
+HGNC:51859	SNORD145	small nucleolar RNA, C/D box 145	Approved	RNA, small nucleolar			1p34.1	109623472			845	Small nucleolar RNAs, C/D box
+HGNC:51860	SNORD146	small nucleolar RNA, C/D box 146	Approved	RNA, small nucleolar			3p21.31	109623484			845	Small nucleolar RNAs, C/D box
+HGNC:51861	SNORD147	small nucleolar RNA, C/D box 147	Approved	RNA, small nucleolar			11p15.1	109623465			845	Small nucleolar RNAs, C/D box
+HGNC:51862	SNORD148	small nucleolar RNA, C/D box 148	Approved	RNA, small nucleolar			16q11.2	109623466			845	Small nucleolar RNAs, C/D box
+HGNC:51863	SNORD149	small nucleolar RNA, C/D box 149	Approved	RNA, small nucleolar			8q24.3	109623485			845	Small nucleolar RNAs, C/D box
+HGNC:10113	SNORD14A	small nucleolar RNA, C/D box 14A	Approved	RNA, small nucleolar	RNU14	U14, RNU14A	11p15.1	26822	ENSG00000272034		845	Small nucleolar RNAs, C/D box
+HGNC:31803	SNORD14B	small nucleolar RNA, C/D box 14B	Approved	RNA, small nucleolar	RNU14B	U14B, U14	11p15.1	85388	ENSG00000201403		845	Small nucleolar RNAs, C/D box
+HGNC:30352	SNORD14C	small nucleolar RNA, C/D box 14C	Approved	RNA, small nucleolar			11q23.3-q25	85389	ENSG00000202252		845	Small nucleolar RNAs, C/D box
+HGNC:30353	SNORD14D	small nucleolar RNA, C/D box 14D	Approved	RNA, small nucleolar			11q23.3-q25	85390	ENSG00000207118		845	Small nucleolar RNAs, C/D box
+HGNC:30354	SNORD14E	small nucleolar RNA, C/D box 14E	Approved	RNA, small nucleolar			11q23.3-q25	85391	ENSG00000200879		845	Small nucleolar RNAs, C/D box
+HGNC:51864	SNORD150	small nucleolar RNA, C/D box 150	Approved	RNA, small nucleolar			11q23.3	109623467			845	Small nucleolar RNAs, C/D box
+HGNC:51865	SNORD151	small nucleolar RNA, C/D box 151	Approved	RNA, small nucleolar			7p12.3	109623468			845	Small nucleolar RNAs, C/D box
+HGNC:51866	SNORD152	small nucleolar RNA, C/D box 152	Approved	RNA, small nucleolar			19q13.13	109623473			845	Small nucleolar RNAs, C/D box
+HGNC:51867	SNORD153	small nucleolar RNA, C/D box 153	Approved	RNA, small nucleolar			11q25	109623486			845	Small nucleolar RNAs, C/D box
+HGNC:51868	SNORD154	small nucleolar RNA, C/D box 154	Approved	RNA, small nucleolar			20q12	109623474			845	Small nucleolar RNAs, C/D box
+HGNC:51869	SNORD155	small nucleolar RNA, C/D box 155	Approved	RNA, small nucleolar			3q13.31	109623450			845	Small nucleolar RNAs, C/D box
+HGNC:51870	SNORD156	small nucleolar RNA, C/D box 156	Approved	RNA, small nucleolar			6q13	109623475			845	Small nucleolar RNAs, C/D box
+HGNC:51871	SNORD157	small nucleolar RNA, C/D box 157	Approved	RNA, small nucleolar			19q13.42	109623451			845	Small nucleolar RNAs, C/D box
+HGNC:51872	SNORD158	small nucleolar RNA, C/D box 158	Approved	RNA, small nucleolar			10q25.3	109623470			845	Small nucleolar RNAs, C/D box
+HGNC:51873	SNORD159	small nucleolar RNA, C/D box 159	Approved	RNA, small nucleolar			21q22.3	109623452			845	Small nucleolar RNAs, C/D box
+HGNC:10114	SNORD15A	small nucleolar RNA, C/D box 15A	Approved	RNA, small nucleolar	RNU15A	U15A	11q13.4	6079	ENSG00000206941		845	Small nucleolar RNAs, C/D box
+HGNC:16649	SNORD15B	small nucleolar RNA, C/D box 15B	Approved	RNA, small nucleolar	RNU15B	U15B	11q13.4	114599	ENSG00000207445		845	Small nucleolar RNAs, C/D box
+HGNC:32712	SNORD16	small nucleolar RNA, C/D box 16	Approved	RNA, small nucleolar		U16	15q22.31	595097	ENSG00000199673		845	Small nucleolar RNAs, C/D box
+HGNC:51874	SNORD160	small nucleolar RNA, C/D box 160	Approved	RNA, small nucleolar			1p34.1	109623476			845	Small nucleolar RNAs, C/D box
+HGNC:51875	SNORD161	small nucleolar RNA, C/D box 161	Approved	RNA, small nucleolar			4q21.21	109623453			845	Small nucleolar RNAs, C/D box
+HGNC:51876	SNORD162	small nucleolar RNA, C/D box 162	Approved	RNA, small nucleolar			4p16.2	109623454			845	Small nucleolar RNAs, C/D box
+HGNC:51877	SNORD163	small nucleolar RNA, C/D box 163	Approved	RNA, small nucleolar			17p11.2	109623477			845	Small nucleolar RNAs, C/D box
+HGNC:51878	SNORD164	small nucleolar RNA, C/D box 164	Approved	RNA, small nucleolar			11p13	109623487			845	Small nucleolar RNAs, C/D box
+HGNC:51879	SNORD165	small nucleolar RNA, C/D box 165	Approved	RNA, small nucleolar			7p22.1	109623455			845	Small nucleolar RNAs, C/D box
+HGNC:51880	SNORD166	small nucleolar RNA, C/D box 166	Approved	RNA, small nucleolar			6q21	109623478			845	Small nucleolar RNAs, C/D box
+HGNC:51881	SNORD167	small nucleolar RNA, C/D box 167	Approved	RNA, small nucleolar			1p36.33	109623456			845	Small nucleolar RNAs, C/D box
+HGNC:51882	SNORD168	small nucleolar RNA, C/D box 168	Approved	RNA, small nucleolar			8q24.11	109623457			845	Small nucleolar RNAs, C/D box
+HGNC:51883	SNORD169	small nucleolar RNA, C/D box 169	Approved	RNA, small nucleolar			14q24.2	109623479			845	Small nucleolar RNAs, C/D box
+HGNC:32713	SNORD17	small nucleolar RNA, C/D box 17	Approved	RNA, small nucleolar		HBI-43	20p11.23	692086	ENSG00000212232		845	Small nucleolar RNAs, C/D box
+HGNC:51884	SNORD170	small nucleolar RNA, C/D box 170	Approved	RNA, small nucleolar			5p15.2	109623458			845	Small nucleolar RNAs, C/D box
+HGNC:51886	SNORD172	small nucleolar RNA, C/D box 172	Approved	RNA, small nucleolar			10q22.2	109623471			845	Small nucleolar RNAs, C/D box
+HGNC:51887	SNORD173	small nucleolar RNA, C/D box 173	Approved	RNA, small nucleolar			8q22.3	109623480			845	Small nucleolar RNAs, C/D box
+HGNC:51889	SNORD175	small nucleolar RNA, C/D box 175	Approved	RNA, small nucleolar			19q13.2	109623469			845	Small nucleolar RNAs, C/D box
+HGNC:32714	SNORD18A	small nucleolar RNA, C/D box 18A	Approved	RNA, small nucleolar		U18A	15q22.31	595098	ENSG00000200623		845	Small nucleolar RNAs, C/D box
+HGNC:32715	SNORD18B	small nucleolar RNA, C/D box 18B	Approved	RNA, small nucleolar		U18B	15q22.31	595099	ENSG00000202529		845	Small nucleolar RNAs, C/D box
+HGNC:32716	SNORD18C	small nucleolar RNA, C/D box 18C	Approved	RNA, small nucleolar		U18C	15q22.31	595100	ENSG00000199574		845	Small nucleolar RNAs, C/D box
+HGNC:32717	SNORD19	small nucleolar RNA, C/D box 19	Approved	RNA, small nucleolar		HBII-108	3p21.1	692089	ENSG00000212493		845	Small nucleolar RNAs, C/D box
+HGNC:33570	SNORD19B	small nucleolar RNA, C/D box 19B	Approved	RNA, small nucleolar			3p21.1	100113381	ENSG00000238862		845	Small nucleolar RNAs, C/D box
+HGNC:52224	SNORD19C	small nucleolar RNA, C/D box 19C	Approved	RNA, small nucleolar			3p21.1	109616991	ENSG00000222345		845	Small nucleolar RNAs, C/D box
+HGNC:32556	SNORD1A	small nucleolar RNA, C/D box 1A	Approved	RNA, small nucleolar		R38A, snR38A	17q25.1	677848	ENSG00000278261		845	Small nucleolar RNAs, C/D box
+HGNC:32676	SNORD1B	small nucleolar RNA, C/D box 1B	Approved	RNA, small nucleolar		R38B, snR38B	17q25.1	677849	ENSG00000199961		845	Small nucleolar RNAs, C/D box
+HGNC:32677	SNORD1C	small nucleolar RNA, C/D box 1C	Approved	RNA, small nucleolar		R38C, snR38C	17q25.1	677850	ENSG00000274091		845	Small nucleolar RNAs, C/D box
+HGNC:32678	SNORD2	small nucleolar RNA, C/D box 2	Approved	RNA, small nucleolar		R39B, snR39B	3q27.3	619567	ENSG00000238942		845	Small nucleolar RNAs, C/D box
+HGNC:10143	SNORD20	small nucleolar RNA, C/D box 20	Approved	RNA, small nucleolar	RNU20	U20	2q37.1	6082	ENSG00000207280		845	Small nucleolar RNAs, C/D box
+HGNC:10144	SNORD21	small nucleolar RNA, C/D box 21	Approved	RNA, small nucleolar	RNU21	U21	1p22.1	6083	ENSG00000206680		845	Small nucleolar RNAs, C/D box
+HGNC:10145	SNORD22	small nucleolar RNA, C/D box 22	Approved	RNA, small nucleolar	RNU22	U22	11q13	9304	ENSG00000277194		845	Small nucleolar RNAs, C/D box
+HGNC:32718	SNORD23	small nucleolar RNA, C/D box 23	Approved	RNA, small nucleolar		HBII-115	19q13.32	692091	ENSG00000221803		845	Small nucleolar RNAs, C/D box
+HGNC:10146	SNORD24	small nucleolar RNA, C/D box 24	Approved	RNA, small nucleolar	RNU24	U24	9q34.2	26820	ENSG00000206611		845	Small nucleolar RNAs, C/D box
+HGNC:10147	SNORD25	small nucleolar RNA, C/D box 25	Approved	RNA, small nucleolar	RNU25	U25	11q13	9303	ENSG00000275043		845	Small nucleolar RNAs, C/D box
+HGNC:10148	SNORD26	small nucleolar RNA, C/D box 26	Approved	RNA, small nucleolar	RNU26	U26	11q12.3	9302	ENSG00000276788		845	Small nucleolar RNAs, C/D box
+HGNC:10149	SNORD27	small nucleolar RNA, C/D box 27	Approved	RNA, small nucleolar	RNU27	U27	11q12.3	9301	ENSG00000275996		845	Small nucleolar RNAs, C/D box
+HGNC:10150	SNORD28	small nucleolar RNA, C/D box 28	Approved	RNA, small nucleolar	RNU28	U28, SNORD28A	11q12.3	9300	ENSG00000274544		845	Small nucleolar RNAs, C/D box
+HGNC:52225	SNORD28B	small nucleolar RNA, C/D box 28B	Approved	RNA, small nucleolar			6q25.3	109617011	ENSG00000212295		845	Small nucleolar RNAs, C/D box
+HGNC:10151	SNORD29	small nucleolar RNA, C/D box 29	Approved	RNA, small nucleolar	RNU29	U29	11q12.3	9297			845	Small nucleolar RNAs, C/D box
+HGNC:10157	SNORD30	small nucleolar RNA, C/D box 30	Approved	RNA, small nucleolar	RNU30	U30	11q12.3	9299	ENSG00000277846		845	Small nucleolar RNAs, C/D box
+HGNC:10158	SNORD31	small nucleolar RNA, C/D box 31	Approved	RNA, small nucleolar	RNU31	U31, SNORD31A	11q12.3	9298			845	Small nucleolar RNAs, C/D box
+HGNC:52226	SNORD31B	small nucleolar RNA, C/D box 31B	Approved	RNA, small nucleolar			13q33.3	109616978	ENSG00000201847		845	Small nucleolar RNAs, C/D box
+HGNC:10159	SNORD32A	small nucleolar RNA, C/D box 32A	Approved	RNA, small nucleolar	RNU32	U32, U32A	19q13.33	26819	ENSG00000201675		845	Small nucleolar RNAs, C/D box
+HGNC:32719	SNORD32B	small nucleolar RNA, C/D box 32B	Approved	RNA, small nucleolar		U32B	6p22.1	692092	ENSG00000201330		845	Small nucleolar RNAs, C/D box
+HGNC:10160	SNORD33	small nucleolar RNA, C/D box 33	Approved	RNA, small nucleolar	RNU33	U33	19q13.33	26818	ENSG00000199631		845	Small nucleolar RNAs, C/D box
+HGNC:10161	SNORD34	small nucleolar RNA, C/D box 34	Approved	RNA, small nucleolar	RNU34	U34	19q13.33	26817	ENSG00000202503		845	Small nucleolar RNAs, C/D box
+HGNC:10162	SNORD35A	small nucleolar RNA, C/D box 35A	Approved	RNA, small nucleolar	RNU35	U35, RNU35A	19q13.33	26816	ENSG00000200259		845	Small nucleolar RNAs, C/D box
+HGNC:17365	SNORD35B	small nucleolar RNA, C/D box 35B	Approved	RNA, small nucleolar	RNU35B	U35B	19q13.33	84546	ENSG00000200530		845	Small nucleolar RNAs, C/D box
+HGNC:10163	SNORD36A	small nucleolar RNA, C/D box 36A	Approved	RNA, small nucleolar	RNU36A	U36a	9q34.2	26815	ENSG00000199744		845	Small nucleolar RNAs, C/D box
+HGNC:10164	SNORD36B	small nucleolar RNA, C/D box 36B	Approved	RNA, small nucleolar	RNU36B	U36b	9q34.2	26814	ENSG00000200831		845	Small nucleolar RNAs, C/D box
+HGNC:10165	SNORD36C	small nucleolar RNA, C/D box 36C	Approved	RNA, small nucleolar	RNU36C	U36c	9q34.2	26813	ENSG00000252542		845	Small nucleolar RNAs, C/D box
+HGNC:10166	SNORD37	small nucleolar RNA, C/D box 37	Approved	RNA, small nucleolar	RNU37	U37	19p13.3	26812	ENSG00000206775		845	Small nucleolar RNAs, C/D box
+HGNC:30355	SNORD38A	small nucleolar RNA, C/D box 38A	Approved	RNA, small nucleolar	RNU38A	U38A	1p34.1	94162	ENSG00000202031		845	Small nucleolar RNAs, C/D box
+HGNC:30356	SNORD38B	small nucleolar RNA, C/D box 38B	Approved	RNA, small nucleolar	RNU38B	U38B	1p34.1	94163	ENSG00000207421		845	Small nucleolar RNAs, C/D box
+HGNC:52227	SNORD38C	small nucleolar RNA, C/D box 38C	Approved	RNA, small nucleolar			3p21.1	109617024	ENSG00000207109		845	Small nucleolar RNAs, C/D box
+HGNC:52228	SNORD38D	small nucleolar RNA, C/D box 38D	Approved	RNA, small nucleolar			8p11.22	109616979			845	Small nucleolar RNAs, C/D box
+HGNC:33189	SNORD3A	small nucleolar RNA, C/D box 3A	Approved	RNA, small nucleolar		U3, RNU3	17p11.2	780851	ENSG00000263934	OTTHUMG00000178445	845	Small nucleolar RNAs, C/D box
+HGNC:10168	SNORD3B-1	small nucleolar RNA, C/D box 3B-1	Approved	RNA, small nucleolar	RNU3A1	U3a, U3b1, U3b2	17p11.2	26851	ENSG00000265185	OTTHUMG00000178499	845	Small nucleolar RNAs, C/D box
+HGNC:33190	SNORD3B-2	small nucleolar RNA, C/D box 3B-2	Approved	RNA, small nucleolar		U3-2B, U3b2	17p11.2	780852	ENSG00000262074	OTTHUMG00000178152	845	Small nucleolar RNAs, C/D box
+HGNC:33191	SNORD3C	small nucleolar RNA, C/D box 3C	Approved	RNA, small nucleolar		U3-3, RNU3-3	17p11.2	780853	ENSG00000264940	OTTHUMG00000178446	845	Small nucleolar RNAs, C/D box
+HGNC:33192	SNORD3D	small nucleolar RNA, C/D box 3D	Approved	RNA, small nucleolar		U3-4, RNU3-4	17p11.2	780854	ENSG00000277947		845	Small nucleolar RNAs, C/D box
+HGNC:52238	SNORD3E	small nucleolar RNA, C/D box 3E	Approved	RNA, small nucleolar			Xq13.1	109617015	ENSG00000280704		845	Small nucleolar RNAs, C/D box
+HGNC:52239	SNORD3F	small nucleolar RNA, C/D box 3F	Approved	RNA, small nucleolar			8p21.3	109616983			845	Small nucleolar RNAs, C/D box
+HGNC:52240	SNORD3G	small nucleolar RNA, C/D box 3G	Approved	RNA, small nucleolar			1p22.2	109616984	ENSG00000199666		845	Small nucleolar RNAs, C/D box
+HGNC:52241	SNORD3H	small nucleolar RNA, C/D box 3H	Approved	RNA, small nucleolar			8q22.1	109617016	ENSG00000207215		845	Small nucleolar RNAs, C/D box
+HGNC:52242	SNORD3I	small nucleolar RNA, C/D box 3I	Approved	RNA, small nucleolar			8p23.1	109616996			845	Small nucleolar RNAs, C/D box
+HGNC:52243	SNORD3J	small nucleolar RNA, C/D box 3J	Approved	RNA, small nucleolar			10q11.21	109616985	ENSG00000221400		845	Small nucleolar RNAs, C/D box
+HGNC:52244	SNORD3K	small nucleolar RNA, C/D box 3K	Approved	RNA, small nucleolar			2q31.1	109617017			845	Small nucleolar RNAs, C/D box
+HGNC:10179	SNORD41	small nucleolar RNA, C/D box 41	Approved	RNA, small nucleolar	RNU41	U41	19p13.13	26810	ENSG00000209702		845	Small nucleolar RNAs, C/D box
+HGNC:10180	SNORD42A	small nucleolar RNA, C/D box 42A	Approved	RNA, small nucleolar	RNU42A	U42	17q11.2	26809	ENSG00000238649		845	Small nucleolar RNAs, C/D box
+HGNC:10181	SNORD42B	small nucleolar RNA, C/D box 42B	Approved	RNA, small nucleolar	RNU42B	U42B	17q11.2	26808	ENSG00000238423		845	Small nucleolar RNAs, C/D box
+HGNC:10182	SNORD43	small nucleolar RNA, C/D box 43	Approved	RNA, small nucleolar	RNU43	U43	22q13.1	26807	ENSG00000263764		845	Small nucleolar RNAs, C/D box
+HGNC:10183	SNORD44	small nucleolar RNA, C/D box 44	Approved	RNA, small nucleolar	RNU44	U44	1q25.1	26806			845	Small nucleolar RNAs, C/D box
+HGNC:10184	SNORD45A	small nucleolar RNA, C/D box 45A	Approved	RNA, small nucleolar	RNU45A	U45a	1p31.1	26805	ENSG00000207241		845	Small nucleolar RNAs, C/D box
+HGNC:10185	SNORD45B	small nucleolar RNA, C/D box 45B	Approved	RNA, small nucleolar	RNU45B	U45b	1p31.1	26804	ENSG00000201487		845	Small nucleolar RNAs, C/D box
+HGNC:32720	SNORD45C	small nucleolar RNA, C/D box 45C	Approved	RNA, small nucleolar		U45C	1p31.1	692085	ENSG00000206620		845	Small nucleolar RNAs, C/D box
+HGNC:10186	SNORD46	small nucleolar RNA, C/D box 46	Approved	RNA, small nucleolar	RNU46, RNU40	U46, U40	1p34.1	94161	ENSG00000200913		845	Small nucleolar RNAs, C/D box
+HGNC:10187	SNORD47	small nucleolar RNA, C/D box 47	Approved	RNA, small nucleolar	RNU47	U47	1q25.1	26802			845	Small nucleolar RNAs, C/D box
+HGNC:10188	SNORD48	small nucleolar RNA, C/D box 48	Approved	RNA, small nucleolar	RNU48	U48	6p21.33	26801	ENSG00000201823		845	Small nucleolar RNAs, C/D box
+HGNC:10189	SNORD49A	small nucleolar RNA, C/D box 49A	Approved	RNA, small nucleolar	RNU49	U49, U49A	17p11.2	26800	ENSG00000277370		845	Small nucleolar RNAs, C/D box
+HGNC:32721	SNORD49B	small nucleolar RNA, C/D box 49B	Approved	RNA, small nucleolar		U49B	17p11.2	692087	ENSG00000277108		845	Small nucleolar RNAs, C/D box
+HGNC:10097	SNORD4A	small nucleolar RNA, C/D box 4A	Approved	RNA, small nucleolar	RNU101A	Z17A, mgh18S-121	17q11	26773	ENSG00000238578		845	Small nucleolar RNAs, C/D box
+HGNC:10098	SNORD4B	small nucleolar RNA, C/D box 4B	Approved	RNA, small nucleolar	RNU101B	Z17B	17q11	26772	ENSG00000238597		845	Small nucleolar RNAs, C/D box
+HGNC:32702	SNORD5	small nucleolar RNA, C/D box 5	Approved	RNA, small nucleolar		mgh28S-2410	11q21	692072	ENSG00000239195		845	Small nucleolar RNAs, C/D box
+HGNC:10200	SNORD50A	small nucleolar RNA, C/D box 50A	Approved	RNA, small nucleolar	RNU50	U50	6q14.3	26799			845	Small nucleolar RNAs, C/D box
+HGNC:32722	SNORD50B	small nucleolar RNA, C/D box 50B	Approved	RNA, small nucleolar		U50B	6q14.3	692088	ENSG00000275072		845	Small nucleolar RNAs, C/D box
+HGNC:10201	SNORD51	small nucleolar RNA, C/D box 51	Approved	RNA, small nucleolar	RNU51	U51	2q33.3	26798	ENSG00000207047		845	Small nucleolar RNAs, C/D box
+HGNC:10202	SNORD52	small nucleolar RNA, C/D box 52	Approved	RNA, small nucleolar	RNU52	U52	6p21.33	26797	ENSG00000201754		845	Small nucleolar RNAs, C/D box
+HGNC:10203	SNORD53	small nucleolar RNA, C/D box 53	Approved	RNA, small nucleolar	RNU53	U53, SNORD53A	2p23.2	26796	ENSG00000265145		845	Small nucleolar RNAs, C/D box
+HGNC:52229	SNORD53B	small nucleolar RNA, C/D box 53B	Approved	RNA, small nucleolar			2p23.2	109617012	ENSG00000265706		845	Small nucleolar RNAs, C/D box
+HGNC:10204	SNORD54	small nucleolar RNA, C/D box 54	Approved	RNA, small nucleolar	RNU54	U54	8q12.1	26795	ENSG00000238650		845	Small nucleolar RNAs, C/D box
+HGNC:10205	SNORD55	small nucleolar RNA, C/D box 55	Approved	RNA, small nucleolar	RNU55, RNU39, SNORD39	U55, U39	1p34.1	26811	ENSG00000264294		845	Small nucleolar RNAs, C/D box
+HGNC:10206	SNORD56	small nucleolar RNA, C/D box 56	Approved	RNA, small nucleolar	RNU56	U56	20p13	26793	ENSG00000229686	OTTHUMG00000031704	845	Small nucleolar RNAs, C/D box
+HGNC:10207	SNORD57	small nucleolar RNA, C/D box 57	Approved	RNA, small nucleolar	RNU57	U57	20p13	26792	ENSG00000226572	OTTHUMG00000031705	845	Small nucleolar RNAs, C/D box
+HGNC:10208	SNORD58A	small nucleolar RNA, C/D box 58A	Approved	RNA, small nucleolar	RNU58A	U58a	18q21.1	26791	ENSG00000206602		845	Small nucleolar RNAs, C/D box
+HGNC:10209	SNORD58B	small nucleolar RNA, C/D box 58B	Approved	RNA, small nucleolar	RNU58B	U58b	18q21.1	26790	ENSG00000271982		845	Small nucleolar RNAs, C/D box
+HGNC:33613	SNORD58C	small nucleolar RNA, C/D box 58C	Approved	RNA, small nucleolar			18q21.1	100124516	ENSG00000202093		845	Small nucleolar RNAs, C/D box
+HGNC:10210	SNORD59A	small nucleolar RNA, C/D box 59A	Approved	RNA, small nucleolar	RNU59	U59	12p13.3	26789	ENSG00000207031		845	Small nucleolar RNAs, C/D box
+HGNC:32723	SNORD59B	small nucleolar RNA, C/D box 59B	Approved	RNA, small nucleolar		U59B	12q13.3	692090			845	Small nucleolar RNAs, C/D box
+HGNC:32703	SNORD6	small nucleolar RNA, C/D box 6	Approved	RNA, small nucleolar		mgh28S-2412	11q21	692075	ENSG00000202314		845	Small nucleolar RNAs, C/D box
+HGNC:10217	SNORD60	small nucleolar RNA, C/D box 60	Approved	RNA, small nucleolar	RNU60	U60	16p13.3	26788	ENSG00000206630		845	Small nucleolar RNAs, C/D box
+HGNC:10218	SNORD61	small nucleolar RNA, C/D box 61	Approved	RNA, small nucleolar	RNU61	U61, HBII-342	Xq26.3	26787	ENSG00000206979		845	Small nucleolar RNAs, C/D box
+HGNC:10219	SNORD62A	small nucleolar RNA, C/D box 62A	Approved	RNA, small nucleolar	RNU62	U62, U62A	9q34.13	26786	ENSG00000235284		845	Small nucleolar RNAs, C/D box
+HGNC:23031	SNORD62B	small nucleolar RNA, C/D box 62B	Approved	RNA, small nucleolar		U62, U62B	9q34.13	692093	ENSG00000231587		845	Small nucleolar RNAs, C/D box
+HGNC:10220	SNORD63	small nucleolar RNA, C/D box 63	Approved	RNA, small nucleolar	RNU63	U63, SNORD63A	5q31.2	26785	ENSG00000206989		845	Small nucleolar RNAs, C/D box
+HGNC:52230	SNORD63B	small nucleolar RNA, C/D box 63B	Approved	RNA, small nucleolar			5q31.2	109617013	ENSG00000222937		845	Small nucleolar RNAs, C/D box
+HGNC:32725	SNORD64	small nucleolar RNA, C/D box 64	Approved	RNA, small nucleolar		HBII-13	15q11.2	347686	ENSG00000276610		845	Small nucleolar RNAs, C/D box
+HGNC:32726	SNORD65	small nucleolar RNA, C/D box 65	Approved	RNA, small nucleolar		HBII-135, SNORD65A	17p11.2	692106	ENSG00000277512		845	Small nucleolar RNAs, C/D box
+HGNC:52231	SNORD65B	small nucleolar RNA, C/D box 65B	Approved	RNA, small nucleolar			8p11.21	109616980	ENSG00000238936		845	Small nucleolar RNAs, C/D box
+HGNC:52232	SNORD65C	small nucleolar RNA, C/D box 65C	Approved	RNA, small nucleolar			7p15.3	109616981	ENSG00000212264		845	Small nucleolar RNAs, C/D box
+HGNC:32727	SNORD66	small nucleolar RNA, C/D box 66	Approved	RNA, small nucleolar		HBII-142	3q27.1	692107	ENSG00000212158		845	Small nucleolar RNAs, C/D box
+HGNC:32728	SNORD67	small nucleolar RNA, C/D box 67	Approved	RNA, small nucleolar		HBII-166	11p11.2	692108	ENSG00000212135		845	Small nucleolar RNAs, C/D box
+HGNC:32729	SNORD68	small nucleolar RNA, C/D box 68	Approved	RNA, small nucleolar		HBII-202	16q24.3	606500	ENSG00000200084		845	Small nucleolar RNAs, C/D box
+HGNC:32730	SNORD69	small nucleolar RNA, C/D box 69	Approved	RNA, small nucleolar		HBII-210	3p21.1	692109	ENSG00000212452		845	Small nucleolar RNAs, C/D box
+HGNC:32704	SNORD7	small nucleolar RNA, C/D box 7	Approved	RNA, small nucleolar		Z30, mgU6-47	17q12	692076	ENSG00000207297		845	Small nucleolar RNAs, C/D box
+HGNC:32731	SNORD70	small nucleolar RNA, C/D box 70	Approved	RNA, small nucleolar		HBII-234, SNORD70A	2q33.1	692110	ENSG00000212534		845	Small nucleolar RNAs, C/D box
+HGNC:52233	SNORD70B	small nucleolar RNA, C/D box 70B	Approved	RNA, small nucleolar			2q33.1	109616995	ENSG00000212309		845	Small nucleolar RNAs, C/D box
+HGNC:32732	SNORD71	small nucleolar RNA, C/D box 71	Approved	RNA, small nucleolar	MIRN768	HBII-239, hsa-mir-768	16q22.2	692111	ENSG00000223224		845	Small nucleolar RNAs, C/D box
+HGNC:32733	SNORD72	small nucleolar RNA, C/D box 72	Approved	RNA, small nucleolar		HBII-240	5p13.1	619564	ENSG00000212296		845	Small nucleolar RNAs, C/D box
+HGNC:10235	SNORD73A	small nucleolar RNA, C/D box 73A	Approved	RNA, small nucleolar	RNU73	U73a, RNU73A	4q31.3	8944	ENSG00000208797		845	Small nucleolar RNAs, C/D box
+HGNC:30357	SNORD73B	small nucleolar RNA, C/D box U73B	Approved	RNA, small nucleolar	RNU73B	U73B	4q31.3	114655	ENSG00000201264		845	Small nucleolar RNAs, C/D box
+HGNC:32734	SNORD74	small nucleolar RNA, C/D box 74	Approved	RNA, small nucleolar		U74, Z18, SNORD74A	1q25.1	619498			845	Small nucleolar RNAs, C/D box
+HGNC:52234	SNORD74B	small nucleolar RNA, C/D box 74B	Approved	RNA, small nucleolar			21q21.1	109617014	ENSG00000201025		845	Small nucleolar RNAs, C/D box
+HGNC:32735	SNORD75	small nucleolar RNA, C/D box 75	Approved	RNA, small nucleolar		U75	1q25.1	692195			845	Small nucleolar RNAs, C/D box
+HGNC:32736	SNORD76	small nucleolar RNA, C/D box 76	Approved	RNA, small nucleolar		U76	1q25.1	692196			845	Small nucleolar RNAs, C/D box
+HGNC:32737	SNORD77	small nucleolar RNA, C/D box 77	Approved	RNA, small nucleolar		U77, SNORD77A	1q25.1	692197			845	Small nucleolar RNAs, C/D box
+HGNC:52235	SNORD77B	small nucleolar RNA, C/D box 77B	Approved	RNA, small nucleolar			8q22.2	109616982	ENSG00000212414		845	Small nucleolar RNAs, C/D box
+HGNC:32738	SNORD78	small nucleolar RNA, C/D box 78	Approved	RNA, small nucleolar		U78	1q25.1	692198			845	Small nucleolar RNAs, C/D box
+HGNC:10100	SNORD79	small nucleolar RNA, C/D box 79	Approved	RNA, small nucleolar	RNU103	Z22, U79	1q25.1	26770			845	Small nucleolar RNAs, C/D box
+HGNC:20159	SNORD8	small nucleolar RNA, C/D box 8	Approved	RNA, small nucleolar	RNU6C	mgU6-53	14q11.2	319103	ENSG00000200785		845	Small nucleolar RNAs, C/D box
+HGNC:10096	SNORD80	small nucleolar RNA, C/D box 80	Approved	RNA, small nucleolar	RNU100	Z15, U80	1q25.1	26774			845	Small nucleolar RNAs, C/D box
+HGNC:10101	SNORD81	small nucleolar RNA, C/D box 81	Approved	RNA, small nucleolar	RNU104	Z23, U81	1q25.1	26769			845	Small nucleolar RNAs, C/D box
+HGNC:10240	SNORD82	small nucleolar RNA, C/D box 82	Approved	RNA, small nucleolar	RNU82	Z25, U82	2q37.1	25826	ENSG00000202400		845	Small nucleolar RNAs, C/D box
+HGNC:17131	SNORD83A	small nucleolar RNA, C/D box 83A	Approved	RNA, small nucleolar	RNU83A	U83A	22q13.1	116937	ENSG00000209482		845	Small nucleolar RNAs, C/D box
+HGNC:17132	SNORD83B	small nucleolar RNA, C/D box 83B	Approved	RNA, small nucleolar	RNU83B	U83B	22q13.1	116938	ENSG00000209480		845	Small nucleolar RNAs, C/D box
+HGNC:32743	SNORD84	small nucleolar RNA, C/D box 84	Approved	RNA, small nucleolar		U84	6p21.33	692199	ENSG00000265236		845	Small nucleolar RNAs, C/D box
+HGNC:32745	SNORD86	small nucleolar RNA, C/D box 86	Approved	RNA, small nucleolar		U86	20p13	692201	ENSG00000212498		845	Small nucleolar RNAs, C/D box
+HGNC:32746	SNORD87	small nucleolar RNA, C/D box 87	Approved	RNA, small nucleolar		HBII-276, U87	8q13.1	641648	ENSG00000254341		845	Small nucleolar RNAs, C/D box
+HGNC:32747	SNORD88A	small nucleolar RNA, C/D box 88A	Approved	RNA, small nucleolar		HBII-180A	19q13.33	692202	ENSG00000221241		845	Small nucleolar RNAs, C/D box
+HGNC:32748	SNORD88B	small nucleolar RNA, C/D box 88B	Approved	RNA, small nucleolar		HBII-180B	19q13.33	692203	ENSG00000221381		845	Small nucleolar RNAs, C/D box
+HGNC:32749	SNORD88C	small nucleolar RNA, C/D box 88C	Approved	RNA, small nucleolar		HBII-180C	19q13.33	692204	ENSG00000220988		845	Small nucleolar RNAs, C/D box
+HGNC:32750	SNORD89	small nucleolar RNA, C/D box 89	Approved	RNA, small nucleolar		HBII-289	2q11.2	692205	ENSG00000212283		845	Small nucleolar RNAs, C/D box
+HGNC:32705	SNORD9	small nucleolar RNA, C/D box 9	Approved	RNA, small nucleolar		mgU6-53B	14q11.2	692053	ENSG00000199436		845	Small nucleolar RNAs, C/D box
+HGNC:32751	SNORD90	small nucleolar RNA, C/D box 90	Approved	RNA, small nucleolar		HBII-295	9q33.2	692206	ENSG00000212447		845	Small nucleolar RNAs, C/D box
+HGNC:32752	SNORD91A	small nucleolar RNA, C/D box 91A	Approved	RNA, small nucleolar		HBII-296a	17p13.3	692207	ENSG00000212163	OTTHUMG00000185961	845	Small nucleolar RNAs, C/D box
+HGNC:32753	SNORD91B	small nucleolar RNA, C/D box 91B	Approved	RNA, small nucleolar		HBII-296b	17p13.3	692208	ENSG00000275084	OTTHUMG00000185960	845	Small nucleolar RNAs, C/D box
+HGNC:32754	SNORD92	small nucleolar RNA, C/D box 92	Approved	RNA, small nucleolar		HBII-316	2p23.2	692209	ENSG00000264994		845	Small nucleolar RNAs, C/D box
+HGNC:32755	SNORD93	small nucleolar RNA, C/D box 93	Approved	RNA, small nucleolar		HBII-336	7p15.3	692210	ENSG00000221740		845	Small nucleolar RNAs, C/D box
+HGNC:32756	SNORD94	small nucleolar RNA, C/D box 94	Approved	RNA, small nucleolar		U94	2p11.2	692225	ENSG00000208772		845	Small nucleolar RNAs, C/D box
+HGNC:32757	SNORD95	small nucleolar RNA, C/D box 95	Approved	RNA, small nucleolar		U95	5q35.3	619570	ENSG00000264549		845	Small nucleolar RNAs, C/D box
+HGNC:32758	SNORD96A	small nucleolar RNA, C/D box 96A	Approved	RNA, small nucleolar		U96a	5q35.3	619571	ENSG00000272296		845	Small nucleolar RNAs, C/D box
+HGNC:32759	SNORD96B	small nucleolar RNA, C/D box 96B	Approved	RNA, small nucleolar		U96b	Xq23	692226	ENSG00000208883		845	Small nucleolar RNAs, C/D box
+HGNC:32760	SNORD97	small nucleolar RNA, C/D box 97	Approved	RNA, small nucleolar		U97	11p15.3	692223	ENSG00000238622		845	Small nucleolar RNAs, C/D box
+HGNC:32761	SNORD98	small nucleolar RNA, C/D box 98	Approved	RNA, small nucleolar		HBII-419	10q21.3	692211	ENSG00000283551		845	Small nucleolar RNAs, C/D box
+HGNC:32762	SNORD99	small nucleolar RNA, C/D box 99	Approved	RNA, small nucleolar		HBII-420	1p35.3	692212	ENSG00000221539		845	Small nucleolar RNAs, C/D box
+HGNC:32557	SNORA1	small nucleolar RNA, H/ACA box 1	Approved	RNA, small nucleolar		ACA1	11q21	677792	ENSG00000206834		846	Small nucleolar RNAs, H/ACA box
+HGNC:32598	SNORA10	small nucleolar RNA, H/ACA box 10	Approved	RNA, small nucleolar		ACA10, SNORA10A	16p13.3	574042	ENSG00000206811		846	Small nucleolar RNAs, H/ACA box
+HGNC:50404	SNORA100	small nucleolar RNA, H/ACA box 100	Approved	RNA, small nucleolar			1q44	106635532			846	Small nucleolar RNAs, H/ACA box
+HGNC:50405	SNORA101A	small nucleolar RNA, H/ACA box 101A	Approved	RNA, small nucleolar			4q24	107399301			846	Small nucleolar RNAs, H/ACA box
+HGNC:50406	SNORA101B	small nucleolar RNA, H/ACA box 101B	Approved	RNA, small nucleolar		ZL4	14q13.2	107399303			846	Small nucleolar RNAs, H/ACA box
+HGNC:51395	SNORA103	small nucleolar RNA, H/ACA box 103	Approved	RNA, small nucleolar			1q25.1	106635533			846	Small nucleolar RNAs, H/ACA box
+HGNC:51396	SNORA104	small nucleolar RNA, H/ACA box 104	Approved	RNA, small nucleolar			19p13.12	106635534			846	Small nucleolar RNAs, H/ACA box
+HGNC:51397	SNORA105A	small nucleolar RNA, H/ACA box 105A	Approved	RNA, small nucleolar			5p14.3	106635539			846	Small nucleolar RNAs, H/ACA box
+HGNC:51398	SNORA105B	small nucleolar RNA, H/ACA box 105B	Approved	RNA, small nucleolar			2q33.1	106635540			846	Small nucleolar RNAs, H/ACA box
+HGNC:51399	SNORA105C	small nucleolar RNA, H/ACA box 105C	Approved	RNA, small nucleolar			12q13.3	106635541			846	Small nucleolar RNAs, H/ACA box
+HGNC:51400	SNORA107	small nucleolar RNA, H/ACA box 107	Approved	RNA, small nucleolar			13q31.1	106635542			846	Small nucleolar RNAs, H/ACA box
+HGNC:51401	SNORA108	small nucleolar RNA, H/ACA box 108	Approved	RNA, small nucleolar			18q21.32	106635543	ENSG00000252284		846	Small nucleolar RNAs, H/ACA box
+HGNC:51402	SNORA109	small nucleolar RNA, H/ACA box 109	Approved	RNA, small nucleolar			Xp11.21	106635544			846	Small nucleolar RNAs, H/ACA box
+HGNC:52188	SNORA10B	small nucleolar RNA, H/ACA box 10B	Approved	RNA, small nucleolar			2p23.1	109616960	ENSG00000207187		846	Small nucleolar RNAs, H/ACA box
+HGNC:32599	SNORA11	small nucleolar RNA, H/ACA box 11	Approved	RNA, small nucleolar		U107, SNORA11A	Xp11.21	677799	ENSG00000221716		846	Small nucleolar RNAs, H/ACA box
+HGNC:51403	SNORA110	small nucleolar RNA, H/ACA box 110	Approved	RNA, small nucleolar			1p34.1	106635545			846	Small nucleolar RNAs, H/ACA box
+HGNC:51404	SNORA111	small nucleolar RNA, H/ACA box 111	Approved	RNA, small nucleolar			18q12.2	106635546			846	Small nucleolar RNAs, H/ACA box
+HGNC:51850	SNORA112	small nucleolar RNA, H/ACA box 112	Approved	RNA, small nucleolar			2q11.2	109623481			846	Small nucleolar RNAs, H/ACA box
+HGNC:51851	SNORA113	small nucleolar RNA, H/ACA box 113	Approved	RNA, small nucleolar			12q15	109623461			846	Small nucleolar RNAs, H/ACA box
+HGNC:51852	SNORA114	small nucleolar RNA, H/ACA box 114	Approved	RNA, small nucleolar			7p22.3	109623488			846	Small nucleolar RNAs, H/ACA box
+HGNC:51853	SNORA115	small nucleolar RNA, H/ACA box 115	Approved	RNA, small nucleolar			2q35	109623482			846	Small nucleolar RNAs, H/ACA box
+HGNC:51854	SNORA116	small nucleolar RNA, H/ACA box 116	Approved	RNA, small nucleolar			6q25.3	109623462			846	Small nucleolar RNAs, H/ACA box
+HGNC:51855	SNORA117	small nucleolar RNA, H/ACA box 117	Approved	RNA, small nucleolar			20q13.33	109623463			846	Small nucleolar RNAs, H/ACA box
+HGNC:51856	SNORA118	small nucleolar RNA, H/ACA box 118	Approved	RNA, small nucleolar			19p13.11	109623483			846	Small nucleolar RNAs, H/ACA box
+HGNC:51857	SNORA119	small nucleolar RNA, H/ACA box 119	Approved	RNA, small nucleolar			16q24.3	109623464			846	Small nucleolar RNAs, H/ACA box
+HGNC:33620	SNORA11B	small nucleolar RNA, H/ACA box 11B	Approved	RNA, small nucleolar			14q32.12	100124539	ENSG00000221102		846	Small nucleolar RNAs, H/ACA box
+HGNC:33621	SNORA11C	small nucleolar RNA, H/ACA box 11C	Approved	RNA, small nucleolar			Xp11.3	100124540	ENSG00000221459		846	Small nucleolar RNAs, H/ACA box
+HGNC:33622	SNORA11D	small nucleolar RNA, H/ACA box 11D	Approved	RNA, small nucleolar			Xp11.22	100124541	ENSG00000221475		846	Small nucleolar RNAs, H/ACA box
+HGNC:33623	SNORA11E	small nucleolar RNA, H/ACA box 11E	Approved	RNA, small nucleolar			Xp11.22	101340250	ENSG00000221705		846	Small nucleolar RNAs, H/ACA box
+HGNC:52189	SNORA11F	small nucleolar RNA, H/ACA box 11F	Approved	RNA, small nucleolar			10q22.1	109617000	ENSG00000221164		846	Small nucleolar RNAs, H/ACA box
+HGNC:52190	SNORA11G	small nucleolar RNA, H/ACA box 11G	Approved	RNA, small nucleolar			Xp11.21	109616961	ENSG00000221750		846	Small nucleolar RNAs, H/ACA box
+HGNC:32600	SNORA12	small nucleolar RNA, H/ACA box 12	Approved	RNA, small nucleolar		U108	10q24.31	677800	ENSG00000212464		846	Small nucleolar RNAs, H/ACA box
+HGNC:51858	SNORA120	small nucleolar RNA, H/ACA box 120	Approved	RNA, small nucleolar			12p13.31	109729112			846	Small nucleolar RNAs, H/ACA box
+HGNC:32601	SNORA13	small nucleolar RNA, H/ACA box 13	Approved	RNA, small nucleolar		ACA13	5q22.2	654322	ENSG00000238363		846	Small nucleolar RNAs, H/ACA box
+HGNC:32602	SNORA14A	small nucleolar RNA, H/ACA box 14A	Approved	RNA, small nucleolar		ACA14a	7q11.23	677801	ENSG00000201643		846	Small nucleolar RNAs, H/ACA box
+HGNC:32603	SNORA14B	small nucleolar RNA, H/ACA box 14B	Approved	RNA, small nucleolar		ACA14b	1q42.3	677802	ENSG00000207181		846	Small nucleolar RNAs, H/ACA box
+HGNC:32604	SNORA15	small nucleolar RNA, H/ACA box 15	Approved	RNA, small nucleolar		ACA15, SNORA15A	7p11.2	677803	ENSG00000207168		846	Small nucleolar RNAs, H/ACA box
+HGNC:52191	SNORA15B-1	small nucleolar RNA, H/ACA box 15B-1	Approved	RNA, small nucleolar			7q11.21	109616962	ENSG00000207062		846	Small nucleolar RNAs, H/ACA box
+HGNC:52192	SNORA15B-2	small nucleolar RNA, H/ACA box 15B-2	Approved	RNA, small nucleolar	SNORA15C		7q11.21	109617022	ENSG00000206785		846	Small nucleolar RNAs, H/ACA box
+HGNC:32605	SNORA16A	small nucleolar RNA, H/ACA box 16A	Approved	RNA, small nucleolar		ACA16	1p35.3	692073	ENSG00000274582		846	Small nucleolar RNAs, H/ACA box
+HGNC:32606	SNORA16B	small nucleolar RNA, H/ACA box 16B	Approved	RNA, small nucleolar		U98b	1q32.3	692157	ENSG00000201544		846	Small nucleolar RNAs, H/ACA box
+HGNC:32607	SNORA17A	small nucleolar RNA, H/ACA box 17A	Approved	RNA, small nucleolar	SNORA17	ACA17	9q34.3	677804	ENSG00000274998		846	Small nucleolar RNAs, H/ACA box
+HGNC:32636	SNORA17B	small nucleolar RNA, H/ACA box 17B	Approved	RNA, small nucleolar	SNORA43	ACA43	9q34.3	677824	ENSG00000276161		846	Small nucleolar RNAs, H/ACA box
+HGNC:32608	SNORA18	small nucleolar RNA, H/ACA box 18	Approved	RNA, small nucleolar		ACA18	11q21	677805	ENSG00000207145		846	Small nucleolar RNAs, H/ACA box
+HGNC:32609	SNORA19	small nucleolar RNA, H/ACA box 19	Approved	RNA, small nucleolar		ACA19	10q26.11	641451	ENSG00000207468		846	Small nucleolar RNAs, H/ACA box
+HGNC:52193	SNORA1B	small nucleolar RNA, H/ACA box 1B	Approved	RNA, small nucleolar			8q12.1	109617001	ENSG00000199405		846	Small nucleolar RNAs, H/ACA box
+HGNC:32610	SNORA20	small nucleolar RNA, H/ACA box 20	Approved	RNA, small nucleolar		ACA20	6q25.3	677806	ENSG00000207392		846	Small nucleolar RNAs, H/ACA box
+HGNC:52194	SNORA20B	small nucleolar RNA, H/ACA box 20B	Approved	RNA, small nucleolar			7p14.1	109616963	ENSG00000206947		846	Small nucleolar RNAs, H/ACA box
+HGNC:32611	SNORA21	small nucleolar RNA, H/ACA box 21	Approved	RNA, small nucleolar		ACA21	17q12	619505	ENSG00000199293		846	Small nucleolar RNAs, H/ACA box
+HGNC:52195	SNORA21B	small nucleolar RNA, H/ACA box 21B	Approved	RNA, small nucleolar			17q12	109617002	ENSG00000252699		846	Small nucleolar RNAs, H/ACA box
+HGNC:32612	SNORA22	small nucleolar RNA, H/ACA box 22	Approved	RNA, small nucleolar		ACA22, SNORA22A	7q11.21	677807	ENSG00000206634		846	Small nucleolar RNAs, H/ACA box
+HGNC:52196	SNORA22B	small nucleolar RNA, H/ACA box 22B	Approved	RNA, small nucleolar			7p11.2	109616964	ENSG00000206603		846	Small nucleolar RNAs, H/ACA box
+HGNC:52197	SNORA22C	small nucleolar RNA, H/ACA box 22C	Approved	RNA, small nucleolar			7q11.21	109616965	ENSG00000207344		846	Small nucleolar RNAs, H/ACA box
+HGNC:32613	SNORA23	small nucleolar RNA, H/ACA box 23	Approved	RNA, small nucleolar		ACA23	11p15.4	677808	ENSG00000201998		846	Small nucleolar RNAs, H/ACA box
+HGNC:32614	SNORA24	small nucleolar RNA, H/ACA box 24	Approved	RNA, small nucleolar		ACA24, SNORA24A	4q26	677809	ENSG00000275994		846	Small nucleolar RNAs, H/ACA box
+HGNC:52198	SNORA24B	small nucleolar RNA, H/ACA box 24B	Approved	RNA, small nucleolar			15q22.31	109617003	ENSG00000206903		846	Small nucleolar RNAs, H/ACA box
+HGNC:32615	SNORA25	small nucleolar RNA, H/ACA box 25	Approved	RNA, small nucleolar		ACA25, SNORA25A	11q21	684959	ENSG00000207112		846	Small nucleolar RNAs, H/ACA box
+HGNC:52199	SNORA25B	small nucleolar RNA, H/ACA box 25B	Approved	RNA, small nucleolar			7q31.2	109623459	ENSG00000202377		846	Small nucleolar RNAs, H/ACA box
+HGNC:32616	SNORA26	small nucleolar RNA, H/ACA box 26	Approved	RNA, small nucleolar		HBI-6	4q12	677810	ENSG00000212588		846	Small nucleolar RNAs, H/ACA box
+HGNC:32617	SNORA27	small nucleolar RNA, H/ACA box 27	Approved	RNA, small nucleolar		ACA27	13q12.2	619499	ENSG00000207051		846	Small nucleolar RNAs, H/ACA box
+HGNC:32618	SNORA28	small nucleolar RNA, H/ACA box 28	Approved	RNA, small nucleolar		ACA28	14q32.32	677811	ENSG00000272533		846	Small nucleolar RNAs, H/ACA box
+HGNC:32619	SNORA29	small nucleolar RNA, H/ACA box 29	Approved	RNA, small nucleolar		ACA29	6q25.3	677812	ENSG00000206910		846	Small nucleolar RNAs, H/ACA box
+HGNC:32584	SNORA2A	small nucleolar RNA, H/ACA box 2A	Approved	RNA, small nucleolar		ACA2A	12q13.11	677793	ENSG00000206612		846	Small nucleolar RNAs, H/ACA box
+HGNC:32585	SNORA2B	small nucleolar RNA, H/ACA box 2B	Approved	RNA, small nucleolar		ACA2b	12q13.11	677794	ENSG00000207313		846	Small nucleolar RNAs, H/ACA box
+HGNC:32624	SNORA2C	small nucleolar RNA, H/ACA box 2C	Approved	RNA, small nucleolar	SNORA34	ACA34	12q13.11	677815	ENSG00000221491		846	Small nucleolar RNAs, H/ACA box
+HGNC:32620	SNORA30	small nucleolar RNA, H/ACA box 30	Approved	RNA, small nucleolar		ACA30, SNORA30A	16p11.2	677813	ENSG00000206755		846	Small nucleolar RNAs, H/ACA box
+HGNC:52200	SNORA30B	small nucleolar RNA, H/ACA box 30B	Approved	RNA, small nucleolar			9p21.3	109616992	ENSG00000202189		846	Small nucleolar RNAs, H/ACA box
+HGNC:32621	SNORA31	small nucleolar RNA, H/ACA box 31	Approved	RNA, small nucleolar		ACA31, SNORA31A	13q14.13	677814	ENSG00000199477		846	Small nucleolar RNAs, H/ACA box
+HGNC:52201	SNORA31B	small nucleolar RNA, H/ACA box 31B	Approved	RNA, small nucleolar			13q14.13	109616966			846	Small nucleolar RNAs, H/ACA box
+HGNC:32622	SNORA32	small nucleolar RNA, H/ACA box 32	Approved	RNA, small nucleolar		ACA32	11q21	692063	ENSG00000206799		846	Small nucleolar RNAs, H/ACA box
+HGNC:32623	SNORA33	small nucleolar RNA, H/ACA box 33	Approved	RNA, small nucleolar		ACA33	6q23.2	594839	ENSG00000200534		846	Small nucleolar RNAs, H/ACA box
+HGNC:32625	SNORA35	small nucleolar RNA, H/ACA box 35	Approved	RNA, small nucleolar		HBI-36, SNORA35A	Xq23	677816	ENSG00000208839		846	Small nucleolar RNAs, H/ACA box
+HGNC:52202	SNORA35B	small nucleolar RNA, H/ACA box 35B	Approved	RNA, small nucleolar			Xq23	109617004	ENSG00000271907		846	Small nucleolar RNAs, H/ACA box
+HGNC:32628	SNORA36A	small nucleolar RNA, H/ACA box 36A	Approved	RNA, small nucleolar		ACA36	Xq28	677817	ENSG00000206948		846	Small nucleolar RNAs, H/ACA box
+HGNC:32629	SNORA36B	small nucleolar RNA, H/ACA box 36B	Approved	RNA, small nucleolar		ACA36b	1q41	677818	ENSG00000222370		846	Small nucleolar RNAs, H/ACA box
+HGNC:33616	SNORA36C	small nucleolar RNA, H/ACA box 36C	Approved	RNA, small nucleolar			2p14	100124535	ENSG00000207016		846	Small nucleolar RNAs, H/ACA box
+HGNC:32630	SNORA37	small nucleolar RNA, H/ACA box 37	Approved	RNA, small nucleolar		ACA37	18q21.2	677819	ENSG00000207233		846	Small nucleolar RNAs, H/ACA box
+HGNC:32631	SNORA38	small nucleolar RNA, H/ACA box 38	Approved	RNA, small nucleolar		ACA38	6p21.33	677820	ENSG00000200816		846	Small nucleolar RNAs, H/ACA box
+HGNC:33617	SNORA38B	small nucleolar RNA, H/ACA box 38B	Approved	RNA, small nucleolar			17q24.2	100124536	ENSG00000200394		846	Small nucleolar RNAs, H/ACA box
+HGNC:32586	SNORA3A	small nucleolar RNA, H/ACA box 3A	Approved	RNA, small nucleolar	SNORA3, SNORA45A	ACA3	11p15.4	619562	ENSG00000200983		846	Small nucleolar RNAs, H/ACA box
+HGNC:32638	SNORA3B	small nucleolar RNA, H/ACA box 3B	Approved	RNA, small nucleolar	SNORA45, SNORA45B	ACA3-2	11p15.4	677826	ENSG00000212607		846	Small nucleolar RNAs, H/ACA box
+HGNC:52203	SNORA3C	small nucleolar RNA, H/ACA box 3C	Approved	RNA, small nucleolar			16p13.3	109616997	ENSG00000221719		846	Small nucleolar RNAs, H/ACA box
+HGNC:32587	SNORA4	small nucleolar RNA, H/ACA box 4	Approved	RNA, small nucleolar		ACA4	3q27.3	619568	ENSG00000263776		846	Small nucleolar RNAs, H/ACA box
+HGNC:32633	SNORA40	small nucleolar RNA, H/ACA box 40	Approved	RNA, small nucleolar		ACA40, SNORA40A	11q21	677822	ENSG00000210825		846	Small nucleolar RNAs, H/ACA box
+HGNC:52204	SNORA40B	small nucleolar RNA, H/ACA box 40B	Approved	RNA, small nucleolar			2q21.3	109616967	ENSG00000208308		846	Small nucleolar RNAs, H/ACA box
+HGNC:52205	SNORA40C	small nucleolar RNA, H/ACA box 40C	Approved	RNA, small nucleolar			6q21	109616968	ENSG00000212587		846	Small nucleolar RNAs, H/ACA box
+HGNC:32634	SNORA41	small nucleolar RNA, H/ACA box 41	Approved	RNA, small nucleolar		ACA41, SNORA41A	2q33.3	619569	ENSG00000207406		846	Small nucleolar RNAs, H/ACA box
+HGNC:52206	SNORA41B	small nucleolar RNA, H/ACA box 41B	Approved	RNA, small nucleolar			15q21.1	109617005	ENSG00000207516		846	Small nucleolar RNAs, H/ACA box
+HGNC:32637	SNORA44	small nucleolar RNA, H/ACA box 44	Approved	RNA, small nucleolar		ACA44	1p35.3	677825	ENSG00000273544		846	Small nucleolar RNAs, H/ACA box
+HGNC:32639	SNORA46	small nucleolar RNA, H/ACA box 46	Approved	RNA, small nucleolar		ACA46	16q21	677827	ENSG00000207493		846	Small nucleolar RNAs, H/ACA box
+HGNC:32640	SNORA47	small nucleolar RNA, H/ACA box 47	Approved	RNA, small nucleolar		HBI-115	5q13.3	677828	ENSG00000238961		846	Small nucleolar RNAs, H/ACA box
+HGNC:32641	SNORA48	small nucleolar RNA, H/ACA box 48	Approved	RNA, small nucleolar		ACA48, SNORA48A	17p13.1	652965	ENSG00000209582		846	Small nucleolar RNAs, H/ACA box
+HGNC:52207	SNORA48B	small nucleolar RNA, H/ACA box 48B	Approved	RNA, small nucleolar			Xp22.33	109616969	ENSG00000212214		846	Small nucleolar RNAs, H/ACA box
+HGNC:32642	SNORA49	small nucleolar RNA, H/ACA box 49	Approved	RNA, small nucleolar		ACA49	12q24.33	677829	ENSG00000208892		846	Small nucleolar RNAs, H/ACA box
+HGNC:32643	SNORA50A	small nucleolar RNA, H/ACA box 50A	Approved	RNA, small nucleolar	SNORA50, SNORA76A	ACA50	16q21	677830	ENSG00000206952		846	Small nucleolar RNAs, H/ACA box
+HGNC:50432	SNORA50B	small nucleolar RNA, H/ACA box 50B	Approved	RNA, small nucleolar			22q12.3	109616998	ENSG00000253007		846	Small nucleolar RNAs, H/ACA box
+HGNC:32662	SNORA50C	small nucleolar RNA, H/ACA box 50C	Approved	RNA, small nucleolar	SNORA76, SNORA76C	ACA62	17q23.3	677842	ENSG00000277887		846	Small nucleolar RNAs, H/ACA box
+HGNC:50433	SNORA50D	small nucleolar RNA, H/ACA box 50D	Approved	RNA, small nucleolar			5q13.2	109616958	ENSG00000280894		846	Small nucleolar RNAs, H/ACA box
+HGNC:32644	SNORA51	small nucleolar RNA, H/ACA box 51	Approved	RNA, small nucleolar		ACA51	20p13	677831	ENSG00000271798		846	Small nucleolar RNAs, H/ACA box
+HGNC:32645	SNORA52	small nucleolar RNA, H/ACA box 52	Approved	RNA, small nucleolar		ACA52	11p15.5	619565	ENSG00000199785		846	Small nucleolar RNAs, H/ACA box
+HGNC:32646	SNORA53	small nucleolar RNA, H/ACA box 53	Approved	RNA, small nucleolar		ACA53	12q23.1	677832	ENSG00000212443		846	Small nucleolar RNAs, H/ACA box
+HGNC:32647	SNORA54	small nucleolar RNA, H/ACA box 54	Approved	RNA, small nucleolar		ACA54	11p15.4	677833	ENSG00000207008		846	Small nucleolar RNAs, H/ACA box
+HGNC:32649	SNORA55	small nucleolar RNA, H/ACA box 55	Approved	RNA, small nucleolar		ACA55	1p34.3	677834	ENSG00000201457		846	Small nucleolar RNAs, H/ACA box
+HGNC:32650	SNORA56	small nucleolar RNA, H/ACA box 56	Approved	RNA, small nucleolar		ACA56	Xq28	677835	ENSG00000206693		846	Small nucleolar RNAs, H/ACA box
+HGNC:32651	SNORA57	small nucleolar RNA, H/ACA box 57	Approved	RNA, small nucleolar		U99	11q12.2	692158	ENSG00000206597		846	Small nucleolar RNAs, H/ACA box
+HGNC:32652	SNORA58	small nucleolar RNA, H/ACA box 58	Approved	RNA, small nucleolar		ACA58, SNORA58B	3q22.1	677836	ENSG00000249020		846	Small nucleolar RNAs, H/ACA box
+HGNC:52208	SNORA58B	small nucleolar RNA, H/ACA box 58B	Approved	RNA, small nucleolar			1q21.3	109617023	ENSG00000201129		846	Small nucleolar RNAs, H/ACA box
+HGNC:32653	SNORA59A	small nucleolar RNA, H/ACA box 59A	Approved	RNA, small nucleolar		ACA59	1p36.21	677885	ENSG00000239149		846	Small nucleolar RNAs, H/ACA box
+HGNC:32658	SNORA59B	small nucleolar RNA, H/ACA box 59B	Approved	RNA, small nucleolar		ACA59	17p11.2	677882	ENSG00000266079	OTTHUMG00000178478	846	Small nucleolar RNAs, H/ACA box
+HGNC:32588	SNORA5A	small nucleolar RNA, H/ACA box 5A	Approved	RNA, small nucleolar		ACA5	7p13	654319	ENSG00000206838		846	Small nucleolar RNAs, H/ACA box
+HGNC:32589	SNORA5B	small nucleolar RNA, H/ACA box 5B	Approved	RNA, small nucleolar		ACA5b	7p13	677795	ENSG00000200656		846	Small nucleolar RNAs, H/ACA box
+HGNC:32590	SNORA5C	small nucleolar RNA, H/ACA box 5C	Approved	RNA, small nucleolar		ACA5c	7p13	677796	ENSG00000201772		846	Small nucleolar RNAs, H/ACA box
+HGNC:32591	SNORA6	small nucleolar RNA, H/ACA box 6	Approved	RNA, small nucleolar		ACA6	3p22.2	574040	ENSG00000206760		846	Small nucleolar RNAs, H/ACA box
+HGNC:32654	SNORA60	small nucleolar RNA, H/ACA box 60	Approved	RNA, small nucleolar		ACA60	20q11.23	677837	ENSG00000199266		846	Small nucleolar RNAs, H/ACA box
+HGNC:32655	SNORA61	small nucleolar RNA, H/ACA box 61	Approved	RNA, small nucleolar		ACA61	1p35.3	677838	ENSG00000278274		846	Small nucleolar RNAs, H/ACA box
+HGNC:10107	SNORA62	small nucleolar RNA, H/ACA box 62	Approved	RNA, small nucleolar	RNE2, RNU108	E2, E2-1	3p22.1	6044	ENSG00000202363		846	Small nucleolar RNAs, H/ACA box
+HGNC:10106	SNORA63	small nucleolar RNA, H/ACA box 63	Approved	RNA, small nucleolar	RNE3, RNU107	E3, E3-2, SNORA63A	3q27.3	6043	ENSG00000200320		846	Small nucleolar RNAs, H/ACA box
+HGNC:52209	SNORA63B	small nucleolar RNA, H/ACA box 63B	Approved	RNA, small nucleolar			3q27.3	109617006	ENSG00000200418		846	Small nucleolar RNAs, H/ACA box
+HGNC:52210	SNORA63C	small nucleolar RNA, H/ACA box 63C	Approved	RNA, small nucleolar			1p34.3	109616970	ENSG00000201448		846	Small nucleolar RNAs, H/ACA box
+HGNC:52211	SNORA63D	small nucleolar RNA, H/ACA box 63D	Approved	RNA, small nucleolar			3q27.1	109616971	ENSG00000201229		846	Small nucleolar RNAs, H/ACA box
+HGNC:52212	SNORA63E	small nucleolar RNA, H/ACA box 63E	Approved	RNA, small nucleolar			3q27.1	109617007	ENSG00000199363		846	Small nucleolar RNAs, H/ACA box
+HGNC:10221	SNORA64	small nucleolar RNA, H/ACA box 64	Approved	RNA, small nucleolar	RNU64	U64	16p13.3	26784	ENSG00000207405		846	Small nucleolar RNAs, H/ACA box
+HGNC:10222	SNORA65	small nucleolar RNA, H/ACA box 65	Approved	RNA, small nucleolar	RNU65	U65	9q33.3	26783	ENSG00000201302		846	Small nucleolar RNAs, H/ACA box
+HGNC:10223	SNORA66	small nucleolar RNA, H/ACA box 66	Approved	RNA, small nucleolar	RNU66	U66	1p22.1	26782	ENSG00000207523		846	Small nucleolar RNAs, H/ACA box
+HGNC:10224	SNORA67	small nucleolar RNA, H/ACA box 67	Approved	RNA, small nucleolar	RNU67	U67	17p13.1	26781	ENSG00000277985		846	Small nucleolar RNAs, H/ACA box
+HGNC:10225	SNORA68	small nucleolar RNA, H/ACA box 68	Approved	RNA, small nucleolar	RNU68	U68, SNORA68A	19p13.11	26780	ENSG00000207166		846	Small nucleolar RNAs, H/ACA box
+HGNC:52213	SNORA68B	small nucleolar RNA, H/ACA box 68B	Approved	RNA, small nucleolar			19q13.11	109616972	ENSG00000201388		846	Small nucleolar RNAs, H/ACA box
+HGNC:10226	SNORA69	small nucleolar RNA, H/ACA box 69	Approved	RNA, small nucleolar	RNU69	U69	Xq24	26779	ENSG00000206622		846	Small nucleolar RNAs, H/ACA box
+HGNC:10231	SNORA70	small nucleolar RNA, H/ACA box 70	Approved	RNA, small nucleolar	RNU70	U70, DXS648E	Xq28	26778	ENSG00000207165		846	Small nucleolar RNAs, H/ACA box
+HGNC:33618	SNORA70B	small nucleolar RNA, H/ACA box 70B	Approved	RNA, small nucleolar			2p15	100124537	ENSG00000206937		846	Small nucleolar RNAs, H/ACA box
+HGNC:33619	SNORA70C	small nucleolar RNA, H/ACA box 70C	Approved	RNA, small nucleolar			9q33.1	100124538	ENSG00000207268		846	Small nucleolar RNAs, H/ACA box
+HGNC:34356	SNORA70D	small nucleolar RNA, H/ACA box 70D	Approved	RNA, small nucleolar		U70D	16q22.3	100379141	ENSG00000263666		846	Small nucleolar RNAs, H/ACA box
+HGNC:34357	SNORA70E	small nucleolar RNA, H/ACA box 70E	Approved	RNA, small nucleolar		U70E	11q	100379250	ENSG00000207221		846	Small nucleolar RNAs, H/ACA box
+HGNC:34358	SNORA70F	small nucleolar RNA, H/ACA box 70F	Approved	RNA, small nucleolar		U70F	2q24.3	100337591	ENSG00000206869		846	Small nucleolar RNAs, H/ACA box
+HGNC:34359	SNORA70G	small nucleolar RNA, H/ACA box 70G	Approved	RNA, small nucleolar		U70G	12q14	100379132	ENSG00000206650		846	Small nucleolar RNAs, H/ACA box
+HGNC:52214	SNORA70H	small nucleolar RNA, H/ACA box 70H	Approved	RNA, small nucleolar			1q32.1	109616993	ENSG00000206637		846	Small nucleolar RNAs, H/ACA box
+HGNC:52215	SNORA70I	small nucleolar RNA, H/ACA box 70I	Approved	RNA, small nucleolar			2q35	109617008	ENSG00000207274		846	Small nucleolar RNAs, H/ACA box
+HGNC:52216	SNORA70J	small nucleolar RNA, H/ACA box 70J	Approved	RNA, small nucleolar			5q35.1	109616973	ENSG00000206909		846	Small nucleolar RNAs, H/ACA box
+HGNC:10232	SNORA71A	small nucleolar RNA, H/ACA box 71A	Approved	RNA, small nucleolar	RNU71A	U71a	20q11.23	26777	ENSG00000225091		846	Small nucleolar RNAs, H/ACA box
+HGNC:10233	SNORA71B	small nucleolar RNA, H/ACA box 71B	Approved	RNA, small nucleolar	RNU71B	U71b	20q11.23	26776	ENSG00000235408	OTTHUMG00000032446	846	Small nucleolar RNAs, H/ACA box
+HGNC:32656	SNORA71C	small nucleolar RNA, H/ACA box 71C	Approved	RNA, small nucleolar		U71c	20q11.23	677839	ENSG00000201512		846	Small nucleolar RNAs, H/ACA box
+HGNC:32657	SNORA71D	small nucleolar RNA, H/ACA box 71D	Approved	RNA, small nucleolar		U71d	20q11.23	677840	ENSG00000200354		846	Small nucleolar RNAs, H/ACA box
+HGNC:32632	SNORA71E	small nucleolar RNA, H/ACA box 71E	Approved	RNA, small nucleolar	SNORA39	ACA39	20q11.23	677821	ENSG00000274309		846	Small nucleolar RNAs, H/ACA box
+HGNC:10234	SNORA72	small nucleolar RNA, H/ACA box 72	Approved	RNA, small nucleolar	RNU72	U72	8q22.2	26775	ENSG00000207067		846	Small nucleolar RNAs, H/ACA box
+HGNC:10115	SNORA73A	small nucleolar RNA, H/ACA box 73A	Approved	RNA, small nucleolar	RNE1, RNU17A	U17A, E1-7, E1b, E1	1p36.1	6080	ENSG00000274266		846	Small nucleolar RNAs, H/ACA box
+HGNC:10116	SNORA73B	small nucleolar RNA, H/ACA box 73B	Approved	RNA, small nucleolar	RNU17B, RNU105A	U17B, E1c	1p35.3	26768	ENSG00000200087		846	Small nucleolar RNAs, H/ACA box
+HGNC:10119	SNORA74A	small nucleolar RNA, H/ACA box 74A	Approved	RNA, small nucleolar	RNU19	U19	5q31.2	26821	ENSG00000200959		846	Small nucleolar RNAs, H/ACA box
+HGNC:32660	SNORA74B	small nucleolar RNA, H/ACA box 74B	Approved	RNA, small nucleolar		U19-2	5q35.1	677841	ENSG00000212402		846	Small nucleolar RNAs, H/ACA box
+HGNC:52217	SNORA74C-1	small nucleolar RNA, H/ACA box 74C-1	Approved	RNA, small nucleolar			10q11.23	109616974	ENSG00000265733		846	Small nucleolar RNAs, H/ACA box
+HGNC:52218	SNORA74C-2	small nucleolar RNA, H/ACA box 74C-2	Approved	RNA, small nucleolar			10q11.23	109617009	ENSG00000223111		846	Small nucleolar RNAs, H/ACA box
+HGNC:52219	SNORA74D	small nucleolar RNA, H/ACA box 74D	Approved	RNA, small nucleolar			5q31.2	109616975	ENSG00000252213		846	Small nucleolar RNAs, H/ACA box
+HGNC:32661	SNORA75	small nucleolar RNA, H/ACA box 75	Approved	RNA, small nucleolar		U23, SNORA75A	2q37.1	654321	ENSG00000206885		846	Small nucleolar RNAs, H/ACA box
+HGNC:52220	SNORA75B	small nucleolar RNA, H/ACA box 75B	Approved	RNA, small nucleolar			4p15.32	109616994	ENSG00000206780		846	Small nucleolar RNAs, H/ACA box
+HGNC:32663	SNORA77	small nucleolar RNA, H/ACA box 77	Approved	RNA, small nucleolar		ACA63, SNORA77A	1q32.1	677843	ENSG00000221643		846	Small nucleolar RNAs, H/ACA box
+HGNC:52221	SNORA77B	small nucleolar RNA, H/ACA box 77B	Approved	RNA, small nucleolar			22q11.21	109617010	ENSG00000264346		846	Small nucleolar RNAs, H/ACA box
+HGNC:32664	SNORA78	small nucleolar RNA, H/ACA box 78	Approved	RNA, small nucleolar		ACA64	16p13.3	677844	ENSG00000273587		846	Small nucleolar RNAs, H/ACA box
+HGNC:32665	SNORA79	small nucleolar RNA, H/ACA box 79	Approved	RNA, small nucleolar		ACA65, SNORA79A	14q31.1	677845	ENSG00000221303		846	Small nucleolar RNAs, H/ACA box
+HGNC:52222	SNORA79B	small nucleolar RNA, H/ACA box 79B	Approved	RNA, small nucleolar			14q11.2	109616976	ENSG00000222489		846	Small nucleolar RNAs, H/ACA box
+HGNC:32592	SNORA7A	small nucleolar RNA, H/ACA box 7A	Approved	RNA, small nucleolar		ACA7	3p25.2	619563	ENSG00000207496		846	Small nucleolar RNAs, H/ACA box
+HGNC:32593	SNORA7B	small nucleolar RNA, H/ACA box 7B	Approved	RNA, small nucleolar		ACA7B	3q21.3	677797	ENSG00000207088		846	Small nucleolar RNAs, H/ACA box
+HGNC:32596	SNORA8	small nucleolar RNA, H/ACA box 8	Approved	RNA, small nucleolar		ACA8	11q21	654320	ENSG00000207304		846	Small nucleolar RNAs, H/ACA box
+HGNC:32666	SNORA80A	small nucleolar RNA, H/ACA box 80A	Approved	RNA, small nucleolar	SNORA80	ACA67	21q22.11	677846	ENSG00000200792		846	Small nucleolar RNAs, H/ACA box
+HGNC:34355	SNORA80B	small nucleolar RNA, H/ACA box 80B	Approved	RNA, small nucleolar		ACA67B	2p25.1	100302743	ENSG00000206633		846	Small nucleolar RNAs, H/ACA box
+HGNC:50434	SNORA80C	small nucleolar RNA, H/ACA box 80C	Approved	RNA, small nucleolar			16p11.2	109616959	ENSG00000199787		846	Small nucleolar RNAs, H/ACA box
+HGNC:50435	SNORA80D	small nucleolar RNA, H/ACA box 80D	Approved	RNA, small nucleolar			7p22.1	109616999	ENSG00000207217		846	Small nucleolar RNAs, H/ACA box
+HGNC:32635	SNORA80E	small nucleolar RNA, H/ACA box 80E	Approved	RNA, small nucleolar	SNORA42	ACA42	1q22	677823	ENSG00000207475		846	Small nucleolar RNAs, H/ACA box
+HGNC:32667	SNORA81	small nucleolar RNA, H/ACA box 81	Approved	RNA, small nucleolar		HBI-61	3q27.3	677847	ENSG00000221420		846	Small nucleolar RNAs, H/ACA box
+HGNC:33615	SNORA84	small nucleolar RNA, H/ACA box 84	Approved	RNA, small nucleolar			9q22.31	100124534	ENSG00000239183		846	Small nucleolar RNAs, H/ACA box
+HGNC:50390	SNORA86	small nucleolar RNA, H/ACA box 86	Approved	RNA, small nucleolar			10p11.22	106633814			846	Small nucleolar RNAs, H/ACA box
+HGNC:50391	SNORA87	small nucleolar RNA, H/ACA box 87	Approved	RNA, small nucleolar			10q25.2	106635520			846	Small nucleolar RNAs, H/ACA box
+HGNC:50392	SNORA88	small nucleolar RNA, H/ACA box 88	Approved	RNA, small nucleolar			11p13	106635521			846	Small nucleolar RNAs, H/ACA box
+HGNC:50393	SNORA89	small nucleolar RNA, H/ACA box 89	Approved	RNA, small nucleolar			14q13.1	106635522			846	Small nucleolar RNAs, H/ACA box
+HGNC:32597	SNORA9	small nucleolar RNA, H/ACA box 9	Approved	RNA, small nucleolar		ACA9, SNORA9A	7p13	677798	ENSG00000277184		846	Small nucleolar RNAs, H/ACA box
+HGNC:50394	SNORA90	small nucleolar RNA, H/ACA box 90	Approved	RNA, small nucleolar			17q12	106635523			846	Small nucleolar RNAs, H/ACA box
+HGNC:50395	SNORA91	small nucleolar RNA, H/ACA box 91	Approved	RNA, small nucleolar			21q22.3	106635524			846	Small nucleolar RNAs, H/ACA box
+HGNC:50396	SNORA92	small nucleolar RNA, H/ACA box 92	Approved	RNA, small nucleolar			22q13.1	106635525			846	Small nucleolar RNAs, H/ACA box
+HGNC:50397	SNORA93	small nucleolar RNA, H/ACA box 93	Approved	RNA, small nucleolar			3p25.1	106635526			846	Small nucleolar RNAs, H/ACA box
+HGNC:50398	SNORA94	small nucleolar RNA, H/ACA box 94	Approved	RNA, small nucleolar			3p21.31	106635528			846	Small nucleolar RNAs, H/ACA box
+HGNC:50399	SNORA95	small nucleolar RNA, H/ACA box 95	Approved	RNA, small nucleolar			3p12.1	106635529			846	Small nucleolar RNAs, H/ACA box
+HGNC:50402	SNORA98	small nucleolar RNA, H/ACA box 98	Approved	RNA, small nucleolar			6q24.2	106635530			846	Small nucleolar RNAs, H/ACA box
+HGNC:50403	SNORA99	small nucleolar RNA, H/ACA box 99	Approved	RNA, small nucleolar			8p23.1	106635531			846	Small nucleolar RNAs, H/ACA box
+HGNC:52223	SNORA9B	small nucleolar RNA, H/ACA box 9B	Approved	RNA, small nucleolar			12q24.31	109616977	ENSG00000206897		846	Small nucleolar RNAs, H/ACA box
