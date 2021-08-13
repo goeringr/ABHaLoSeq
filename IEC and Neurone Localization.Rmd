@@ -16,7 +16,7 @@ h2m <- h2m %>% filter(ensembl_gene_id != "ENSG00000147604") %>% rbind(., c("ENSG
 
 AB_LR <- readRDS("All_AB_LRs.rds") %>% left_join(h2m)
 
-LCM_AB <- readRDS(file = "LCM_apical_basal_dds_results.txt") %>% as_tibble(rownames = "ensembl_gene_id") %>% select(ensembl_gene_id, log2FoldChange, padj) %>% na.omit()
+LCM_AB <- readRDS(file = "LCM_apical_basal_dds_results_filtered.txt") %>% as_tibble(rownames = "ensembl_gene_id") %>% select(ensembl_gene_id, log2FoldChange, padj) %>% na.omit()
 
 N_TPM <- read.table("FractionationTPMs.txt", header = TRUE) %>% as_tibble()
 N_LR <- read.table("FractionationLR_z.txt", header = TRUE) %>% as_tibble()
@@ -29,10 +29,10 @@ N_LR_ave <- N_LR %>% gather(-ensembl_gene_id, -Gene, -ribo, -mito, key = fractio
 
 ```{r, }
 #all genes
-full_join(AB_LR, LCM_AB, by = c("mouse_gene" = "ensembl_gene_id")) %>% select(-contains("pval"), -padj) %>% rename("LCM_FC" = "log2FoldChange") %>% gather(-ensembl_gene_id, -mouse_gene, -Gene_name,-ave_tpm, key = experiment, value = AB_LR) %>% full_join(.,N_LR_ave, by = c("mouse_gene" = "ensembl_gene_id")) %>% na.omit() %>% ggplot(aes(x = AB_LR, y = med_LR)) + geom_point() + geom_smooth(aes(x = AB_LR, y = med_LR), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman", label.y = -2.75) + labs(x = "Apicobasal LR", y = "Neuronal LR") + facet_grid(.~experiment)
+full_join(AB_LR, LCM_AB, by = c("mouse_gene" = "ensembl_gene_id")) %>% select(-contains("pval"), -padj) %>% dplyr::rename("LCM_FC" = "log2FoldChange") %>% gather(-ensembl_gene_id, -mouse_gene, -Gene_name,-ave_tpm, key = experiment, value = AB_LR) %>% full_join(.,N_LR_ave, by = c("mouse_gene" = "ensembl_gene_id")) %>% na.omit() %>% ggplot(aes(x = AB_LR, y = med_LR)) + geom_point() + geom_smooth(aes(x = AB_LR, y = med_LR), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman", label.y = -2.75) + labs(x = "Apicobasal LR", y = "Neuronal LR") + facet_grid(.~experiment)
 
 #ribo genes
-full_join(AB_LR, LCM_AB, by = c("mouse_gene" = "ensembl_gene_id")) %>% select(-contains("pval"), -padj) %>% rename("LCM_FC" = "log2FoldChange") %>% gather(-ensembl_gene_id, -mouse_gene, -Gene_name,-ave_tpm, key = experiment, value = AB_LR) %>% full_join(.,N_LR_ave, by = c("mouse_gene" = "ensembl_gene_id")) %>% na.omit() %>% filter(ribo == "yes") %>%  ggplot(aes(x = AB_LR, y = med_LR)) + geom_point() + geom_smooth(aes(x = AB_LR, y = med_LR), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman", label.y = -0.75) + labs(x = "Apicobasal LR", y = "Neuronal LR") + facet_grid(.~experiment)
+full_join(AB_LR, LCM_AB, by = c("mouse_gene" = "ensembl_gene_id")) %>% select(-contains("pval"), -padj) %>% dplyr::rename("LCM_FC" = "log2FoldChange") %>% gather(-ensembl_gene_id, -mouse_gene, -Gene_name,-ave_tpm, key = experiment, value = AB_LR) %>% full_join(.,N_LR_ave, by = c("mouse_gene" = "ensembl_gene_id")) %>% na.omit() %>% filter(ribo == "yes") %>%  ggplot(aes(x = AB_LR, y = med_LR)) + geom_point() + geom_smooth(aes(x = AB_LR, y = med_LR), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman", label.y = -0.75) + labs(x = "Apicobasal LR", y = "Neuronal LR") + facet_grid(.~experiment)
 
 ```
 
@@ -40,7 +40,7 @@ full_join(AB_LR, LCM_AB, by = c("mouse_gene" = "ensembl_gene_id")) %>% select(-c
 AB_LR %>% gather(-ensembl_gene_id, -mouse_gene, -Gene_name,-ave_tpm, key = experiment, value = AB_LR) %>% full_join(.,N_LR_ave, by = c("mouse_gene" = "ensembl_gene_id")) %>% na.omit() %>% filter(experiment == "AB_FC") %>% ggplot(aes(x = AB_LR, y = med_LR, col = ribo, alpha = ribo)) + geom_point() + geom_smooth(aes(x = AB_LR, y = med_LR, group = ribo, col = ribo), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman", label.y = c(-2.75, -3.25), alpha = 1) + labs(x = "Apicobasal LR", y = "Neuronal LR") + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) 
 
 
-ribo_Genes <- readRDS("C:/Users/rgoer/Documents/ABHaLo12.19/quants/hs_RPgenes.txt")
+ribo_Genes <- readRDS("hs_RPgenes.txt")
 
 AB_LR %>% gather(-ensembl_gene_id, -mouse_gene, -Gene_name,-ave_tpm, key = experiment, value = AB_LR) %>% full_join(.,N_LR_ave, by = c("mouse_gene" = "ensembl_gene_id")) %>% na.omit() %>% filter(experiment == "AB_FC") %>% mutate(ribo = ifelse(ensembl_gene_id %in% ribo_Genes, "yes", "no")) %>% ggplot(aes(x = AB_LR, y = med_LR, col = ribo, alpha = ribo)) + geom_point() + geom_smooth(aes(x = AB_LR, y = med_LR, group = ribo, col = ribo), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman", label.y = c(-2.75, -3.25), alpha = 1) + labs(x = "Apicobasal LR", y = "Neuronal LR") + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1))
 
@@ -61,15 +61,16 @@ z %>% ggplot(aes(x = AB_LR_Z, y = med_LR, col = ribo, alpha = ribo)) + geom_poin
 ```
 
 ```{r, }
-AB_LR_tidy <- full_join(AB_LR, LCM_AB, by = c("mouse_gene" = "ensembl_gene_id")) %>% select(-contains("pval"), -padj) %>% rename("LCM_FC" = "log2FoldChange") %>% gather(-ensembl_gene_id, -mouse_gene, -Gene_name,-ave_tpm, key = experiment, value = LR) %>% select(mouse_gene, Gene_name, experiment,LR) %>% rename("Gene" = Gene_name, "ensembl_gene_id" = mouse_gene)
-N_LR_tidy <- N_LR %>% gather(-ensembl_gene_id, -Gene, -ribo, -mito, key = experiment, value = LR) %>% select(-mito,-ribo) 
+AB_LR_tidy <- full_join(AB_LR, LCM_AB, by = c("mouse_gene" = "ensembl_gene_id")) %>% dplyr::select(-contains("pval"), -padj) %>% dplyr::rename("LCM_FC" = "log2FoldChange") %>% gather(-ensembl_gene_id, -mouse_gene, -Gene_name,-ave_tpm, key = experiment, value = LR) %>% dplyr::select(mouse_gene, Gene_name, experiment,LR) %>% dplyr::rename("Gene" = Gene_name, "ensembl_gene_id" = mouse_gene)
+N_LR_tidy <- N_LR %>% gather(-ensembl_gene_id, -Gene, -ribo, -mito, key = experiment, value = LR) %>% dplyr::select(-mito,-ribo) 
 
-AB_LR_tidy %>% filter(experiment %in% c("LCM_AB", "AB_FC", "GvN_LR")) %>% full_join(.,N_LR_tidy, by = "ensembl_gene_id") %>% na.omit() %>% rename("AB_LR" = LR.x, "N_LR" = LR.y) %>% select(ensembl_gene_id, Gene.x, experiment.x, AB_LR, experiment.y, N_LR) %>% group_by(ensembl_gene_id) %>% summarize(cor = cor.test(AB_LR, N_LR, method = "spearman"))
+#AB_LR_tidy %>% filter(experiment %in% c("LCM_AB", "AB_FC", "GvN_LR")) %>% full_join(.,N_LR_tidy, by = "ensembl_gene_id") %>% na.omit() %>% rename(LR.x = "AB_LR", LR.y = "N_LR") %>% dplyr::select(ensembl_gene_id, Gene.x, experiment.x, AB_LR, experiment.y, N_LR) %>% group_by(ensembl_gene_id) %>% summarize(cor = cor.test(AB_LR, N_LR, method = "spearman"))
 
 ```
 
 ```{r, }
 library(enrichR)
+library(biomaRt)
 `%notin%` <- Negate(`%in%`)
 
 loc_genes <- p %>% filter(AB_LR < 0, med_LR > 0) %>% pull(ensembl_gene_id)
@@ -98,7 +99,7 @@ loc_GO <- bind_rows(loc_genes[["GO_Biological_Process_2018"]] %>% as_tibble() %>
 loc_genes[["GO_Cellular_Component_2018"]] %>% as_tibble() %>% filter(Adjusted.P.value < 0.05) %>% arrange(Adjusted.P.value, P.value) %>% head(20) %>% dplyr::select(Term, Overlap, P.value, Adjusted.P.value) %>% .[c(1,7,15,18),],
 loc_genes[["GO_Molecular_Function_2018"]] %>% as_tibble() %>% filter(Adjusted.P.value < 0.05) %>% arrange(Adjusted.P.value, P.value) %>% head(20) %>% dplyr::select(Term, Overlap, P.value, Adjusted.P.value) %>% .[c(1),])
 
-loc_GO %>% ggplot(aes(x = -log(Adjusted.P.value), y = Term), fill = -log(Adjusted.P.value)) + geom_bar(orientation = "y", stat = "identity", aes(fill = -log(Adjusted.P.value))) + theme_cowplot() + viridis::scale_fill_viridis(begin = 0.35)
+loc_GO %>% ggplot(aes(x = -log10(Adjusted.P.value), y = Term), fill = -log10(Adjusted.P.value)) + geom_bar(orientation = "y", stat = "identity", aes(fill = -log10(Adjusted.P.value))) + theme_cowplot() + viridis::scale_fill_viridis(begin = 0.45)
 
 basal_gene_name <- getBM(attributes=c('ensembl_gene_id',
                    'external_gene_name'),
@@ -116,7 +117,7 @@ basal_GO <- bind_rows(basal_genes[["GO_Biological_Process_2018"]] %>% as_tibble(
 basal_genes[["GO_Cellular_Component_2018"]] %>% as_tibble() %>% filter(Adjusted.P.value < 0.05) %>% arrange(Adjusted.P.value, P.value) %>% head(20) %>% dplyr::select(Term, Overlap, P.value, Adjusted.P.value) %>% .[c(1,8,17),],
 basal_genes[["GO_Molecular_Function_2018"]] %>% as_tibble() %>% filter(Adjusted.P.value < 0.05) %>% arrange(Adjusted.P.value, P.value) %>% head(20) %>% dplyr::select(Term, Overlap, P.value, Adjusted.P.value) %>% .[c(1,6,14),])
 
-basal_GO %>% ggplot(aes(x = -log(Adjusted.P.value), y = Term), fill = -log(Adjusted.P.value)) + geom_bar(orientation = "y", stat = "identity", aes(fill = -log(Adjusted.P.value))) + theme_cowplot() + viridis::scale_fill_viridis(begin = 0.35)
+basal_GO %>% ggplot(aes(x = -log10(Adjusted.P.value), y = Term), fill = -log10(Adjusted.P.value)) + geom_bar(orientation = "y", stat = "identity", aes(fill = -log10(Adjusted.P.value))) + theme_cowplot() + viridis::scale_fill_viridis(begin = 0.35)
 
 apical_gene_name <- getBM(attributes=c('ensembl_gene_id',
                    'external_gene_name'),
@@ -132,10 +133,38 @@ apical_genes[["GO_Molecular_Function_2018"]] %>% as_tibble() %>% filter(Adjusted
 ```
 
 ```{r, surfacevcore RP}
-Interface_Index <- read.csv("C:/Users/rgoer/Documents/Google Backup/RandomDellFiles/RPInterfaceIndex.csv", skip = 1, header = TRUE, nrow = 68)[,c(1:3)] %>% as_tibble()
+Interface_Index <- read.csv("RPInterfaceIndex.csv", skip = 1, header = TRUE, nrow = 68, fileEncoding="latin1")[,c(1:3)] %>% as_tibble()
 
-AB_LR %>% gather(-ensembl_gene_id, -mouse_gene, -Gene_name,-ave_tpm, key = experiment, value = AB_LR) %>% filter(experiment == "AB_FC") %>% left_join(., Interface_Index, by = c("Gene_name" = "gene_name")) %>% ggplot(aes(x = AB_LR, y = interface_index, col = interface_index)) + geom_point() + theme_cowplot() + geom_smooth(aes(x = AB_LR, y = interface_index), method = lm, se = FALSE, inherit.aes = FALSE)  + stat_cor(method = "spearman", label.y = c(1,0.75), alpha = 1) + labs(x = "Apicobasal LR", y = "Interface Index") + viridis::scale_color_viridis() + xlim(-1,0.5)
+AB_LR %>% gather(-ensembl_gene_id, -mouse_gene, -Gene_name,-ave_tpm, key = experiment, value = AB_LR) %>% filter(experiment == "AB_FC") %>% left_join(., Interface_Index, by = c("Gene_name" = "gene_name")) %>% ggplot(aes(x = AB_LR, y = interface_index, col = interface_index)) + geom_point() + theme_cowplot() + geom_smooth(aes(x = AB_LR, y = interface_index), method = lm, se = FALSE, inherit.aes = FALSE, col = "black")  + stat_cor(method = "spearman", label.y = c(1,0.75), alpha = 1) + labs(x = "Apicobasal LR", y = "Interface Index") + viridis::scale_color_viridis() + xlim(-1,0.5) + guides(col = FALSE)
 
-N_LR_tidy %>% left_join(., h2m, by = c("ensembl_gene_id" = "mouse_gene")) %>% select(-Gene) %>% left_join(., AB_LR_tidy[,1:2], by = c("ensembl_gene_id")) %>% left_join(., Interface_Index, by = c("Gene" = "gene_name")) %>% na.omit() %>% ggplot(aes(x = LR, y = interface_index, col = interface_index)) + geom_point() + theme_cowplot() + geom_smooth(aes(x = LR, y = interface_index), method = lm, se = FALSE, inherit.aes = FALSE)  + stat_cor(method = "spearman", label.y = c(1,0.75), alpha = 1) + labs(x = "Neuronal LR", y = "Interface Index") + viridis::scale_color_viridis() + xlim(-4,5)
+N_LR_tidy %>% left_join(., h2m, by = c("ensembl_gene_id" = "mouse_gene")) %>% dplyr::select(-Gene) %>% left_join(., AB_LR_tidy[,1:2], by = c("ensembl_gene_id")) %>% left_join(., Interface_Index, by = c("Gene" = "gene_name")) %>% na.omit() %>% ggplot(aes(x = LR, y = interface_index, col = interface_index)) + geom_point() + theme_cowplot() + geom_smooth(aes(x = LR, y = interface_index), method = lm, se = FALSE, inherit.aes = FALSE, col = "black")  + stat_cor(method = "spearman", label.y = c(1,0.75), alpha = 1) + labs(x = "Neuronal LR", y = "Interface Index") + viridis::scale_color_viridis() + xlim(-4,5) + guides(col = FALSE)
+
+```
+
+```{r, }
+AB_LR %>% filter(grepl(Gene_name, pattern = "LARP") | Gene_name == "SSB") %>% ggplot(aes(x = Gene_name, y = ave_tpm, fill = Gene_name)) + geom_bar(stat = "identity") + theme_cowplot() + guides(fill = FALSE) + geom_text(aes(x = Gene_name, y = -15, label = format(ave_tpm, digits = 3)), size = 4, vjust = -1.5) 
+
+AB_LR %>% filter(grepl(Gene_name, pattern = "LARP") | Gene_name == "SSB") %>% ggplot(aes(x = Gene_name, y = AB_FC, fill = Gene_name)) + geom_bar(stat = "identity") + theme_cowplot() + guides(fill = FALSE)
+
+norm_counts <- read.table("norm_counts_AB_Halo.txt")
+tpms <- read.table("tpms_AB_Halo.txt")
+
+norm_counts %>% as_tibble(rownames = "ensembl_gene_id") %>% gather(-ensembl_gene_id, key = sample, value = LR) %>% separate(sample, into = c("C2bbe1", "halo", "fraction", "rep")) %>% filter(halo != "P65", fraction == "enriched") %>% spread(halo,LR) %>% mutate(AB_LR = log2(GP135/NaKATPase)) %>%  left_join(., ens2gene) %>% filter(grepl("LARP",Gene)) %>% ggplot(aes(x = Gene, y = AB_LR, fill = Gene)) + geom_point(position = "jitter") + geom_boxplot() + theme_cowplot() + guides(fill = FALSE)
+
+med_dat <- tpms %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(tpms)) %>% gather(-ensembl_gene_id,key = sample, value = tpm) %>% separate(sample, into = c("C2bbe1", "halo", "fraction", "rep")) %>% filter(fraction == "input") %>% left_join(.,ens2gene) %>% filter(grepl("LARP", Gene)) %>% group_by(Gene) %>% summarize(med = median(tpm, na.rm =TRUE)) %>% mutate(med = round(med, digits = 1))
+
+tpms %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(tpms)) %>% gather(-ensembl_gene_id,key = sample, value = tpm) %>% separate(sample, into = c("C2bbe1", "halo", "fraction", "rep")) %>% filter(fraction == "input") %>% left_join(.,ens2gene) %>% filter(grepl("LARP", Gene)) %>% ggplot(aes(x = Gene, y = tpm, fill = Gene)) + geom_point(position = "jitter") + geom_boxplot(width = 0.5) + theme_cowplot() + guides(fill = FALSE) + geom_text(data = med_dat, aes(x = Gene, y = -5, label = med), size = 3, vjust = -1.5) 
+
+
+
+N_LR_ave %>% filter(grepl(Gene, pattern = "Larp") | Gene == "Ssb") %>% ggplot(aes(x = Gene, y = med_LR, fill = Gene))  + geom_bar(stat = "identity") + theme_cowplot() + guides(fill = FALSE)
+
+N_LR %>% filter(grepl(Gene, pattern = "Larp") | Gene == "Ssb") %>% gather(-ensembl_gene_id, -Gene, -ribo, -mito, key = sample, value = LR) %>% ggplot(aes(x = Gene, y = LR, fill = Gene)) + geom_point(position = "jitter") + geom_violin() + geom_boxplot(width = 0.1) + theme_cowplot() + guides(fill = FALSE) + geom_hline(yintercept = 0, linetype = "dashed")
+
+
+med_dat <- N_TPM %>% gather(-ensembl_gene_id, -Gene, key = sample, value = TPM) %>% filter(grepl("Larp", Gene) | Gene == "Ssb", grepl("soma", sample)) %>% group_by(Gene) %>% summarize(med = median(TPM, na.rm =TRUE)) %>% mutate(med = round(med, digits = 1))
+
+N_TPM %>% filter(grepl(Gene, pattern = "Larp") | Gene == "Ssb") %>% gather(-ensembl_gene_id, -Gene,  key = sample, value = TPM) %>% filter(grepl("soma", sample)) %>% ggplot(aes(x = Gene, y = TPM, fill = Gene)) + geom_point(position = "jitter", alpha = 0.5) + geom_boxplot(width = 0.5) + theme_cowplot() + guides(fill = FALSE) + geom_text(data = med_dat, aes(x = Gene, y = -50, label = med), size = 3, vjust = -1.5) 
+
 
 ```

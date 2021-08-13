@@ -34,3 +34,19 @@ IP %>% ggplot(aes(x = input, y = eluate, col = year, shape = fluor)) + geom_poin
 
 IP %>% mutate(percent_enriched = eluate / (input * 10)) %>% ggplot(aes(x = input, y = percent_enriched, col = year, shape = fluor)) + geom_point(size = 3) + theme_cowplot() + facet_grid(.~halo)
 ```
+
+```{r, }
+IP %>% mutate(Fluor = ifelse(fluor == "DBF", "+DBF", "-DBF"), 
+              Halo = ifelse(halo == "NKHH", "NaK ATPase", ifelse(halo == "GHH", "GP135", "RELA"))) %>% 
+    filter(year == "2019") %>%
+    ggplot(aes(x = Fluor, y = (eluate/(input*1000)) * 100, col = Halo)) + 
+    geom_point(aes(shape = Fluor),size = 5) +
+    theme_cowplot() + 
+    scale_color_manual(values = c("#59d0a3", "#ce7bd8", "#4d86ff")) + 
+    facet_grid(.~Halo) +
+    scale_x_discrete(limits = c("+DBF", "-DBF")) +
+    labs(x = "", y = "Percent Enriched") +
+    theme(strip.background = element_rect(color = "white", fill = "white")) + 
+  theme(text = element_text(size=25), axis.text = element_text(size = 15))
+
+```

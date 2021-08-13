@@ -1,0 +1,52 @@
+---
+title: "HeLa expression"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tximport)
+library(biomaRt)
+library(stringr)
+library(ggfortify)
+library(DESeq2)
+library(pheatmap)
+library(ggpubr)
+library(tidyverse)
+library(cowplot)
+```
+
+```{r, }
+mart <- readRDS(file = "hs_Biomart.txt")
+t2g <- readRDS(file = "t2g.txt")
+
+ens2gene <- t2g[,c(2,3)]
+colnames(ens2gene)[2] <- 'Gene'
+ens2gene <- unique(ens2gene)
+tx2gene <- t2g[,c(1,2)]
+colnames(tx2gene) <- c('TXNAME', 'GENEID')
+
+files_f <- list.files("~/Documents/TaliaferroLab/HeLa expression")
+files_f <- files_f %>% as_tibble() %>% filter(str_detect(value, "quant.sf")) %>% pull()
+samples_f <- str_sub(files_f, 1, str_length(files_f)-9)
+salm_dirs_f <- sapply(samples_f, function(id) file.path(paste("~/Documents/TaliaferroLab/HeLa expression/",id,".quant.sf",sep = "")))
+enst_txi <- tximport(salm_dirs_f, 
+                type = 'salmon', 
+                #tx2gene = tx2gene,
+                dropInfReps = TRUE, 
+                txOut = TRUE,
+                countsFromAbundance = 'lengthScaledTPM')
+enst_tpms <- data.frame(enst_txi$abundance) 
+#enst_tpms <- enst_tpms[apply(enst_tpms, MARGIN = 1, function(x) any(x > 5)), ] 
+
+```
+
+```{r, }
+enst_tpms %>% as_tibble(rownames = "target_id") %>% rowwise() %>%  mutate(ave_tpm = mean(c(Input1, Input2, Input3), na.rm = TRUE)) %>% left_join(dplyr::select(t2g, target_id, ensembl_gene_id, ext_gene)) %>% filter(ext_gene == "GAPDH") %>% arrange(desc(ave_tpm)) 
+
+#GAPDH == ENST00000619601
+
+enst_tpms %>% as_tibble(rownames = "target_id") %>% rowwise() %>%  mutate(ave_tpm = mean(c(Input1, Input2, Input3), na.rm = TRUE)) %>% left_join(dplyr::select(t2g, target_id, ensembl_gene_id, ext_gene)) %>% filter(ext_gene == "MALAT1") %>% arrange(desc(ave_tpm))
+
+#MALAT1 = ENST00000610851
+```

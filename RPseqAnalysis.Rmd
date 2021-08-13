@@ -1,0 +1,340 @@
+---
+title: "RPseqAnalysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(biomaRt)
+library(tidyverse)
+library(cowplot)
+library(ggpubr)
+library(FeatureReachR)
+`%notin%` <- Negate(`%in%`)
+
+```
+
+```{r, RPgenelists}
+mart <- readRDS(file = "hs_Biomart.txt")
+
+RPS <- c("RPSA","RPS2","RPS3","RPS3A","RPS4X","RPS4Y1","RPS4Y2","RPS5","RPS6","RPS7","RPS8","RPS9","RPS10","RPS11","RPS12","RPS13","RPS14","RPS15","RPS15A","RPS16","RPS17","RPS18","RPS19","RPS20","RPS21","RPS23","RPS24","RPS25","RPS26","RPS27","RPS27A","RPS27L","RPS28","RPS29","FAU")
+
+RPL <- c("RPLP0","RPLP1","RPLP2","RPL3","RPL3L","RPL4","RPL5","RPL6","RPL7","RPL7A","RPL7L1","RPL8","RPL9","RPL10","RPL10A","RPL10L","RPL11","RPL12","RPL13","RPL13A","RPL14","RPL15","RPL17","RPL18","RPL18A","RPL19","RPL21","RPL22","RPL22L1","RPL23","RPL23A","RPL24","RPL26","RPL26L1","RPL27","RPL27A","RPL28","RPL29","RPL30","RPL31","RPL32","RPL34","RPL35","RPL35A","RPL36","RPL36A","RPL36AL","RPL37","RPL37A","RPL38","RPL39","RPL39L","UBA52","RPL41")
+
+TOP_genes <- tibble(read.csv("RPseqAnalysis/5pTOPgenes_YamashitaNAR2008.csv", header = TRUE))
+
+RP_ensg <- biomaRt::getBM(attributes = c('ensembl_gene_id'), filters = c('external_gene_name'), values = c(RPS,RPL), mart = mart) %>% as_tibble() %>% pull(ensembl_gene_id) %>% unique()
+newTOP <- biomaRt::getBM(attributes = c('ensembl_gene_id'), filters = c('refseq_mrna'), values = (TOP_genes %>% filter(mouse.TOP != "0") %>% pull(Refseq.ID)), mart = mart) %>% as_tibble() %>% pull(ensembl_gene_id) %>% unique()
+knownTOP <- biomaRt::getBM(attributes = c('ensembl_gene_id'), filters = c('refseq_mrna'), values = (TOP_genes %>% filter(known.TOP != "0") %>% pull(Refseq.ID)), mart = mart) %>% as_tibble() %>% pull(ensembl_gene_id) %>% unique()
+
+library(eulerr)
+`%notin%` <- Negate(`%in%`)
+fit <- function(l1,l2,l3, n1, n2, n3) {
+  abc = length(Reduce(intersect, list(l1, l2, l3)))
+  ab = sum(l1[l1 %in% l2] %notin% Reduce(intersect, list(l1, l2, l3)))
+  ac = sum(l1[l1 %in% l3] %notin% Reduce(intersect, list(l1, l2, l3)))
+  bc = sum(l2[l2 %in% l3] %notin% Reduce(intersect, list(l1, l2, l3)))
+  
+  a = length(l1)-abc-ab-ac
+  b = length(l2)-abc-ab-bc
+  c = length(l3)-abc-bc-ac
+  f <- euler(c("A"=a, "B"=b, "C"=c, "A&B"=ab, "A&C"=ac, "B&C"=bc, "A&B&C"=abc))
+  f$labels <- c(n1, n2, n3)
+  return(f)
+}
+
+v <- fit(RP_ensg, newTOP, knownTOP, "RP genes", "new TOPs", "known TOPs")
+plot(v, quantities = TRUE, labels = v$labels, main = "RP and TOP containing Genes")
+
+v <- fit(RP_ensg, "", knownTOP, "RP genes", "", "known TOPs")
+plot(v, quantities = TRUE, labels = v$labels, main = "RP and TOP containing Genes")
+```
+
+```{r, }
+all_LR <- tibble(read.table("prj_AB_neuronal_LRs.txt", header = TRUE))
+h2m <- readRDS("human2mousegeneid.txt") %>% as_tibble()
+h2m <- h2m %>% filter(ensembl_gene_id != "ENSG00000147604") %>% rbind(., c("ENSG00000147604", "ENSMUSG00000043716"))
+N_LR <- read.table("FractionationLR_z.txt", header = TRUE) %>% as_tibble()
+N_LR_ave <- N_LR %>% gather(-ensembl_gene_id, -Gene, -ribo, -mito, key = fractionation, value = LR) %>% group_by(ensembl_gene_id, Gene, ribo,mito) %>% summarize(med_LR = median(LR, na.rm =TRUE)) %>% na.omit() %>% left_join(h2m, by = c("ensembl_gene_id" = "mouse_gene")) %>% rename("hs_gene" = "ensembl_gene_id.y") %>% ungroup()
+
+
+all_LR %>% mutate(RP = ifelse(ensembl_gene_id %in% RP_ensg, T, F)) %>% 
+    gather(-ensembl_gene_id, -RP, key = sample, value = LR) %>% 
+    ggplot(aes(x = RP, y = LR, col = RP)) +
+    geom_point(position = "jitter", alpha = 0.01) +
+    geom_violin() +
+    geom_boxplot(width = 0.25, outlier.shape = NA) +
+    theme_cowplot() +
+    stat_compare_means(comparisons = list(c("TRUE", "FALSE")), method = "wilcox.test", label.y = 1.75) +
+    scale_color_manual(values = c("black", "red")) +
+    facet_grid(.~sample) +
+    ylim(-1.5,2) 
+
+all_LR %>% mutate(TOP = ifelse(ensembl_gene_id %in% knownTOP, T, F)) %>% 
+    gather(-ensembl_gene_id, -TOP, key = sample, value = LR) %>% 
+    ggplot(aes(x = TOP, y = LR, col = TOP)) +
+    geom_point(position = "jitter", alpha = 0.01) +
+    geom_violin() +
+    geom_boxplot(width = 0.25, outlier.shape = NA) +
+    theme_cowplot() +
+    stat_compare_means(comparisons = list(c("TRUE", "FALSE")), method = "wilcox.test", label.y = 1.75) +
+    scale_color_manual(values = c("black", "red")) +
+    facet_grid(.~sample) +
+    ylim(-1.5,2) 
+
+
+##8 genes in top 0.4 most localized in at least 4 cell types
+loc_RP_genes <- all_LR %>% 
+    filter(ensembl_gene_id %in% RP_ensg) %>% 
+    ungroup() %>% 
+    mutate(AB_FC = -AB_FC, LCM_AB = -LCM_AB) %>% 
+    gather(-ensembl_gene_id, key = cell, value = LR) %>% 
+    na.omit() %>% 
+    unique() %>% 
+    top_frac(0.25, wt = LR) %>% 
+    group_by(ensembl_gene_id) %>%
+    summarise(n = n()) %>% 
+    arrange(desc(n)) %>% 
+    filter(n >= 4) %>% 
+    pull(ensembl_gene_id)
+
+all_LR %>% 
+    filter(ensembl_gene_id %in% RP_ensg) %>% 
+    mutate(RP = ifelse(ensembl_gene_id %in% loc_RP_genes, T, F)) %>% 
+    gather(-ensembl_gene_id, -RP, key = sample, value = LR) %>% 
+    ggplot(aes(x = sample, y = LR)) +
+    geom_point(aes(col = RP, alpha = RP),position = "jitter") +
+    geom_violin() +
+    geom_boxplot(width = 0.25) +
+    theme_cowplot() +
+    scale_color_manual(values = c("black", "red")) +
+    ylim(-1.5,2) 
+
+all_LR %>% 
+    filter(ensembl_gene_id %in% RP_ensg) %>%
+    mutate(RP = ifelse(ensembl_gene_id %in% loc_RP_genes, T, F)) %>% 
+    left_join(., select(N_LR_ave, hs_gene, Gene), by = c("ensembl_gene_id" = "hs_gene")) %>% 
+    gather(-ensembl_gene_id, -RP, -Gene, key = sample, value = LR) %>% 
+    mutate(RP_col = ifelse(RP == T, toupper(Gene), NA)) %>% 
+    ggplot(aes(x = sample, y = LR)) +
+    geom_point(aes(col = RP_col, alpha = RP),position = "jitter") +
+    geom_violin() +
+    geom_boxplot(width = 0.25) +
+    theme_cowplot()  +
+    ylim(-1.5,2) 
+
+ABloc_RP_genes <- all_LR %>% 
+    filter(ensembl_gene_id %in% RP_ensg) %>% 
+    ungroup() %>% 
+    select(ensembl_gene_id, AB_FC) %>% 
+    top_frac(0.25, wt = -AB_FC) %>% 
+    pull(ensembl_gene_id)
+
+```
+
+```{r, eval = FALSE}
+
+loc_RP_genes
+llocRP_genes <- RP_ensg[RP_ensg %notin% loc_RP_genes]
+ABloc_RP_genes
+ABlloc_RP_genes <- RP_ensg[RP_ensg %notin% ABloc_RP_genes]
+notRP_genes <- all_LR %>% filter(ensembl_gene_id %notin% RP_ensg) %>% pull(ensembl_gene_id) %>% unique() 
+ABnotRP_genes <- all_LR %>% select(ensembl_gene_id, AB_FC) %>% filter(ensembl_gene_id %notin% RP_ensg) %>% na.omit() %>% pull(ensembl_gene_id) %>% unique() 
+
+
+hs_filtered_TxDb <- filter_Tx(system.file("extdata", "gencode.v33.annotation.gff3.gz", package = "FeatureReachR"))
+longest_hs <- make_longest_df(hs_filtered_TxDb)
+
+#longest 5'UTRs
+locRP_5pUTR_tx <- gene2Tx(longest_hs, locRP_genes, "UTR5")
+llocRP_5pUTR_tx <- gene2Tx(longest_hs, llocRP_genes, "UTR5")
+ABloc_RP_5pUTR_tx <- gene2Tx(longest_hs, ABloc_RP_genes, "UTR5")
+ABllocRP_5pUTR_tx <- gene2Tx(longest_hs, ABlloc_RP_genes, "UTR5")
+notRP_5pUTR_tx <- gene2Tx(longest_hs, notRP_genes[grepl(notRP_genes, pattern = "ENSG")], "UTR5")
+ABnotRP_5pUTR_tx <- gene2Tx(longest_hs, ABnotRP_genes[grepl(ABnotRP_genes, pattern = "ENSG")], "UTR5")
+
+
+write_Sequence(hs_filtered_TxDb, locRP_5pUTR_tx, "UTR5", "RPseqAnalysis/locRPlongestUTR5", "both")
+write_Sequence(hs_filtered_TxDb, llocRP_5pUTR_tx, "UTR5", "RPseqAnalysis/llocRPlongestUTR5", "both")
+write_Sequence(hs_filtered_TxDb, ABloc_RP_5pUTR_tx, "UTR5", "RPseqAnalysis/ABlocRPlongestUTR5", "both")
+write_Sequence(hs_filtered_TxDb, ABllocRP_5pUTR_tx, "UTR5", "RPseqAnalysis/ABllocRPlongestUTR5", "both")
+write_Sequence(hs_filtered_TxDb, notRP_5pUTR_tx, "UTR5", "RPseqAnalysis/notRPlongestUTR5", "both")
+write_Sequence(hs_filtered_TxDb, ABnotRP_5pUTR_tx, "UTR5", "RPseqAnalysis/ABnotRPlongestUTR5", "both")
+
+#longest CDS
+loc_RP_CDS_tx <- gene2Tx(longest_hs, locRP_genes, "CDS")
+llocRP_CDS_tx <- gene2Tx(longest_hs, llocRP_genes, "CDS")
+ABloc_RP_CDS_tx <- gene2Tx(longest_hs, ABloc_RP_genes, "CDS")
+ABllocRP_CDS_tx <- gene2Tx(longest_hs, ABlloc_RP_genes, "CDS")
+notRP_CDS_tx <- gene2Tx(longest_hs, notRP_genes[grepl(notRP_genes, pattern = "ENSG")], "CDS")
+ABnotRP_CDS_tx <- gene2Tx(longest_hs, ABnotRP_genes[grepl(ABnotRP_genes, pattern = "ENSG")], "CDS")
+
+write_Sequence(hs_filtered_TxDb, locRP_CDS_tx, "CDS", "RPseqAnalysis/locRPlongestCDS", "both")
+write_Sequence(hs_filtered_TxDb, llocRP_CDS_tx, "CDS", "RPseqAnalysis/llocRPlongestCDS", "both")
+write_Sequence(hs_filtered_TxDb, ABloc_RP_CDS_tx, "CDS", "RPseqAnalysis/ABlocRPlongestCDS", "both")
+write_Sequence(hs_filtered_TxDb, ABllocRP_CDS_tx, "CDS", "RPseqAnalysis/ABllocRPlongestCDS", "both")
+write_Sequence(hs_filtered_TxDb, notRP_CDS_tx, "CDS", "RPseqAnalysis/notRPlongestCDS", "both")
+write_Sequence(hs_filtered_TxDb, ABnotRP_CDS_tx, "CDS", "RPseqAnalysis/ABnotRPlongestCDS", "both")
+
+#longest 3'UTR
+loc_RP_3pUTR_tx <- gene2Tx(longest_hs, locRP_genes, "UTR3")
+llocRP_3pUTR_tx <- gene2Tx(longest_hs, llocRP_genes, "UTR3")
+ABloc_RP_3pUTR_tx <- gene2Tx(longest_hs, ABloc_RP_genes, "UTR3")
+ABllocRP_3pUTR_tx <- gene2Tx(longest_hs, ABlloc_RP_genes, "UTR3")
+notRP_3pUTR_tx <- gene2Tx(longest_hs, notRP_genes[grepl(notRP_genes, pattern = "ENSG")], "UTR3")
+ABnotRP_3pUTR_tx <- gene2Tx(longest_hs, ABnotRP_genes[grepl(ABnotRP_genes, pattern = "ENSG")], "UTR3")
+
+write_Sequence(hs_filtered_TxDb, locRP_3pUTR_tx, "UTR3", "RPseqAnalysis/locRPlongestUTR3", "both")
+write_Sequence(hs_filtered_TxDb, llocRP_3pUTR_tx, "UTR3", "RPseqAnalysis/llocRPlongestUTR3", "both")
+write_Sequence(hs_filtered_TxDb, ABloc_RP_3pUTR_tx, "UTR3", "RPseqAnalysis/ABlocRPlongestUTR3", "both")
+write_Sequence(hs_filtered_TxDb, ABllocRP_3pUTR_tx, "UTR3", "RPseqAnalysis/ABllocRPlongestUTR3", "both")
+write_Sequence(hs_filtered_TxDb, notRP_3pUTR_tx, "UTR3", "RPseqAnalysis/notRPlongestUTR3", "both")
+write_Sequence(hs_filtered_TxDb, ABnotRP_3pUTR_tx, "UTR3", "RPseqAnalysis/ABnotRPlongestUTR3", "both")
+
+```
+
+## 5'UTRs
+
+```{r, }
+loc_RP_5pUTR <- Biostrings::readDNAStringSet("RPseqAnalysis/locRPlongestUTR5.fa")
+llocRP_5pUTR <- Biostrings::readDNAStringSet("RPseqAnalysis/llocRPlongestUTR5.fa")
+ABloc_RP_5pUTR <- Biostrings::readDNAStringSet("RPseqAnalysis/ABlocRPlongestUTR5.fa")
+ABllocRP_5pUTR <- Biostrings::readDNAStringSet("RPseqAnalysis/ABllocRPlongestUTR5.fa")
+notRP_5pUTR <- Biostrings::readDNAStringSet("RPseqAnalysis/notRPlongestUTR5.fa")
+ABnotRP_5pUTR <- Biostrings::readDNAStringSet("RPseqAnalysis/ABnotRPlongestUTR5.fa")
+
+```
+
+```{r, }
+GC_compare(loc_RP_5pUTR, llocRP_5pUTR)
+length_compare(loc_RP_5pUTR, llocRP_5pUTR)
+RPloc_kmerstats <- kmer_compare(loc_RP_5pUTR, llocRP_5pUTR,6)
+RPloc_kmerstats %>% kmer_plot() + ggtitle("Conserved Localized RP vs less localized RP 5'UTRs")
+RPloc_cisbpRNA <- motif_compare(CISBPRNA_hs_PWM, loc_RP_5pUTR, llocRP_5pUTR)
+RPloc_cisbpRNA %>% motif_plot() + ggtitle("Conserved Localized RP vs less localized RP 5'UTRs")
+RPloc_RBNS <- motif_compare(RBNS_PWM, loc_RP_5pUTR, llocRP_5pUTR)
+RPloc_RBNS %>% motif_plot() + ggtitle("Conserved Localized RP vs less localized RP 5'UTRs")
+
+
+GC_compare(ABloc_RP_5pUTR, ABllocRP_5pUTR)
+length_compare(ABloc_RP_5pUTR, ABllocRP_5pUTR)
+ABRPloc_kmerstats <- kmer_compare(ABloc_RP_5pUTR, ABllocRP_5pUTR,6)
+ABRPloc_kmerstats %>% kmer_plot() + ggtitle("AB HaLo Localized RP vs less localized RP 5'UTRs")
+ABRPloc_cisbpRNA <- motif_compare(CISBPRNA_hs_PWM, ABloc_RP_5pUTR, ABllocRP_5pUTR)
+ABRPloc_cisbpRNA %>% motif_plot() + ggtitle("AB HaLo Localized RP vs less localized RP 5'UTRs")
+ABRPloc_RBNS <- motif_compare(RBNS_PWM, ABloc_RP_5pUTR, ABllocRP_5pUTR)
+ABRPloc_RBNS %>% motif_plot() + ggtitle("AB HaLo Localized RP vs less localized RP 5'UTRs")
+
+GC_compare(c(loc_RP_5pUTR, llocRP_5pUTR), notRP_5pUTR)
+length_compare(c(loc_RP_5pUTR, llocRP_5pUTR), notRP_5pUTR)
+RP_kmerstats <- kmer_compare(c(loc_RP_5pUTR, llocRP_5pUTR), notRP_5pUTR,6)
+RP_kmerstats %>% kmer_plot() + ggtitle("All RP vs All 5'UTRs")
+#RP_cisbpRNA <- motif_compare(CISBPRNA_hs_PWM, c(loc_RP_5pUTR, llocRP_5pUTR), notRP_5pUTR)
+#write.table(RP_cisbpRNA, "RPseqAnalysis/conservedRPvctrl_5pUTR_cisbpRNA_stats.txt")
+RP_cisbpRNA <- tibble(read.table("RPseqAnalysis/conservedRPvctrl_5pUTR_cisbpRNA_stats.txt", header = TRUE))
+RP_cisbpRNA %>% motif_plot() + ggtitle("All RP vs All 5'UTRs")
+#RP_RBNS <- motif_compare(RBNS_PWM, c(loc_RP_5pUTR, llocRP_5pUTR), notRP_5pUTR)
+#write.table(RP_RBNS, "RPseqAnalysis/conservedRPvctrl_5pUTR_RBNS_stats.txt")
+RP_RBNS <- tibble(read.table("RPseqAnalysis/conservedRPvctrl_5pUTR_RBNS_stats.txt", header = TRUE))
+RP_RBNS %>% motif_plot() + ggtitle("All RP vs All 5'UTRs")
+
+
+GC_compare(c(ABloc_RP_5pUTR, ABllocRP_5pUTR), ABnotRP_5pUTR)
+length_compare(c(ABloc_RP_5pUTR, ABllocRP_5pUTR), ABnotRP_5pUTR)
+ABRP_kmerstats <- kmer_compare(c(ABloc_RP_5pUTR, ABllocRP_5pUTR), ABnotRP_5pUTR,6)
+ABRP_kmerstats %>% kmer_plot() + ggtitle("AB HaLo RP vs All 5'UTRs")
+#ABRP_cisbpRNA <- motif_compare(CISBPRNA_hs_PWM, c(ABloc_RP_5pUTR, ABllocRP_5pUTR), ABnotRP_5pUTR)
+#write.table(ABRP_cisbpRNA, "RPseqAnalysis/ABHaLoRPvctrl_5pUTR_cisbpRNA_stats.txt")
+ABRP_cisbpRNA <- tibble(read.table("RPseqAnalysis/ABHaLoRPvctrl_5pUTR_cisbpRNA_stats.txt", header = TRUE))
+ABRP_cisbpRNA %>% motif_plot() + ggtitle("AB HaLo RP vs All 5'UTRs")
+#ABRP_RBNS <- motif_compare(RBNS_PWM, c(ABloc_RP_5pUTR, ABllocRP_5pUTR), ABnotRP_5pUTR)
+#write.table(ABRP_RBNS, "RPseqAnalysis/ABHaLoRPvctrl_5pUTR_RBNS_stats.txt")
+ABRP_RBNS <- tibble(read.table("RPseqAnalysis/ABHaLoRPvctrl_5pUTR_RBNS_stats.txt", header = TRUE))
+ABRP_RBNS %>% motif_plot() + ggtitle("AB HaLo RP vs All 5'UTRs")
+
+```
+
+## 3'UTRs
+
+```{r, }
+loc_RP_3pUTR <- Biostrings::readDNAStringSet("RPseqAnalysis/locRPlongestUTR3.fa")
+llocRP_3pUTR <- Biostrings::readDNAStringSet("RPseqAnalysis/llocRPlongestUTR3.fa")
+ABloc_RP_3pUTR <- Biostrings::readDNAStringSet("RPseqAnalysis/ABlocRPlongestUTR3.fa")
+ABllocRP_3pUTR <- Biostrings::readDNAStringSet("RPseqAnalysis/ABllocRPlongestUTR3.fa")
+notRP_3pUTR <- Biostrings::readDNAStringSet("RPseqAnalysis/notRPlongestUTR3.fa")
+ABnotRP_3pUTR <- Biostrings::readDNAStringSet("RPseqAnalysis/ABnotRPlongestUTR3.fa")
+
+```
+
+```{r, }
+GC_compare(loc_RP_3pUTR, llocRP_3pUTR)
+length_compare(loc_RP_3pUTR, llocRP_3pUTR)
+RPloc_kmerstats <- kmer_compare(loc_RP_3pUTR, llocRP_3pUTR,6)
+RPloc_kmerstats %>% kmer_plot() + ggtitle("Conserved Localized RP vs less localized RP 3'UTRs")
+RPloc_cisbpRNA <- motif_compare(CISBPRNA_hs_PWM, loc_RP_3pUTR, llocRP_3pUTR)
+RPloc_cisbpRNA %>% motif_plot() + ggtitle("Conserved Localized RP vs less localized RP 3'UTRs")
+RPloc_RBNS <- motif_compare(RBNS_PWM, loc_RP_3pUTR, llocRP_3pUTR)
+RPloc_RBNS %>% motif_plot() + ggtitle("Conserved Localized RP vs less localized RP 3'UTRs")
+
+
+GC_compare(ABloc_RP_3pUTR, ABllocRP_3pUTR)
+length_compare(ABloc_RP_3pUTR, ABllocRP_3pUTR)
+ABRPloc_kmerstats <- kmer_compare(ABloc_RP_3pUTR, ABllocRP_3pUTR,6)
+ABRPloc_kmerstats %>% kmer_plot() + ggtitle("AB HaLo Localized RP vs less localized RP 3'UTRs")
+ABRPloc_cisbpRNA <- motif_compare(CISBPRNA_hs_PWM, ABloc_RP_3pUTR, ABllocRP_3pUTR)
+ABRPloc_cisbpRNA %>% motif_plot() + ggtitle("AB HaLo Localized RP vs less localized RP 3'UTRs")
+ABRPloc_RBNS <- motif_compare(RBNS_PWM, ABloc_RP_3pUTR, ABllocRP_3pUTR)
+ABRPloc_RBNS %>% motif_plot() + ggtitle("AB HaLo Localized RP vs less localized RP 3'UTRs")
+
+GC_compare(c(loc_RP_3pUTR, llocRP_3pUTR), notRP_3pUTR)
+length_compare(c(loc_RP_3pUTR, llocRP_3pUTR), notRP_3pUTR)
+RP_kmerstats <- kmer_compare(c(loc_RP_3pUTR, llocRP_3pUTR), notRP_3pUTR,6)
+RP_kmerstats %>% kmer_plot() + ggtitle("All RP vs All 3'UTRs")
+#RP_cisbpRNA <- motif_compare(CISBPRNA_hs_PWM, c(loc_RP_3pUTR, llocRP_3pUTR), notRP_3pUTR)
+#write.table(RP_cisbpRNA, "RPseqAnalysis/conservedRPvctrl_3pUTR_cisbpRNA_stats.txt")
+RP_cisbpRNA <- tibble(read.table("RPseqAnalysis/conservedRPvctrl_3pUTR_cisbpRNA_stats.txt", header = TRUE))
+RP_cisbpRNA %>% motif_plot() + ggtitle("All RP vs All 3'UTRs")
+#RP_RBNS <- motif_compare(RBNS_PWM, c(loc_RP_3pUTR, llocRP_3pUTR), notRP_3pUTR)
+#write.table(RP_RBNS, "RPseqAnalysis/conservedRPvctrl_3pUTR_RBNS_stats.txt")
+RP_RBNS <- tibble(read.table("RPseqAnalysis/conservedRPvctrl_3pUTR_RBNS_stats.txt", header = TRUE))
+RP_RBNS %>% motif_plot() + ggtitle("All RP vs All 3'UTRs")
+
+
+GC_compare(c(ABloc_RP_3pUTR, ABllocRP_3pUTR), ABnotRP_3pUTR)
+length_compare(c(ABloc_RP_3pUTR, ABllocRP_3pUTR), ABnotRP_3pUTR)
+ABRP_kmerstats <- kmer_compare(c(ABloc_RP_3pUTR, ABllocRP_3pUTR), ABnotRP_3pUTR,6)
+ABRP_kmerstats %>% kmer_plot() + ggtitle("AB HaLo RP vs All 3'UTRs")
+#ABRP_cisbpRNA <- motif_compare(CISBPRNA_hs_PWM, c(ABloc_RP_3pUTR, ABllocRP_3pUTR), ABnotRP_3pUTR)
+#write.table(ABRP_cisbpRNA, "RPseqAnalysis/ABHaLoRPvctrl_3pUTR_cisbpRNA_stats.txt")
+ABRP_cisbpRNA <- tibble(read.table("RPseqAnalysis/ABHaLoRPvctrl_3pUTR_cisbpRNA_stats.txt", header = TRUE))
+ABRP_cisbpRNA %>% motif_plot() + ggtitle("AB HaLo RP vs All 3'UTRs")
+#ABRP_RBNS <- motif_compare(RBNS_PWM, c(ABloc_RP_3pUTR, ABllocRP_3pUTR), ABnotRP_3pUTR)
+#write.table(ABRP_RBNS, "RPseqAnalysis/ABHaLoRPvctrl_3pUTR_RBNS_stats.txt")
+ABRP_RBNS <- tibble(read.table("RPseqAnalysis/ABHaLoRPvctrl_3pUTR_RBNS_stats.txt", header = TRUE))
+ABRP_RBNS %>% motif_plot() + ggtitle("AB HaLo RP vs All 3'UTRs")
+
+```
+
+```{r, }
+nucleargenes <- readRDS(file = "hs_nucleargenes.txt")
+
+all_LR %>%
+    mutate(GO = "All Genes") %>% 
+    rbind(filter(all_LR, ensembl_gene_id %in% nucleargenes) %>% mutate(GO = "Nuclear")) %>% 
+    rbind(filter(all_LR, ensembl_gene_id %in% RP_ensg) %>% mutate(GO = "RP")) %>% 
+    ggplot(aes(x = factor(GO, levels = c("All Genes", "Nuclear", "RP")), y = AB_FC, fill = GO)) + geom_point(position = "jitter", alpha = 0.01) + 
+    geom_violin() +
+    geom_boxplot(outlier.shape = NA, width = 0.25) + 
+    theme_cowplot() +
+    geom_hline(yintercept = 0) +
+    stat_compare_means(comparisons = EZ_comparisons, method = "wilcox.test", label.y = c(1.5,1.75)) + 
+    labs(x = "", y = "Human Apical Bias") + 
+    guides(fill = FALSE) +
+    coord_cartesian(ylim = c(-1.5,2.5)) +
+    scale_fill_manual(values = c("#808080","#247ea7","#09921d")) +
+    coord_cartesian(ylim = c(-1.5,2))
+
+z <- all_LR %>% mutate(AB_LR_Z = (AB_FC - mean(.$AB_FC, na.rm = TRUE)) / sd(.$AB_FC, na.rm = TRUE)) %>% mutate(ribo = ifelse(ensembl_gene_id %in% RP_ensg, "yes", "no"))
+
+z %>% ggplot(aes(x = AB_LR_Z, y = Neuron_LR, col = ribo, alpha = ribo)) + geom_point() + geom_smooth(aes(x = AB_LR_Z, y = Neuron_LR, group = ribo, col = ribo), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman", label.y = c(-2.75, -3.25), alpha = 1) + labs(x = "Apicobasal LR", y = "Neuronal LR") + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) 
+```

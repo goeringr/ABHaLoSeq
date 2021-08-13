@@ -1,0 +1,43 @@
+---
+title: "RP Proteomics"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggpubr)
+library(tidyverse)
+library(cowplot)
+```
+
+PSM = Protein spectral matches
+PEP_score = The PEP is the probability that the observed PSM is incorrect.
+
+The experimental q-values that are derived from the validation. These are calculated from the number of target and decoy proteins and are the minimum false discovery rate required for a hit to be considered correct. For our common workflows, q-values are greater than 0.01 for high confidence hits and 0.05 for medium confidence hits. 
+
+The protein score which is calculated by summing the individual scores of each peptide. The higher this score, the higher the individual scores of the peptides, and thus the better the identification. SEQUEST HT is the name of the employed search engine. 
+
+```{r, }
+CAD <- as_tibble(read.csv("Proteomics/JT033021_041821_CAD_Comparison.csv", header = TRUE, sep = ",")) %>% filter(Protein.FDR.Confidence..Combined == "High") %>%  mutate(protein = gsub(x = .$Description, pattern = "(.*GN=)(.*)( PE.*)", replacement = "\\2")) %>% select(protein,X..PSMs..by.Search.Engine...A2.Sequest.HT, X..PSMs..by.Search.Engine...B2.Sequest.HT, Sum.PEP.Score, Exp..q.value..Combined) %>% rename("WT_PSM" = X..PSMs..by.Search.Engine...A2.Sequest.HT, "Mut_PSM" = X..PSMs..by.Search.Engine...B2.Sequest.HT, PEP_score = Sum.PEP.Score, qval = Exp..q.value..Combined) %>% mutate(WT_PSM = as.numeric(WT_PSM), Mut_PSM = as.numeric(Mut_PSM), PEP_score = as.numeric(PEP_score), qval = as.numeric(qval))
+
+C2bbe1 <- as_tibble(read.csv("Proteomics/JT033021_041821_C2bbe1_Comparison.csv", header = TRUE, sep = ","))  %>% filter(Protein.FDR.Confidence..Combined == "High") %>%  mutate(protein = gsub(x = .$Description, pattern = "(.*GN=)(.*)( PE.*)", replacement = "\\2")) %>% select(protein,X..PSMs..by.Search.Engine...A2.Sequest.HT, X..PSMs..by.Search.Engine...B2.Sequest.HT, Sum.PEP.Score, Exp..q.value..Combined) %>% rename("WT_PSM" = X..PSMs..by.Search.Engine...A2.Sequest.HT, "Mut_PSM" = X..PSMs..by.Search.Engine...B2.Sequest.HT, PEP_score = Sum.PEP.Score, qval = Exp..q.value..Combined) %>% mutate(WT_PSM = as.numeric(WT_PSM), Mut_PSM = as.numeric(Mut_PSM), PEP_score = as.numeric(PEP_score), qval = as.numeric(qval))
+```
+
+```{r, }
+CAD %>% filter(WT_PSM > 2, Mut_PSM > 2) %>%  mutate(ratio = WT_PSM / Mut_PSM) %>% arrange(desc(ratio))
+
+CAD %>% filter(WT_PSM > 2, Mut_PSM > 2) %>%  mutate(ratio = WT_PSM / Mut_PSM)  %>% filter(grepl(protein, pattern = "La"))
+
+CAD %>% filter(WT_PSM > 2, Mut_PSM > 2) %>%  mutate(ratio = log2(WT_PSM / Mut_PSM)) %>% ggplot(aes(x = ratio, y = PEP_score)) + geom_point() + theme_cowplot()
+
+C2bbe1 %>% filter(WT_PSM > 2, Mut_PSM > 2) %>%  mutate(ratio = WT_PSM / Mut_PSM)  %>% arrange(desc(ratio))
+
+C2bbe1 %>% filter(WT_PSM > 2, Mut_PSM > 2) %>%  mutate(ratio = WT_PSM / Mut_PSM)  %>% filter(grepl(protein, pattern = "La"))
+
+```
+
+```{r, }
+PSM <- CAD %>% mutate(protein = toupper(protein)) %>%  full_join(., C2bbe1, by = "protein") %>% mutate(CAD_ratio = WT_PSM.x/Mut_PSM.x, C2bbe1_ratio = WT_PSM.y/Mut_PSM.y)
+
+PSM %>% na.omit() %>% ggplot(aes(x = CAD_ratio, y = C2bbe1_ratio)) + geom_point() + geom_smooth(aes(x = CAD_ratio, y = C2bbe1_ratio), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman", label.y = 0.75)
+```

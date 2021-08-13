@@ -1,0 +1,263 @@
+---
+title: "P65_intron"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tximport)
+library(biomaRt)
+library(stringr)
+library(ggfortify)
+library(DESeq2)
+library(pheatmap)
+library(ggpubr)
+library(tidyverse)
+library(cowplot)
+```
+
+# First just the original data (7d filter)
+
+```{r, }
+files <- list.files("./quants/ABHaLo_12.19_intron")
+files <- files %>% as_tibble() %>% filter(str_detect(value, "P65"))  %>% pull()
+samples <- str_sub(files, 1, str_length(files)-16)
+salm_dirs <- sapply(samples, function(id) file.path(paste("./quants/ABHaLo_12.19_intron/",id,"_intron.quant.sf",sep = "")))
+
+#### need a new t2g to contain pre_genes (intron containing ones)
+get_tx <- function(path){
+  as_tibble(read.table(path, header = T)) %>%
+    pull(Name) 
+  }
+
+t2g <- readRDS(file = "t2g.txt")
+tx2gene <- t2g[,c(1,2)]
+colnames(tx2gene) <- c('TXNAME', 'GENEID')
+
+x <- 1:6
+tx <- lapply(x, function(x) get_tx(salm_dirs[[x]]))
+
+t2g_new <- unlist(tx) %>% 
+  unique() %>% 
+  tibble("intron_tx" = .) %>%
+  rowwise() %>%
+  mutate(tx_short = ifelse(str_detect(intron_tx, pattern = "\\."), str_split(intron_tx, pattern = "\\.")[[1]][1], NA)) %>% 
+  left_join(as_tibble(tx2gene), by = c("tx_short" = "TXNAME")) %>% 
+  mutate(GENEID = ifelse(str_detect(tx_short, pattern = "ENSG"), tx_short, GENEID)) 
+
+t2g_new <- t2g_new %>% na.omit() %>% select(-tx_short) %>% rename("TXNAME" = "intron_tx")
+
+####
+
+txi <- tximport(salm_dirs, 
+                type = 'salmon', 
+                tx2gene = t2g_new,
+                dropInfReps = TRUE, 
+                countsFromAbundance = 'lengthScaledTPM')
+tpms <- data.frame(txi$abundance) 
+tpms <- tpms[apply(tpms, MARGIN = 1, function(x) any(x > 5)), ] 
+
+```
+
+```{r, }
+dat <- t(tpms) %>% 
+    as_tibble() %>% 
+    mutate(sample = colnames(tpms))
+
+dat_all <- dat %>%
+    separate(sample, into = c("c2bbe1", "Halo", "fraction", "rep"), sep = "_") %>% 
+    select(Halo, fraction, rep, everything(), -c2bbe1)
+
+autoplot(prcomp(log(dat_all[4:ncol(dat_all)]+1)), 
+         data = dat_all,
+         colour = "rep", 
+         shape = "fraction",
+         size = 5) +
+    ggtitle("PCA of log(TPMs)") +
+    theme_cowplot()
+
+```
+
+```{r, }
+conditions <- c("P65_enriched", "P65_enriched", "P65_enriched", "P65_input", "P65_input", "P65_input")
+type <- c("paired-end", "paired-end", "paired-end", "paired-end", "paired-end", "paired-end")
+
+colData <- data.frame("sample" = samples, "Conditions" = conditions, "Type" = type)
+rownames(colData) <- colData$sample
+
+dds <- DESeqDataSetFromTximport(txi, colData = colData, design = ~Conditions)
+dds <- dds[rowMins(counts(dds)) > 10, ]
+dds <- DESeq(dds)
+
+```
+
+```{r, }
+
+norm_counts <- counts(dds, normalized = TRUE)
+norm_counts <- norm_counts[apply(norm_counts, MARGIN = 1, function(x) all(x > 100)), ]
+
+norm_counts_PCAdat <- t(norm_counts) %>%
+  as_tibble() %>%
+  mutate(sample = colnames(norm_counts)) %>%
+  separate(sample, into = c("c2bbe1", "Halo", "fraction", "rep"), sep = "_") %>% 
+  select(Halo, fraction, rep, everything(), -c2bbe1)
+
+#PC1 and 2
+autoplot(prcomp(log(norm_counts_PCAdat[4:ncol(norm_counts_PCAdat)]+1)),
+         data = norm_counts_PCAdat,
+         colour = "rep", 
+         shape = "fraction",
+         size = 5) +
+  ggtitle("PCA of log(normalized counts)") +
+  theme_cowplot()
+
+```
+
+```{r, PCA on LR values}
+LR_tidy <- norm_counts %>% 
+  as_tibble() %>%
+  mutate(ensembl_gene_id = rownames(norm_counts),
+         LR_P65_rep1 = log2(C2bbe1_P65_enriched_rep1 / C2bbe1_P65_input_rep1),
+         LR_P65_rep2 = log2(C2bbe1_P65_enriched_rep2 / C2bbe1_P65_input_rep2),
+         LR_P65_rep3 = log2(C2bbe1_P65_enriched_rep3 / C2bbe1_P65_input_rep3)) %>%
+  select(ensembl_gene_id, contains("LR")) 
+
+is.na(LR_tidy) <- sapply(LR_tidy, is.infinite)
+LR_tidy[is.na(LR_tidy)] <- 0
+
+p <- LR_tidy %>% gather(-ensembl_gene_id, key = "rep", value = "LR") %>% mutate(intron_containing = ifelse(str_detect(ensembl_gene_id, pattern = "pre_"), T, F))
+p %>% ggplot(aes(x = LR, fill = intron_containing)) + geom_density(alpha = 0.5) + theme_cowplot() + xlim(-2,2) + scale_fill_manual(values = c("#d84848", "#1885c7"))
+
+wilcox.test(subset(p, intron_containing == T)$LR, subset(p,intron_containing == F)$LR)
+
+p %>% ggplot(aes(x = intron_containing, y = LR, fill = intron_containing)) + geom_point(alpha = 0.01, position = "jitter") + geom_violin() + geom_boxplot(width = 0.25, outlier.shape = NA) + EnvStats::stat_n_text(y.pos = -1.75) + theme_cowplot() + stat_compare_means(comparisons = list(c("FALSE", "TRUE")), label.y = 1.75) + geom_hline(yintercept = 0, linetype = "dashed") + ylim(-2,2) + scale_fill_manual(values = c("#d84848", "#1885c7"))
+
+
+p %>% ggplot(aes(x = intron_containing, y = LR, fill = intron_containing)) + geom_point(alpha = 0.01, position = "jitter") + geom_violin() + geom_boxplot(width = 0.25, outlier.shape = NA) + EnvStats::stat_n_text(y.pos = -1.75) + theme_cowplot() + stat_compare_means(comparisons = list(c("FALSE", "TRUE")), label.y = 1.75) + geom_hline(yintercept = 0, linetype = "dashed") + ylim(-2,2) + scale_fill_manual(values = c("#d84848", "#1885c7")) + facet_grid(.~rep)
+
+```
+
+# Now 7d (no filter) and 21d P65
+
+```{r, }
+files <- list.files("./ABHaLo_05.21/P65Intron_quants")
+samples <- str_sub(files, 1, str_length(files)-16)
+salm_dirs <- sapply(samples, function(id) file.path(paste("./ABHaLo_05.21/P65Intron_quants/",id,"_intron.quant.sf",sep = "")))
+
+#### need a new t2g to contain pre_genes (intron containing ones)
+get_tx <- function(path){
+  as_tibble(read.table(path, header = T)) %>%
+    pull(Name) 
+  }
+
+t2g <- readRDS(file = "t2g.txt")
+tx2gene <- t2g[,c(1,2)]
+colnames(tx2gene) <- c('TXNAME', 'GENEID')
+
+x <- 1:6
+tx <- lapply(x, function(x) get_tx(salm_dirs[[x]]))
+
+t2g_new <- unlist(tx) %>% 
+  unique() %>% 
+  tibble("intron_tx" = .) %>%
+  rowwise() %>%
+  mutate(tx_short = ifelse(str_detect(intron_tx, pattern = "\\."), str_split(intron_tx, pattern = "\\.")[[1]][1], NA)) %>% 
+  left_join(as_tibble(tx2gene), by = c("tx_short" = "TXNAME")) %>% 
+  mutate(GENEID = ifelse(str_detect(tx_short, pattern = "ENSG"), tx_short, GENEID)) 
+
+t2g_new <- t2g_new %>% na.omit() %>% select(-tx_short) %>% rename("TXNAME" = "intron_tx")
+
+####
+
+txi <- tximport(salm_dirs, 
+                type = 'salmon', 
+                tx2gene = t2g_new,
+                dropInfReps = TRUE, 
+                countsFromAbundance = 'lengthScaledTPM')
+tpms <- data.frame(txi$abundance) 
+tpms <- tpms[apply(tpms, MARGIN = 1, function(x) any(x > 5)), ] 
+
+```
+
+```{r, }
+dat <- t(tpms) %>% 
+    as_tibble() %>% 
+    mutate(sample = colnames(tpms))
+
+dat_all <- dat %>%
+    separate(sample, into = c("c2bbe1", "Day", "Halo", "fraction", "rep"), sep = "_") %>% 
+    select(Day, Halo, fraction, rep, everything(), -c2bbe1)
+
+autoplot(prcomp(log(dat_all[5:ncol(dat_all)]+1)), 
+         data = dat_all,
+         colour = "Day", 
+         shape = "fraction",
+         size = 5) +
+    ggtitle("PCA of log(TPMs)") +
+    theme_cowplot()
+
+```
+
+```{r, }
+conditions <- c("P65_enriched", "P65_enriched", "P65_enriched", "P65_input", "P65_input", "P65_input")
+type <- c("paired-end", "paired-end", "paired-end", "paired-end", "paired-end", "paired-end")
+day <- c("21d", "21d", "21d", "21d", "21d", "21d", "7d", "7d", "7d", "7d", "7d", "7d")
+
+colData <- data.frame("sample" = samples, "Conditions" = conditions, "Type" = type, "Day" = day)
+rownames(colData) <- colData$sample
+
+dds <- DESeqDataSetFromTximport(txi, colData = colData, design = ~Conditions)
+dds <- dds[rowMins(counts(dds)) > 10, ]
+dds <- DESeq(dds)
+
+```
+
+
+```{r, }
+
+norm_counts <- counts(dds, normalized = TRUE)
+norm_counts <- norm_counts[apply(norm_counts, MARGIN = 1, function(x) all(x > 100)), ]
+
+norm_counts_PCAdat <- t(norm_counts) %>%
+  as_tibble() %>%
+  mutate(sample = colnames(norm_counts)) %>%
+  separate(sample, into = c("c2bbe1", "Day", "Halo", "fraction", "rep"), sep = "_") %>% 
+  select(Day, Halo, fraction, rep, everything(), -c2bbe1)
+
+#PC1 and 2
+autoplot(prcomp(log(norm_counts_PCAdat[5:ncol(norm_counts_PCAdat)]+1)),
+         data = norm_counts_PCAdat,
+         colour = "Day", 
+         shape = "fraction",
+         size = 5) +
+  ggtitle("PCA of log(normalized counts)") +
+  theme_cowplot()
+
+```
+
+```{r, PCA on LR values2}
+LR_tidy <- norm_counts %>% 
+  as_tibble() %>%
+  mutate(ensembl_gene_id = rownames(norm_counts),
+         LR_21d_P65_rep1 = log2(C2bbe1_21d_P65_enriched_rep1 / C2bbe1_21d_P65_input_rep1),
+         LR_21d_P65_rep2 = log2(C2bbe1_21d_P65_enriched_rep2 / C2bbe1_21d_P65_input_rep2),
+         LR_21d_P65_rep3 = log2(C2bbe1_21d_P65_enriched_rep3 / C2bbe1_21d_P65_input_rep3),
+         LR_7d_P65_rep1 = log2(C2bbe1_7d_P65_enriched_rep1 / C2bbe1_7d_P65_input_rep1),
+         LR_7d_P65_rep2 = log2(C2bbe1_7d_P65_enriched_rep2 / C2bbe1_7d_P65_input_rep2),
+         LR_7d_P65_rep3 = log2(C2bbe1_7d_P65_enriched_rep3 / C2bbe1_7d_P65_input_rep3)) %>%
+  select(ensembl_gene_id, contains("LR")) 
+
+is.na(LR_tidy) <- sapply(LR_tidy, is.infinite)
+LR_tidy[is.na(LR_tidy)] <- 0
+
+p <- LR_tidy %>% gather(-ensembl_gene_id, key = "sample", value = "LR") %>% mutate(intron_containing = ifelse(str_detect(ensembl_gene_id, pattern = "pre_"), T, F))
+p %>% separate(sample, into = c("stuff", "Day", "Halo", "rep")) %>% ggplot(aes(x = LR, fill = intron_containing)) + geom_density(alpha = 0.5) + theme_cowplot() + xlim(-2,2) + scale_fill_manual(values = c("#d84848", "#1885c7")) + facet_grid(.~Day)
+
+wilcox.test(subset(p, intron_containing == T)$LR, subset(p,intron_containing == F)$LR)
+
+p %>% separate(sample, into = c("stuff", "Day", "Halo", "rep")) %>% ggplot(aes(x = intron_containing, y = LR, fill = intron_containing)) + geom_point(alpha = 0.01, position = "jitter") + geom_violin() + geom_boxplot(width = 0.25, outlier.shape = NA) + EnvStats::stat_n_text(y.pos = -1.75) + theme_cowplot() + stat_compare_means(comparisons = list(c("FALSE", "TRUE")), label.y = 1.75) + geom_hline(yintercept = 0, linetype = "dashed") + ylim(-2,2) + scale_fill_manual(values = c("#d84848", "#1885c7")) + facet_grid(.~Day)
+
+p %>% separate(sample, into = c("stuff", "Day", "Halo", "rep")) %>% ggplot(aes(x = intron_containing, y = LR, fill = intron_containing)) + geom_point(alpha = 0.01, position = "jitter") + geom_violin() + geom_boxplot(width = 0.25, outlier.shape = NA) + EnvStats::stat_n_text(y.pos = -1.75) + theme_cowplot() + stat_compare_means(comparisons = list(c("FALSE", "TRUE")), label.y = 1.75) + geom_hline(yintercept = 0, linetype = "dashed") + ylim(-2,2) + scale_fill_manual(values = c("#d84848", "#1885c7")) + facet_grid(rep~Day)
+
+```
+

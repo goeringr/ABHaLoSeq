@@ -1,0 +1,1030 @@
+---
+title: "21dSeqAnalysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tximport)
+library(biomaRt)
+library(stringr)
+library(ggfortify)
+library(DESeq2)
+library(pheatmap)
+library(ggpubr)
+library(tidyverse)
+library(cowplot)
+```
+
+```{r, tximport stuff, warning = FALSE}
+# mart <- useMart("ENSEMBL_MART_ENSEMBL",
+#                dataset = "hsapiens_gene_ensembl",
+#                host='www.ensembl.org')
+# saveRDS(mart, file = "hs_Biomart.txt")
+mart <- readRDS(file = "hs_Biomart.txt")
+
+#t2g <- getBM(attributes = c('ensembl_transcript_id',
+#                            'ensembl_gene_id',
+#                            'external_gene_name',
+#                            'refseq_mrna'), mart = mart)
+
+#t2g <- rename(t2g, target_id = ensembl_transcript_id, ext_gene = external_gene_name)
+#saveRDS(t2g, file = "t2g.txt")
+t2g <- readRDS(file = "t2g.txt")
+
+ens2gene <- t2g[,c(2,3)]
+colnames(ens2gene)[2] <- 'Gene'
+ens2gene <- unique(ens2gene)
+tx2gene <- t2g[,c(1,2)]
+colnames(tx2gene) <- c('TXNAME', 'GENEID')
+
+# get old Halo data files
+files_f <- list.files("./quants/ABHaLo_12.19_filtered")
+files_f <- files_f %>% as_tibble() %>% filter(str_detect(value, "filtered.quant.sf")) %>% pull()
+samples_f <- str_sub(files_f, 1, str_length(files_f)-18)
+salm_dirs_f <- sapply(samples_f, function(id) file.path(paste("./quants/ABHaLo_12.19_filtered/",id,"_filtered.quant.sf",sep = "")))
+
+# get new Halo salmon alignments
+
+files <- list.files("./ABHaLo_05.21/salmon quants")
+files <- files %>% as_tibble() %>% filter(str_detect(value, "quant.sf")) %>% pull()
+samples <- str_sub(files, 1, str_length(files)-9)
+
+# actually fix the sample names
+salm_dirs <- tibble(sampleName = c("C2bbe1_21d_GHH_input_rep1","C2bbe1_21d_GHH_enriched_rep1","C2bbe1_21d_NaKATPase_input_rep1","C2bbe1_21d_NaKATPase_enriched_rep1","C2bbe1_21d_P65_input_rep1","C2bbe1_21d_P65_enriched_rep1","C2bbe1_21d_GHH_input_rep2","C2bbe1_21d_GHH_enriched_rep2","C2bbe1_21d_NaKATPase_input_rep2","C2bbe1_21d_NaKATPase_enriched_rep2","C2bbe1_21d_P65_input_rep2","C2bbe1_21d_P65_enriched_rep2","C2bbe1_21d_GHH_input_rep3","C2bbe1_21d_GHH_enriched_rep3","C2bbe1_21d_NaKATPase_input_rep3","C2bbe1_21d_NaKATPase_enriched_rep3","C2bbe1_21d_P65_input_rep3","C2bbe1_21d_P65_enriched_rep3","C2bbe1_7d_GHH_input_rep1","C2bbe1_7d_GHH_enriched_rep1","C2bbe1_7d_NaKATPase_input_rep1","C2bbe1_7d_NaKATPase_enriched_rep1","C2bbe1_7d_P65_input_rep1","C2bbe1_7d_P65_enriched_rep1","C2bbe1_7d_OHH_input_rep1","C2bbe1_7d_OHH_enriched_rep1","C2bbe1_7d_GHH_input_rep2","C2bbe1_7d_GHH_enriched_rep2","C2bbe1_7d_NaKATPase_input_rep2","C2bbe1_7d_NaKATPase_enriched_rep2","C2bbe1_7d_P65_input_rep2","C2bbe1_7d_P65_enriched_rep2","C2bbe1_7d_OHH_input_rep2","C2bbe1_7d_OHH_enriched_rep2","C2bbe1_7d_GHH_input_rep3","C2bbe1_7d_GHH_enriched_rep3","C2bbe1_7d_NaKATPase_input_rep3","C2bbe1_7d_NaKATPase_enriched_rep3","C2bbe1_7d_P65_input_rep3","C2bbe1_7d_P65_enriched_rep3","C2bbe1_7d_OHH_input_rep3","C2bbe1_7d_OHH_enriched_rep3"), sampleID = c("RG1","RG2","RG3","RG4","RG5","RG6","RG7","RG8","RG9","RG10","RG11","RG12","RG13","RG14","RG15","RG16","RG17","RG18","RG19","RG20","RG21","RG22","RG23","RG24","RG25","RG26","RG27","RG28","RG29","RG30","RG31","RG32","RG33","RG34","RG35","RG36","RG37","RG38","RG39","RG40","RG41","RG42")) %>% 
+  mutate(sampleID = paste("./ABHaLo_05.21/salmon quants/",sampleID,".quant.sf",sep = "")) %>% 
+  deframe()
+
+# now do tximport
+all_txi <- tximport(c(salm_dirs,salm_dirs_f),
+               type = 'salmon',
+               tx2gene = tx2gene,
+               dropInfReps = TRUE,
+               countsFromAbundance = 'lengthScaledTPM')
+
+all_tpms <- data.frame(all_txi$abundance) 
+all_tpms <- all_tpms[apply(all_tpms, MARGIN = 1, function(x) any(x > 5)), ] 
+
+
+```
+
+## First look at TPMs
+
+```{r,  looknsee}
+dat <- t(all_tpms) %>% 
+  as_tibble() %>% 
+  mutate(sample = colnames(all_tpms)) 
+
+dat_all <- dat %>% 
+  mutate(sample = ifelse(grepl(sample, pattern = "_7d_") | 
+                           grepl(sample, pattern = "_21d_"), sample, paste("C2bbe1_7dfilter_", substr(sample, 8,nchar(sample)), sep = ""))) %>%
+  separate(sample, into = c("c2bbe1","Day", "Halo", "fraction", "rep"), sep = "_") %>% 
+  select(Halo, Day, fraction, rep, everything(), -c2bbe1) %>% 
+  unite(Day,Halo,col = "sample") 
+
+autoplot(prcomp(as.matrix(log10((dat_all[4:10]+1)))), 
+         data = dat_all,
+         colour = "sample", 
+         shape = "fraction",
+         size = 5) +
+  ggtitle("PCA of log(TPMs)") +
+  theme_cowplot()
+
+autoplot(prcomp(as.matrix(log10((dat_all[4:10]+1)))), 
+         data = dat_all,
+         x = 2,
+         y = 3,
+         colour = "sample", 
+         shape = "fraction",
+         size = 5) +
+  ggtitle("PCA of log(TPMs)") +
+  theme_cowplot()
+
+
+```
+
+### Now for normalized counts
+
+```{r,  DEseq stuff, error = FALSE}
+conditions <- c("C2bbe1_21d_GHH_input","C2bbe1_21d_GHH_enriched","C2bbe1_21d_NaKATPase_input","C2bbe1_21d_NaKATPase_enriched","C2bbe1_21d_P65_input","C2bbe1_21d_P65_enriched","C2bbe1_21d_GHH_input","C2bbe1_21d_GHH_enriched","C2bbe1_21d_NaKATPase_input","C2bbe1_21d_NaKATPase_enriched","C2bbe1_21d_P65_input","C2bbe1_21d_P65_enriched","C2bbe1_21d_GHH_input","C2bbe1_21d_GHH_enriched","C2bbe1_21d_NaKATPase_input","C2bbe1_21d_NaKATPase_enriched","C2bbe1_21d_P65_input","C2bbe1_21d_P65_enriched","C2bbe1_7d_GHH_input","C2bbe1_7d_GHH_enriched","C2bbe1_7d_NaKATPase_input","C2bbe1_7d_NaKATPase_enriched","C2bbe1_7d_P65_input","C2bbe1_7d_P65_enriched","C2bbe1_7dfilt_OHH_input","C2bbe1_7dfilt_OHH_enriched","C2bbe1_7d_GHH_input","C2bbe1_7d_GHH_enriched","C2bbe1_7d_NaKATPase_input","C2bbe1_7d_NaKATPase_enriched","C2bbe1_7d_P65_input","C2bbe1_7d_P65_enriched","C2bbe1_7dfilt_OHH_input","C2bbe1_7dfilt_OHH_enriched","C2bbe1_7d_GHH_input","C2bbe1_7d_GHH_enriched","C2bbe1_7d_NaKATPase_input","C2bbe1_7d_NaKATPase_enriched","C2bbe1_7d_P65_input","C2bbe1_7d_P65_enriched","C2bbe1_7dfilt_OHH_input","C2bbe1_7dfilt_OHH_enriched","C2bbe1_7dfilt_GHH_enriched", "C2bbe1_7dfilt_GHH_enriched", "C2bbe1_7dfilt_GHH_enriched", "C2bbe1_7dfilt_GHH_input", "C2bbe1_7dfilt_GHH_input", "C2bbe1_7dfilt_GHH_input", "C2bbe1_7dfilt_NaKATPase_enriched", "C2bbe1_7dfilt_NaKATPase_enriched", "C2bbe1_7dfilt_NaKATPase_enriched", "C2bbe1_7dfilt_NaKATPase_input", "C2bbe1_7dfilt_NaKATPase_input", "C2bbe1_7dfilt_NaKATPase_input", "C2bbe1_7dfilt_P65_enriched", "C2bbe1_7dfilt_P65_enriched", "C2bbe1_7dfilt_P65_enriched", "C2bbe1_7dfilt_P65_input", "C2bbe1_7dfilt_P65_input", "C2bbe1_7dfilt_P65_input")
+batch <- c(rep("1",42), rep("2",18))
+haloday <- c("GHH_21d","GHH_21d","NKHH_21d","NKHH_21d","P65_21d","P65_21d","GHH_21d","GHH_21d","NKHH_21d","NKHH_21d","P65_21d","P65_21d","GHH_21d","GHH_21d","NKHH_21d","NKHH_21d","P65_21d","P65_21d","GHH_7d","GHH_7d","NKHH_7d","NKHH_7d","P65_7d","P65_7d","OHH_7d","OHH_7d","GHH_7d","GHH_7d","NKHH_7d","NKHH_7d","P65_7d","P65_7d","OHH_7d","OHH_7d","GHH_7d","GHH_7d","NKHH_7d","NKHH_7d","P65_7d","P65_7d","OHH_7d","OHH_7d",rep("GHH_7dfilt",6),rep("NKHH_7dfilt",6),rep("P65_7dfilt",6))
+fraction <- c(rep(c("input","enriched"),21), rep("input",3), rep("enriched",3),rep("input",3), rep("enriched",3),rep("input",3), rep("enriched",3))
+
+
+colData <- data.frame("Samples" = c(names(salm_dirs),samples_f),"Conditions" = conditions, "Batch" = batch, "haloDay" = haloday, "Fraction" = fraction)
+
+rownames(colData) <- c(names(salm_dirs),samples_f)
+
+all_dds <- DESeqDataSetFromTximport(all_txi, colData = colData, design =  ~Conditions)
+all_dds <- all_dds[rowMins(counts(all_dds)) > 10, ]
+all_dds <- DESeq(all_dds)
+
+```
+
+```{r, }
+all_norm_counts <- counts(all_dds, normalized = TRUE)
+all_norm_counts <- all_norm_counts[apply(all_norm_counts, MARGIN = 1, function(x) any(x > 100)), ]
+#change above from "any" to "all" (doesnt change much)
+
+norm_counts_PCAdat <- t(all_norm_counts) %>%
+  as_tibble(rownames = "sample") %>%
+  mutate(sample = ifelse(grepl(sample, pattern = "_7d_") | 
+                           grepl(sample, pattern = "_21d_"), sample, paste("C2bbe1_7dfilter_", substr(sample, 8,nchar(sample)), sep = ""))) %>%
+  separate(sample, into = c("c2bbe1","Day", "Halo", "fraction", "rep"), sep = "_") %>% 
+  select(Halo, Day, fraction, rep, everything(), -c2bbe1) %>% 
+  unite(Day,Halo,col = "sample") 
+
+norm_counts_PCAdat[is.na(norm_counts_PCAdat)] <- 0
+
+#PC1 and 2
+autoplot(prcomp(as.matrix(log10((norm_counts_PCAdat[4:ncol(norm_counts_PCAdat)]+1)))),
+         data = norm_counts_PCAdat,
+         colour = "sample", 
+         shape = "fraction",
+         size = 5) +
+  ggtitle("PCA of log(normalized counts)") +
+  theme_cowplot()
+
+#PC2 and 3
+autoplot(prcomp(log10(norm_counts_PCAdat[6:ncol(norm_counts_PCAdat)]+1)),
+         data = norm_counts_PCAdat,
+         x = 2,
+         y = 3,
+         colour = "sample", 
+         shape = "fraction",
+         size = 5) +
+  ggtitle("PCA of log(normalized counts)") +
+  theme_cowplot()
+
+
+#look at all PC contributions
+summary(prcomp(log10(norm_counts_PCAdat[4:ncol(norm_counts_PCAdat)]+1)))
+
+```
+
+### what about PCAs on LR values?
+
+```{r, PCA on LR values}
+all_LR_tidy <- all_norm_counts %>% 
+  as_tibble(rownames = "ensembl_gene_id") %>%
+  mutate(LR_21d_GP135_rep1 = log2(C2bbe1_21d_GHH_enriched_rep1 / C2bbe1_21d_GHH_input_rep1),
+         LR_21d_GP135_rep2 = log2(C2bbe1_21d_GHH_enriched_rep2 / C2bbe1_21d_GHH_input_rep2),
+         LR_21d_GP135_rep3 = log2(C2bbe1_21d_GHH_enriched_rep3 / C2bbe1_21d_GHH_input_rep3),
+         LR_21d_NaKATPase_rep1 = log2(C2bbe1_21d_NaKATPase_enriched_rep1 / C2bbe1_21d_NaKATPase_input_rep1),
+         LR_21d_NaKATPase_rep2 = log2(C2bbe1_21d_NaKATPase_enriched_rep2 / C2bbe1_21d_NaKATPase_input_rep2),
+         LR_21d_NaKATPase_rep3 = log2(C2bbe1_21d_NaKATPase_enriched_rep3 / C2bbe1_21d_NaKATPase_input_rep3),
+         LR_21d_P65_rep1 = log2(C2bbe1_21d_P65_enriched_rep1 / C2bbe1_21d_P65_input_rep1),
+         LR_21d_P65_rep2 = log2(C2bbe1_21d_P65_enriched_rep2 / C2bbe1_21d_P65_input_rep2),
+         LR_21d_P65_rep3 = log2(C2bbe1_21d_P65_enriched_rep3 / C2bbe1_21d_P65_input_rep3),
+         LR_7d_GP135_rep1 = log2(C2bbe1_7d_GHH_enriched_rep1 / C2bbe1_7d_GHH_input_rep1),
+         LR_7d_GP135_rep2 = log2(C2bbe1_7d_GHH_enriched_rep2 / C2bbe1_7d_GHH_input_rep2),
+         LR_7d_GP135_rep3 = log2(C2bbe1_7d_GHH_enriched_rep3 / C2bbe1_7d_GHH_input_rep3),
+         LR_7d_NaKATPase_rep1 = log2(C2bbe1_7d_NaKATPase_enriched_rep1 / C2bbe1_7d_NaKATPase_input_rep1),
+         LR_7d_NaKATPase_rep2 = log2(C2bbe1_7d_NaKATPase_enriched_rep2 / C2bbe1_7d_NaKATPase_input_rep2),
+         LR_7d_NaKATPase_rep3 = log2(C2bbe1_7d_NaKATPase_enriched_rep3 / C2bbe1_7d_NaKATPase_input_rep3),
+         LR_7d_P65_rep1 = log2(C2bbe1_7d_P65_enriched_rep1 / C2bbe1_7d_P65_input_rep1),
+         LR_7d_P65_rep2 = log2(C2bbe1_7d_P65_enriched_rep2 / C2bbe1_7d_P65_input_rep2),
+         LR_7d_P65_rep3 = log2(C2bbe1_7d_P65_enriched_rep3 / C2bbe1_7d_P65_input_rep3),
+         LR_7d_OCLN_rep1 = log2(C2bbe1_7d_OHH_enriched_rep1 / C2bbe1_7d_OHH_input_rep1),
+         LR_7d_OCLN_rep2 = log2(C2bbe1_7d_OHH_enriched_rep2 / C2bbe1_7d_OHH_input_rep2),
+         LR_7d_OCLN_rep3 = log2(C2bbe1_7d_OHH_enriched_rep3 / C2bbe1_7d_OHH_input_rep3),
+         LR_7dfilt_GP135_rep1 = log2(C2bbe1_GP135_enriched_rep1 / C2bbe1_GP135_input_rep1),
+         LR_7dfilt_GP135_rep2 = log2(C2bbe1_GP135_enriched_rep2 / C2bbe1_GP135_input_rep2),
+         LR_7dfilt_GP135_rep3 = log2(C2bbe1_GP135_enriched_rep3 / C2bbe1_GP135_input_rep3),
+         LR_7dfilt_NaKATPase_rep1 = log2(C2bbe1_NaKATPase_enriched_rep1 / C2bbe1_NaKATPase_input_rep1),
+         LR_7dfilt_NaKATPase_rep2 = log2(C2bbe1_NaKATPase_enriched_rep2 / C2bbe1_NaKATPase_input_rep2),
+         LR_7dfilt_NaKATPase_rep3 = log2(C2bbe1_NaKATPase_enriched_rep3 / C2bbe1_NaKATPase_input_rep3),
+         LR_7dfilt_P65_rep1 = log2(C2bbe1_P65_enriched_rep1 / C2bbe1_P65_input_rep1),
+         LR_7dfilt_P65_rep2 = log2(C2bbe1_P65_enriched_rep2 / C2bbe1_P65_input_rep2),
+         LR_7dfilt_P65_rep3 = log2(C2bbe1_P65_enriched_rep3 / C2bbe1_P65_input_rep3)) %>%
+  dplyr::select(ensembl_gene_id, contains("LR")) 
+ 
+
+is.na(all_LR_tidy) <- sapply(all_LR_tidy, is.infinite)
+all_LR_tidy[is.na(all_LR_tidy)] <- 0
+
+LRPCAdat <- all_LR_tidy %>% 
+  select(-ensembl_gene_id) %>% 
+  as.data.frame()
+
+rownames(LRPCAdat) <- all_LR_tidy$ensembl_gene_id
+
+LRPCAdat <- t(LRPCAdat) %>% 
+    as_tibble() %>%
+    mutate(sample = colnames(LRPCAdat)) %>% separate(sample, into = c("LR", "day", "Halo", "rep"), sep = "_") %>% 
+  select(day,Halo, rep, everything(), -LR) 
+
+autoplot(prcomp(LRPCAdat[4:ncol(LRPCAdat)]),
+         data = LRPCAdat,
+         x = 1,
+         y = 2,
+         colour = "Halo",
+         shape = "day",
+         size = 5) +
+  ggtitle("PCA of log2(Localization Ratio)") + 
+  theme_cowplot()
+
+autoplot(prcomp(LRPCAdat[4:ncol(LRPCAdat)]),
+         data = LRPCAdat,
+         x = 2,
+         y = 3,
+         colour = "Halo",
+         shape = "day",
+         size = 5) +
+  ggtitle("PCA of log2(Localization Ratio)") + 
+  theme_cowplot()
+
+```
+
+## Are my Halo fusion genes over expressed?
+### Are they enriched in the pull downs?
+
+```{r,  norm counts of Halo genes, fig.width = 20, fig.height = 10}
+all_norm_counts %>% 
+  as_tibble(rownames = "ensembl_gene_id") %>% 
+  left_join(., as_tibble(ens2gene)) %>% 
+  select(ensembl_gene_id, Gene, everything()) %>% 
+  filter(Gene %in% c("ATP1A1", "RELA", "PODXL", "OCLN")) %>% 
+  gather(-ensembl_gene_id, -Gene, key = sample, value = norm_counts) %>%
+  mutate(sample = ifelse(grepl(sample, pattern = "_7d_") | 
+                           grepl(sample, pattern = "_21d_"), sample, paste("C2bbe1_7dfilter_", substr(sample, 8,nchar(sample)), sep = ""))) %>% 
+  separate(sample, into = c("C2bbe1", "day", "Halo", "Fraction", "rep"), sep = "_") %>% 
+  select(-C2bbe1, -rep) %>% 
+  ggplot(aes(x = Halo, y = log10(norm_counts), col = Fraction, fill = Fraction)) + 
+  geom_violin() + 
+  geom_boxplot(col = "Black", position = position_dodge(width = 0.9), width = 0.25) + 
+  geom_point(col = "Black", position = position_jitterdodge()) + 
+  theme_cowplot() + 
+  facet_grid(day~Gene)
+
+all_norm_counts %>% 
+  as_tibble(rownames = "ensembl_gene_id") %>% 
+  left_join(., as_tibble(ens2gene)) %>% 
+  select(ensembl_gene_id, Gene, everything()) %>% 
+  filter(Gene %in% c("ATP1A1", "RELA", "PODXL", "OCLN")) %>% 
+  gather(-ensembl_gene_id, -Gene, key = sample, value = norm_counts) %>% 
+  mutate(sample = ifelse(grepl(sample, pattern = "_7d_") | 
+                           grepl(sample, pattern = "_21d_"), sample, paste("C2bbe1_7dfilter_", substr(sample, 8,nchar(sample)), sep = ""))) %>% 
+  separate(sample, into = c("C2bbe1", "day", "Halo", "Fraction", "rep"), sep = "_") %>% 
+  select(-C2bbe1) %>% 
+  spread(key = Fraction, value = norm_counts) %>% 
+  mutate(LR = log2(enriched/input)) %>% 
+  select(-rep,-enriched,-input) %>% 
+  ggplot(aes(x = Halo, y = LR, fill = Halo, col = Halo)) + 
+  geom_violin() + 
+  geom_boxplot(col = "Black", width = 0.25) + 
+  geom_point(col = "Black") + 
+  facet_grid(day~Gene) + 
+  theme_cowplot() +
+  guides(fill = FALSE,col = FALSE)
+
+```
+
+## Fun with DEseq2
+
+```{r, }
+p <- results(all_dds, contrast = c("Conditions", "C2bbe1_21d_GHH_enriched", "C2bbe1_21d_GHH_input")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-1.5), y = c(5,5), label = c(paste("Apical \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("NL \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "21d GP135 enriched / input", y = "FDR, log", x = "GHH enriched / GHH input, log2")
+
+p <- results(all_dds, contrast = c("Conditions", "C2bbe1_21d_NaKATPase_enriched", "C2bbe1_21d_NaKATPase_input")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-1.5), y = c(7.5,7.5), label = c(paste("Basal \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("NL \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "21d NKHH enriched / input", y = "FDR, log", x = "NKHH enriched / NKHH input, log2")
+
+p <- results(all_dds, contrast = c("Conditions", "C2bbe1_21d_GHH_enriched", "C2bbe1_21d_NaKATPase_enriched")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-1.5), y = c(20,20), label = c(paste("Apical \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("Basal \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "21d AB ", y = "FDR, log", x = "GHH enriched / NKHH enriched, log2")
+
+p <- results(all_dds, contrast = c("Conditions", "C2bbe1_21d_P65_enriched", "C2bbe1_21d_P65_input")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-1.5), y = c(15,15), label = c(paste("Cyto \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("NL \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "21d P65 enriched / input", y = "FDR, log", x = "P65 enriched / P65 input, log2")
+
+p <- results(all_dds, contrast = c("Conditions", "C2bbe1_7d_GHH_enriched", "C2bbe1_7d_GHH_input")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-1.5), y = c(20,20), label = c(paste("Apical \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("NL \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "7d GP135 enriched / input", y = "FDR, log", x = "GHH enriched / GHH input, log2")
+
+p <- results(all_dds, contrast = c("Conditions", "C2bbe1_7d_NaKATPase_enriched", "C2bbe1_7d_NaKATPase_input")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-1.5), y = c(3.5,3.5), label = c(paste("Basal \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("NL \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "7d NKHH enriched / input", y = "FDR, log", x = "NKHH enriched / NKHH input, log2")
+
+p <- results(all_dds, contrast = c("Conditions", "C2bbe1_7d_GHH_enriched", "C2bbe1_7d_GHH_input")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-1.5), y = c(10,10), label = c(paste("Apical \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("Basal \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "7d AB", y = "FDR, log", x = "GHH enriched / NKHH enriched, log2")
+
+p <- results(all_dds, contrast = c("Conditions", "C2bbe1_7d_P65_enriched", "C2bbe1_7d_P65_input")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-1.5), y = c(4,4), label = c(paste("Cyto \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("NL \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "7d P65 enriched / input", y = "FDR, log", x = "P65 enriched / P65 input, log2")
+
+p <- results(all_dds, contrast = c("Conditions", "C2bbe1_7dfilt_OHH_enriched", "C2bbe1_7dfilt_OHH_input")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-1.5), y = c(7.5,7.5), label = c(paste("TJ \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("NL \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "7d OCLN enriched / input", y = "FDR, log", x = "OHH enriched / OHH input, log2")
+
+p <- results(all_dds, contrast = c("Conditions", "C2bbe1_7dfilt_GHH_enriched", "C2bbe1_7dfilt_OHH_enriched")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-1.5), y = c(7.5,7.5), label = c(paste("Apical \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("TJ \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "7d GHHenriched / OHH enriched", y = "FDR, log", x = "GHH enriched / OHH enriched, log2")
+
+p <- results(all_dds, contrast = c("Conditions", "C2bbe1_7dfilt_OHH_enriched", "C2bbe1_7dfilt_NaKATPase_enriched")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-1.5), y = c(7.5,7.5), label = c(paste("TJ \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("Basal \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "7d OHH enriched / NKHH enriched", y = "FDR, log", x = "OHH enriched / NKHH enriched, log2")
+
+```
+
+## Did the P65 enrichment work?
+```{r,  norm counts of cyto/nuclear genes}
+all_norm_counts %>% 
+    as_tibble(rownames = "ensembl_gene_id") %>% 
+    left_join(., as_tibble(ens2gene)) %>% 
+    select(ensembl_gene_id, Gene, everything()) %>% 
+    filter(Gene %in% c("MALAT1", "GAPDH", "TUBA1B", "7SK")) %>% 
+    gather(-ensembl_gene_id, -Gene, key = sample, value = norm_counts) %>%
+    mutate(sample = ifelse(grepl(sample, pattern = "_7d_") | 
+                               grepl(sample, pattern = "_21d_"), sample, paste("C2bbe1_7dfilter_", substr(sample, 8,nchar(sample)), sep = ""))) %>% 
+    separate(sample, into = c("C2bbe1", "day", "Halo", "Fraction", "rep"), sep = "_") %>% 
+    select(-C2bbe1) %>% 
+    filter(Halo == "P65") %>% 
+    spread(key = Fraction, value = norm_counts) %>% mutate(LR = log2(enriched/input)) %>% 
+    select(-enriched,-input) %>% 
+    ggplot(aes(x = Gene, y = LR, fill = Gene, col = Gene)) + 
+    geom_violin() + 
+    geom_boxplot(col = "Black", width = 0.25) + 
+    geom_point(aes(shape = rep),col = "Black",size = 3.5) + 
+    theme_cowplot() +
+    guides(fill = FALSE, col = FALSE) +
+    scale_fill_manual(values = c("#d84848", "#1885c7", "#8b0c0c")) +
+    scale_color_manual(values = c("#d84848", "#1885c7", "#8b0c0c")) +
+    facet_grid(.~day)
+
+all_norm_counts %>% 
+  as_tibble(rownames = "ensembl_gene_id") %>% 
+  left_join(., as_tibble(ens2gene)) %>% 
+  select(ensembl_gene_id, Gene, everything()) %>% 
+  filter(Gene %in% c("MALAT1", "GAPDH", "TUBA1B", "7SK")) %>% 
+  gather(-ensembl_gene_id, -Gene, key = sample, value = norm_counts) %>%
+  mutate(sample = ifelse(grepl(sample, pattern = "_7d_") | 
+                           grepl(sample, pattern = "_21d_"), sample, paste("C2bbe1_7dfilter_", substr(sample, 8,nchar(sample)), sep = ""))) %>% 
+  separate(sample, into = c("C2bbe1", "day", "Halo", "Fraction", "rep"), sep = "_") %>% 
+  select(-C2bbe1) %>% 
+  filter(Halo == "P65") %>% 
+  spread(key = Fraction, value = norm_counts) %>% mutate(LR = log2(enriched/input)) %>% 
+  select(-enriched,-input) %>% 
+  ggplot(aes(x = Gene, y = LR, fill = Gene, col = Gene, shape = rep)) + 
+  geom_point(size = 5) + 
+  theme_cowplot() +
+  guides(fill = FALSE, col = FALSE) +
+  scale_fill_manual(values = c("#d84848", "#1885c7", "#8b0c0c")) +
+  scale_color_manual(values = c("#d84848", "#1885c7", "#8b0c0c")) +
+  facet_grid(.~day)
+  
+
+sno <- read.table(file = "snoRNAs.txt", header = TRUE, sep = "\t") %>% as_tibble() %>% mutate(Ensembl.gene.ID = as.character(Ensembl.gene.ID)) %>% filter(Ensembl.gene.ID != "") %>% pull(., Ensembl.gene.ID)  
+pro <- read.table(file = "Hs_GRCh38.proteincoding.txt", header = TRUE, sep = "\t") %>% as_tibble() %>% mutate(Gene.stable.ID = as.character(Gene.stable.ID)) %>% filter(Gene.stable.ID != "") %>% pull(., Gene.stable.ID)
+lnc <- read.table(file = "lncRNAs.txt", header = TRUE, sep = "\t") %>%  as_tibble() %>% mutate(Ensembl.gene.ID = as.character(Ensembl.gene.ID)) %>% filter(Ensembl.gene.ID != "") %>% pull(., Ensembl.gene.ID)  
+sn <- read.table(file = "snRNAs.txt", header = TRUE, sep = "\t") %>%  as_tibble() %>% mutate(Ensembl.gene.ID = as.character(Ensembl.gene.ID)) %>% filter(Ensembl.gene.ID != "") %>% pull(., Ensembl.gene.ID)  
+
+my_comparisons = list(c("All Genes", "mRNA"), c("All Genes", "lncRNA"))
+
+P_I_21_simple <- results(all_dds, contrast = c("Conditions", "C2bbe1_21d_P65_enriched", "C2bbe1_21d_P65_input")) %>% as_tibble(rownames = "ensembl_gene_id")
+P_I_7_simple <- results(all_dds, contrast = c("Conditions", "C2bbe1_7d_P65_enriched", "C2bbe1_7d_P65_input")) %>% as_tibble(rownames = "ensembl_gene_id")
+
+P_I_21_type <- P_I_21_simple %>% mutate(type = "All Genes")
+P_I_21_simple %>% mutate(type = ifelse(ensembl_gene_id %in% pro, "mRNA", ifelse(ensembl_gene_id %in% lnc, "lncRNA", ""))) %>% filter(type != "") %>% rbind(., P_I_21_type) %>% ggplot(aes(x = type, y = log2FoldChange, fill = type)) + geom_point(position = "jitter", alpha = 0.01) + geom_violin() + geom_boxplot(outlier.shape = NA, width = 0.25) + theme_cowplot() +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    stat_compare_means(comparisons = my_comparisons, method = "wilcox.test", label.y = c(1.45, 1.25)) + 
+  guides(fill = FALSE) + labs(title = "21d", x = "", y = "P65 enriched / input") +
+  scale_fill_manual(values = c("#d84848", "#1885c7", "#c72c2c")) +
+  scale_color_manual(values = c("#d84848", "#1885c7", "#c72c2c")) +
+  coord_cartesian(ylim = c(-2,2)) + EnvStats::stat_n_text(y.pos = -1.75)
+
+P_I_7_type <- P_I_7_simple %>% mutate(type = "All Genes")
+P_I_7_simple %>% mutate(type = ifelse(ensembl_gene_id %in% pro, "mRNA", ifelse(ensembl_gene_id %in% lnc, "lncRNA", ""))) %>% filter(type != "") %>% rbind(., P_I_7_type) %>% ggplot(aes(x = type, y = log2FoldChange, fill = type)) + geom_point(position = "jitter", alpha = 0.01) + geom_violin() + geom_boxplot(outlier.shape = NA, width = 0.25) + theme_cowplot() +
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    stat_compare_means(comparisons = my_comparisons, method = "wilcox.test", label.y = c(1.45, 1.25)) + 
+  guides(fill = FALSE) + labs(title = "7d", x = "", y = "P65 enriched / input") +
+  scale_fill_manual(values = c("#d84848", "#1885c7", "#c72c2c")) +
+  scale_color_manual(values = c("#d84848", "#1885c7", "#c72c2c")) +
+  coord_cartesian(ylim = c(-2,2)) + EnvStats::stat_n_text(y.pos = -1.5)
+
+
+```
+
+### Trying to do Ratio of Ratios with DEseq2
+
+```{r, ratio of ratio DESeq2}
+# from here: https://support.bioconductor.org/p/61509/
+
+ror_dds <- DESeqDataSetFromTximport(all_txi, colData = colData, design =  ~ haloDay + haloDay:Fraction)
+ror_dds <- ror_dds[rowMins(counts(ror_dds)) > 10, ]
+ror_dds <- DESeq(ror_dds, test ="LRT", reduced = ~ Fraction + haloDay)
+
+tst_dds <- DESeqDataSetFromTximport(all_txi, colData = colData, design =  ~ Fraction + haloDay)
+tst_dds <- tst_dds[rowMins(counts(ror_dds)) > 10, ]
+tst_dds <- DESeq(tst_dds, test ="LRT", reduced = ~ Fraction)
+
+dds2 <- DESeqDataSetFromTximport(all_txi, colData = colData, design = ~ Fraction + haloDay + haloDay:Fraction)
+#dds2$genotype<-relevel(dds2$haloDay, ref="P65")
+dds2 <- DESeq(dds2)
+
+
+p <- results(dds2,contrast =c('haloDay',"GHH_21d","P65_21d")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(7.5,-7.5), y = c(20,20), label = c(paste("Apical \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("NL \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "21d GP135 enriched / input", y = "FDR, log", x = "[GHH enriched / GHH input]  \n  [P65 enriched / P65 input], log2")
+
+p <- results(dds2,contrast =c('haloDay',"NKHH_21d","P65_21d")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(7.5,-7.5), y = c(30,30), label = c(paste("Basal \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("NL \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "21d NKHH enriched / input", y = "FDR, log", x = "[NKHH enriched / NKHH input]  \n  [P65 enriched / P65 input], log2")
+
+p <- results(dds2,contrast =c('haloDay',"GHH_21d","NKHH_21d")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(7.5,-7.5), y = c(30,30), label = c(paste("Apical \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("Basal \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "21d Apical enriched / Basal enriched", y = "FDR, log", x = "[GHH enriched / GHH input]  \n  [NKHH enriched / NKHH input], log2")
+
+p <- results(dds2,contrast =c('haloDay',"GHH_7d","P65_7d")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(7.5,-7.5), y = c(30,30), label = c(paste("Apical \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("NL \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "7d GP135 enriched / input", y = "FDR, log", x = "[GHH enriched / GHH input]  \n  [P65 enriched / P65 input], log2")
+
+p <- results(dds2,contrast =c('haloDay',"NKHH_7d","P65_7d")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(7.5,-7.5), y = c(30,30), label = c(paste("Basal \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("NL \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "7d NKHH enriched / input", y = "FDR, log", x = "[NKHH enriched / NKHH input]  \n  [P65 enriched / P65 input], log2")
+
+p <- results(dds2,contrast =c('haloDay',"GHH_7d","NKHH_7d")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(7.5,-7.5), y = c(17,17), label = c(paste("Apical \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("Basal \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "7d Apical enriched / Basal enriched", y = "FDR, log", x = "[GHH enriched / GHH input]  \n  [NKHH enriched / NKHH input], log2")
+
+p <- results(dds2,contrast =c('haloDay',"OHH_7d","P65_7dfilt")) %>% as_tibble(rownames = "ensembl_gene_id") %>% mutate(pval = ifelse(padj < 0.05, "< 0.05", ""))
+p %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(7.5,-7.5), y = c(50,50), label = c(paste("TJ \n", sum(p$pval == "< 0.05" & p$log2FoldChange > 0, na.rm = TRUE) , sep = ""), paste("NL \n", sum(p$pval == "< 0.05" & p$log2FoldChange < 0, na.rm = TRUE), sep = "")), size = 7) + labs(title = "7d OHH enriched / input", y = "FDR, log", x = "[OHH enriched / OHH input]  \n  [P65 enriched / P65 input], log2")
+
+
+```
+
+## Comparing all Enriched/Input (AB = Apical enriched / basal enriched)
+
+```{r, fig.width = 25, fig.height = 25, warning = FALSE}
+get_DE_comp <- function(x,y,name) {
+    FCname <- paste(name,"log2FC",sep = "_")
+    Pname <- paste(name,"padj",sep = "_")
+    
+    df <- results(all_dds, contrast = c("Conditions", x, y)) %>%
+        as_tibble(rownames = "ensembl_gene_id") %>% 
+        select(ensembl_gene_id, log2FoldChange, padj) 
+    
+    colnames(df) <- c("ensembl_gene_id", FCname, Pname)
+    
+    return(df)
+}
+
+all_DE_comps <- list(get_DE_comp("C2bbe1_7d_GHH_enriched", "C2bbe1_7d_GHH_input", "GHH_7d"), 
+     get_DE_comp("C2bbe1_7d_NaKATPase_enriched", "C2bbe1_7d_NaKATPase_input", "NKHH_7d"),
+     get_DE_comp("C2bbe1_7d_GHH_enriched", "C2bbe1_7d_NaKATPase_enriched", "AB_7d"),
+     get_DE_comp("C2bbe1_7d_P65_enriched", "C2bbe1_7d_P65_input", "P65_7d"),
+     get_DE_comp("C2bbe1_7dfilt_OHH_enriched", "C2bbe1_7dfilt_OHH_input", "OHH_7d"),
+     get_DE_comp("C2bbe1_21d_GHH_enriched", "C2bbe1_21d_GHH_input", "GHH_21d"), 
+     get_DE_comp("C2bbe1_21d_NaKATPase_enriched", "C2bbe1_21d_NaKATPase_input", "NKHH_21d"), 
+     get_DE_comp("C2bbe1_21d_GHH_enriched", "C2bbe1_21d_NaKATPase_enriched", "AB_21d"),
+     get_DE_comp("C2bbe1_21d_P65_enriched", "C2bbe1_21d_P65_input", "P65_21d"),
+     get_DE_comp("C2bbe1_7dfilt_GHH_enriched", "C2bbe1_7dfilt_GHH_input", "GHH_7dfilt"), 
+     get_DE_comp("C2bbe1_7dfilt_NaKATPase_enriched", "C2bbe1_7dfilt_NaKATPase_input", "NKHH_7dfilt"), 
+     get_DE_comp("C2bbe1_7dfilt_GHH_enriched", "C2bbe1_7dfilt_NaKATPase_enriched", "AB_7dfilt"),
+     get_DE_comp("C2bbe1_7dfilt_P65_enriched", "C2bbe1_7dfilt_P65_input", "P65_7dfilt")) %>% purrr::reduce(left_join, by = "ensembl_gene_id")
+
+
+all_DE_comps %>% select(-ensembl_gene_id, -contains("padj")) %>% rename_with(~ gsub("_log2FC", "", .x)) %>% GGally::ggpairs()
+```
+
+## Comparing all P65 normalized (AB = apical enriched/input / basal enriched/input)
+
+```{r, fig.width = 25, fig.height = 25, warning = FALSE}
+get_DE_comp2 <- function(x,y,name) {
+    FCname <- paste(name,"log2FC",sep = "_")
+    Pname <- paste(name,"padj",sep = "_")
+    
+    df <- results(dds2, contrast = c("haloDay", x, y)) %>%
+        as_tibble(rownames = "ensembl_gene_id") %>% 
+        select(ensembl_gene_id, log2FoldChange, padj) 
+    
+    colnames(df) <- c("ensembl_gene_id", FCname, Pname)
+    
+    return(df)
+}
+
+all_DE_comps2 <- list(get_DE_comp2("GHH_7d", "P65_7d", "GHH_7d"), 
+     get_DE_comp2("NKHH_7d", "P65_7d", "NKHH_7d"),
+     get_DE_comp2("GHH_7d", "NKHH_7d", "AB_7d"),
+     get_DE_comp2("OHH_7d", "P65_7dfilt", "OHH_7d"),
+     get_DE_comp2("GHH_21d", "P65_21d", "GHH_21d"), 
+     get_DE_comp2("NKHH_21d", "P65_21d", "NKHH_21d"), 
+     get_DE_comp2("GHH_21d", "NKHH_21d", "AB_21d"),
+     get_DE_comp2("GHH_7dfilt", "P65_7dfilt", "GHH_7dfilt"), 
+     get_DE_comp2("NKHH_7dfilt", "P65_7dfilt", "NKHH_7dfilt"), 
+     get_DE_comp2("GHH_7dfilt", "NKHH_7dfilt", "AB_7dfilt")) %>% 
+  purrr::reduce(left_join, by = "ensembl_gene_id")
+
+
+all_DE_comps2 %>% select(-ensembl_gene_id, -contains("padj")) %>% rename_with(~ gsub("_log2FC", "", .x)) %>% GGally::ggpairs()
+
+```
+
+## A peek at RP genes
+
+
+```{r, }
+ribo_Genes <- readRDS("hs_RPgenes.txt")
+
+all_DE_comps %>% mutate(RP = ifelse(ensembl_gene_id %in% ribo_Genes, "True", "False")) %>% select(-contains("padj")) %>% gather(-ensembl_gene_id, -RP, key = sample, value = log2FC) %>% separate(sample, into = c("halo", "day", "extra")) %>% ggplot(aes(x = RP, y = log2FC, color = RP)) + geom_boxplot(outlier.shape = NA) + theme_cowplot() + stat_compare_means(comparisons = list(c("True", "False")), label.y = 1, method = "wilcox.test") + facet_grid(day~halo) + scale_x_discrete(limits = c("True", "False")) + guides(color = FALSE) + scale_color_manual(values = c("Black", "Red")) + coord_cartesian(ylim = c(-2,2)) + labs(main = "simple comparisons")
+
+all_DE_comps2 %>% mutate(RP = ifelse(ensembl_gene_id %in% ribo_Genes, "True", "False")) %>% select(-contains("padj")) %>% gather(-ensembl_gene_id, -RP, key = sample, value = log2FC) %>% separate(sample, into = c("halo", "day", "extra")) %>% ggplot(aes(x = RP, y = log2FC, color = RP)) + geom_boxplot(outlier.shape = NA) + theme_cowplot() + stat_compare_means(comparisons = list(c("True", "False")), label.y = c(1,1,1,1,1,1,1,1,1,1), method = "wilcox.test") + facet_grid(day~halo) + scale_x_discrete(limits = c("True", "False")) + guides(color = FALSE) + scale_color_manual(values = c("Black", "Red")) + coord_cartesian(ylim = c(-5,5)) + labs(main = "P65 normalized comparisons")
+
+
+
+
+```
+
+```{r, }
+
+library(eulerr)
+`%notin%` <- Negate(`%in%`)
+fit <- function(l1,l2,l3, n1, n2, n3) {
+  abc = length(Reduce(intersect, list(l1, l2, l3)))
+  ab = sum(l1[l1 %in% l2] %notin% Reduce(intersect, list(l1, l2, l3)))
+  ac = sum(l1[l1 %in% l3] %notin% Reduce(intersect, list(l1, l2, l3)))
+  bc = sum(l2[l2 %in% l3] %notin% Reduce(intersect, list(l1, l2, l3)))
+  
+  a = length(l1)-abc-ab-ac
+  b = length(l2)-abc-ab-bc
+  c = length(l3)-abc-bc-ac
+  f <- euler(c("A"=a, "B"=b, "C"=c, "A&B"=ab, "A&C"=ac, "B&C"=bc, "A&B&C"=abc))
+  f$labels <- c(n1, n2, n3)
+  return(f)
+}
+
+```
+
+## Overlaps of significant genes as calculated enriched Apical/ enriched Basal
+
+```{r, }
+
+v <- fit(pull(filter(all_DE_comps, AB_7d_log2FC > 0, AB_7d_padj < 0.05),ensembl_gene_id),
+         pull(filter(all_DE_comps, AB_7dfilt_log2FC > 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         pull(filter(all_DE_comps, AB_21d_log2FC > 0, AB_21d_padj < 0.05),ensembl_gene_id), "AB_7d_Apical", "AB_7dfilt_Apical", "AB_21d_Apical")
+plot(v, quantities = TRUE, labels = v$labels, main = "AB Apical significant genes")
+
+v <- fit(pull(filter(all_DE_comps, AB_7d_log2FC > 0, AB_7d_padj < 0.05),ensembl_gene_id),
+         pull(filter(all_DE_comps, AB_7dfilt_log2FC < 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         pull(filter(all_DE_comps, AB_21d_log2FC > 0, AB_21d_padj < 0.05),ensembl_gene_id), "AB_7d_Apical", "AB_7dfilt_Basal", "AB_21d_Apical")
+plot(v, quantities = TRUE, labels = v$labels, main = "AB Apical v 7dfilt basal significant genes")
+
+v <- fit(pull(filter(all_DE_comps, AB_7d_log2FC < 0, AB_7d_padj < 0.05),ensembl_gene_id),
+         pull(filter(all_DE_comps, AB_7dfilt_log2FC < 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         pull(filter(all_DE_comps, AB_21d_log2FC < 0, AB_21d_padj < 0.05),ensembl_gene_id), "AB_7d_Basal", "AB_7dfilt_Basal", "AB_21d_Basal")
+plot(v, quantities = TRUE, labels = v$labels, main = "AB Basal significant genes")
+
+v <- fit(pull(filter(all_DE_comps, AB_7d_log2FC < 0, AB_7d_padj < 0.05),ensembl_gene_id),
+         pull(filter(all_DE_comps, AB_7dfilt_log2FC > 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         pull(filter(all_DE_comps, AB_21d_log2FC < 0, AB_21d_padj < 0.05),ensembl_gene_id), "AB_7d_Basal", "AB_7dfilt_Apical", "AB_21d_Basal")
+plot(v, quantities = TRUE, labels = v$labels, main = "AB Basal v 7dfilt apical significant genes")
+
+```
+
+## Overlaps of significant genes as calculated enriched (Apical/input Apical) / (enriched Basal/input Basal)
+
+
+```{r, }
+v <- fit(pull(filter(all_DE_comps2, AB_7d_log2FC > 0, AB_7d_padj < 0.05),ensembl_gene_id),
+         pull(filter(all_DE_comps2, AB_7dfilt_log2FC > 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         pull(filter(all_DE_comps2, AB_21d_log2FC > 0, AB_21d_padj < 0.05),ensembl_gene_id), "AB_7d_Apical", "AB_7dfilt_Apical", "AB_21d_Apical")
+plot(v, quantities = TRUE, labels = v$labels, main = "AB Apical significant genes")
+
+v <- fit(pull(filter(all_DE_comps2, AB_7d_log2FC > 0, AB_7d_padj < 0.05),ensembl_gene_id),
+         pull(filter(all_DE_comps2, AB_7dfilt_log2FC < 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         pull(filter(all_DE_comps2, AB_21d_log2FC > 0, AB_21d_padj < 0.05),ensembl_gene_id), "AB_7d", "AB_7dfilt_Basal", "AB_21d")
+plot(v, quantities = TRUE, labels = v$labels, main = "AB Apical v 7dfilt basal significant genes")
+
+v <- fit(pull(filter(all_DE_comps2, AB_7d_log2FC < 0, AB_7d_padj < 0.05),ensembl_gene_id),
+         pull(filter(all_DE_comps2, AB_7dfilt_log2FC < 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         pull(filter(all_DE_comps2, AB_21d_log2FC < 0, AB_21d_padj < 0.05),ensembl_gene_id), "AB_7d_Basal", "AB_7dfilt_Basal", "AB_21d_Basal")
+plot(v, quantities = TRUE, labels = v$labels, main = "AB Basal significant genes")
+
+v <- fit(pull(filter(all_DE_comps2, AB_7d_log2FC < 0, AB_7d_padj < 0.05),ensembl_gene_id),
+         pull(filter(all_DE_comps2, AB_7dfilt_log2FC > 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         pull(filter(all_DE_comps2, AB_21d_log2FC < 0, AB_21d_padj < 0.05),ensembl_gene_id), "AB_7d_Apical", "AB_7dfilt_Basal", "AB_21d_Apical")
+plot(v, quantities = TRUE, labels = v$labels, main = "AB Basal v 7dfilt apical significant genes")
+
+```
+
+## UPSETS!!
+
+```{r, }
+library(UpSetR)
+library(grid)
+
+upset(fromList(list("AB_7d" = pull(filter(all_DE_comps, AB_7d_log2FC > 0, AB_7d_padj < 0.05),ensembl_gene_id),
+         "AB_7dfilt" = pull(filter(all_DE_comps, AB_7dfilt_log2FC > 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         "AB_21d" = pull(filter(all_DE_comps, AB_21d_log2FC > 0, AB_21d_padj < 0.05),ensembl_gene_id),
+         "AB_7d_norm" = pull(filter(all_DE_comps2, AB_7d_log2FC > 0, AB_7d_padj < 0.05),ensembl_gene_id),
+         "AB_7dfilt_norm" = pull(filter(all_DE_comps2, AB_7dfilt_log2FC > 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         "AB_21d_norm" = pull(filter(all_DE_comps2, AB_21d_log2FC > 0, AB_21d_padj < 0.05),ensembl_gene_id))), order.by = "freq", empty.intersections = "on", nsets = 6)  
+  grid.text("all Apical sig genes",x = 0.65, y=0.95, gp=gpar(fontsize=20))
+
+upset(fromList(list("AB_7d" = pull(filter(all_DE_comps, AB_7d_log2FC < 0, AB_7d_padj < 0.05),ensembl_gene_id),
+         "AB_7dfilt" = pull(filter(all_DE_comps, AB_7dfilt_log2FC < 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         "AB_21d" = pull(filter(all_DE_comps, AB_21d_log2FC < 0, AB_21d_padj < 0.05),ensembl_gene_id),
+         "AB_7d_norm" = pull(filter(all_DE_comps2, AB_7d_log2FC < 0, AB_7d_padj < 0.05),ensembl_gene_id),
+         "AB_7dfilt_norm" = pull(filter(all_DE_comps2, AB_7dfilt_log2FC < 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         "AB_21d_norm" = pull(filter(all_DE_comps2, AB_21d_log2FC < 0, AB_21d_padj < 0.05),ensembl_gene_id))), order.by = "freq", empty.intersections = "on", nsets = 6)  
+  grid.text("all Basal sig genes",x = 0.65, y=0.95, gp=gpar(fontsize=20))
+  
+  
+upset(fromList(list("AB_7d" = pull(filter(all_DE_comps, AB_7d_log2FC > 0, AB_7d_padj < 0.05),ensembl_gene_id),
+         "AB_7dfilt" = pull(filter(all_DE_comps, AB_7dfilt_log2FC > 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         "AB_21d" = pull(filter(all_DE_comps, AB_21d_log2FC > 0, AB_21d_padj < 0.05),ensembl_gene_id),
+         "AB_7d_norm" = pull(filter(all_DE_comps2, AB_7d_log2FC > 0, AB_7d_padj < 0.05),ensembl_gene_id),
+         "AB_7dfilt_norm" = pull(filter(all_DE_comps2, AB_7dfilt_log2FC > 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         "AB_21d_norm" = pull(filter(all_DE_comps2, AB_21d_log2FC > 0, AB_21d_padj < 0.05),ensembl_gene_id),
+         "OHH_7dfilt" = pull(filter(all_DE_comps, AB_7dfilt_log2FC > 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         "OHH_7dfilt_norm" = pull(filter(all_DE_comps2, AB_7dfilt_log2FC > 0, AB_7dfilt_padj < 0.05),ensembl_gene_id))), order.by = "freq", nsets = 8)  
+  grid.text("all Apical and OHH \n sig genes",x = 0.65, y=0.90, gp=gpar(fontsize=20))
+  
+  upset(fromList(list("AB_7d" = pull(filter(all_DE_comps, AB_7d_log2FC < 0, AB_7d_padj < 0.05),ensembl_gene_id),
+         "AB_7dfilt" = pull(filter(all_DE_comps, AB_7dfilt_log2FC < 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         "AB_21d" = pull(filter(all_DE_comps, AB_21d_log2FC < 0, AB_21d_padj < 0.05),ensembl_gene_id),
+         "AB_7d_norm" = pull(filter(all_DE_comps2, AB_7d_log2FC < 0, AB_7d_padj < 0.05),ensembl_gene_id),
+         "AB_7dfilt_norm" = pull(filter(all_DE_comps2, AB_7dfilt_log2FC < 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         "AB_21d_norm" = pull(filter(all_DE_comps2, AB_21d_log2FC < 0, AB_21d_padj < 0.05),ensembl_gene_id),
+         "OHH_7dfilt" = pull(filter(all_DE_comps, AB_7dfilt_log2FC > 0, AB_7dfilt_padj < 0.05),ensembl_gene_id),
+         "OHH_7dfilt_norm" = pull(filter(all_DE_comps2, AB_7dfilt_log2FC > 0, AB_7dfilt_padj < 0.05),ensembl_gene_id))), order.by = "freq", nsets = 8)  
+  grid.text("all Basal and OHH \n sig genes",x = 0.65, y=0.90, gp=gpar(fontsize=20))
+```
+
+## Compare to Neuron Fractioantion
+
+```{r, }
+h2m <- readRDS(file = "human2mousegeneid.txt")
+N_LR <- read.table("FractionationLR_z.txt", header = TRUE) %>% as_tibble()
+N_LR_ave <- N_LR %>% gather(-ensembl_gene_id, -Gene, -ribo, -mito, key = fractionation, value = LR) %>% group_by(ensembl_gene_id, Gene, ribo,mito) %>% summarize(med_LR = median(LR, na.rm =TRUE)) %>% na.omit() %>% ungroup() %>%  select(ensembl_gene_id, med_LR) %>% rename("Neuron_log2FC" = med_LR) 
+
+N_LR_ave %>% left_join(., h2m, by = c("ensembl_gene_id" = "mouse_gene")) %>% full_join(., all_DE_comps, by = c("ensembl_gene_id.y" = "ensembl_gene_id")) %>%  select(Neuron_log2FC, contains("AB"), -contains("padj")) %>% rename_with(~ gsub("_log2FC", "", .x)) %>% GGally::ggpairs()
+
+```
+
+## Compare to Mouse LCM data
+
+```{r, warnings = FALSE}
+LCM_AB_f <- readRDS(file = "LCM_apical_basal_dds_results_filtered.txt")
+LCM_AB_f <- LCM_AB_f %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(LCM_AB_f)) %>% dplyr::select(ensembl_gene_id, log2FoldChange, padj) %>% na.omit() %>% rename("LCM_AB_log2FC" = log2FoldChange, "LCM_AB_padj" = padj)
+
+LCM_AB_f %>% left_join(., h2m, by = c("ensembl_gene_id" = "mouse_gene")) %>% full_join(., all_DE_comps, by = c("ensembl_gene_id.y" = "ensembl_gene_id")) %>%  select(contains("AB"), -contains("padj")) %>% rename_with(~ gsub("_log2FC", "", .x)) %>% GGally::ggpairs()
+
+```
+
+```{r, genes of interest, warning = FALSE}
+
+GOI <- c("RPL7", "RPS28", "SERPINF2", "OSBPL3", "COL12A1", "SDC2", "NET1")
+
+q <- LCM_AB_f %>% left_join(., h2m, by = c("ensembl_gene_id" = "mouse_gene")) %>% full_join(., all_DE_comps, by = c("ensembl_gene_id.y" = "ensembl_gene_id")) %>% left_join(ens2gene, by = c("ensembl_gene_id.y" = "ensembl_gene_id")) %>% dplyr::select(ensembl_gene_id.y, Gene, contains("AB")) %>% rename_with(~ gsub("_log2FC", "", .x)) %>% unite(3,4,col = "LCM_AB", sep = "_") %>% unite(4,5,col = "AB_7d", sep = "_") %>% unite(5,6,col = "AB_21d",sep = "_") %>% unite(6,7,col = "AB_7dfilt",sep = "_") %>% gather(-ensembl_gene_id.y, -Gene, key = sample, value = log2FC_padj) %>% separate(log2FC_padj, into = c("log2FC", "padj"), sep = "_") %>% mutate(log2FC = as.numeric(log2FC), padj = as.numeric(padj)) %>% na.omit() %>% unique() %>% mutate(sig = ifelse(padj < 0.05, "<0.05", "ns"), GOI = ifelse(Gene %in% GOI, "yes", "no"), AB = ifelse(Gene %in% c("OSBPL3", "COL12A1"), "apical", ifelse(Gene %in% c("RPL7", "RPS28", "SERPINF2", "SDC2", "NET1"), "basal", "NL"))) 
+
+q %>% ggplot(aes(x = log2FC, y = -log10(padj))) + geom_point(aes(alpha = sig, color = AB, size = GOI)) + facet_wrap(.~sample) + theme_cowplot() + scale_color_manual(values = c("Green", "Blue", "Black")) + scale_alpha_manual(values = c(0.5,0.001)) + ggrepel::geom_text_repel(data = subset(q, GOI != "no"), aes(label = Gene, col = AB), size = 3, alpha = 1) + scale_size_manual(values = c(1,4)) + coord_cartesian(ylim = c(0,15))
+
+```
+
+## Other markers
+
+```{r, }
+
+ribo_Genes <- readRDS("hs_RPgenes.txt")
+ETCgenes <- readRDS(file = "hs_ETCgenes.txt")
+nucleargenes <- readRDS(file = "hs_nucleargenes.txt")
+ERgenes <- readRDS(file = "hs_ERgenes.txt")
+Mito_Mat <- readRDS(file = "hs_mitomatrixgenes.txt")
+Mito_tx <- readRDS(file = "hs_mitotranscript.txt")
+signalseqgenes <- read.table(file = "AllSignalSequences.txt") %>% as_tibble() %>% filter(V10 == "Y") %>% separate(V1, into = c("ensembl_gene_id", "ensembl_transcript_id"), sep = "_") %>% mutate(ensembl_gene_id = substr(ensembl_gene_id, 0, 15)) %>% select(ensembl_gene_id) %>% unique() %>% pull(., ensembl_gene_id)
+
+
+# TJgenes <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0070160'), mart = mart) %>% as_tibble() %>% pull(.,ensembl_gene_id)
+# apicalPM <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0016324'), mart = mart) %>% as_tibble() %>% pull(.,ensembl_gene_id)
+# apical_poc <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0045177'), mart = mart) %>% as_tibble() %>% pull(.,ensembl_gene_id)
+# basalPM <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0009925'), mart = mart) %>% as_tibble() %>% pull(.,ensembl_gene_id)
+# basal_poc <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0045178'), mart = mart) %>% as_tibble() %>% pull(.,ensembl_gene_id)
+# PM <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0005886'), mart = mart) %>% as_tibble() %>% pull(.,ensembl_gene_id)
+# BB <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0005903'), mart = mart) %>% as_tibble() %>% pull(.,ensembl_gene_id)
+
+# write.table(TJgenes, "hs_TJgenes.txt")
+# write.table(apicalPM, "hs_apicalplasmamembranegenes.txt")
+# write.table(apical_poc, "hs_apicalpartofcellgenes.txt")
+# write.table(basalPM, "hs_basalplasmamembranegenes.txt")
+# write.table(basal_poc, "hs_basalpartofcellgenes.txt")
+# write.table(PM, "hs_plasmamemgenes.txt")
+# write.table(BB, "hs_brushbordergenes.txt")
+
+TJgenes <- read.table("hs_TJgenes.txt")
+apicalPM <- read.table("hs_apicalplasmamembranegenes.txt")
+apical_poc <- read.table("hs_apicalpartofcellgenes.txt")
+basalPM <- read.table("hs_basalplasmamembranegenes.txt")
+basal_poc <- read.table("hs_basalpartofcellgenes.txt")
+PM <- read.table("hs_plasmamemgenes.txt")
+BB <- read.table("hs_brushbordergenes.txt")
+
+
+p <- LCM_AB_f %>% left_join(., h2m, by = c("ensembl_gene_id" = "mouse_gene")) %>% full_join(., all_DE_comps, by = c("ensembl_gene_id.y" = "ensembl_gene_id")) %>% left_join(ens2gene, by = c("ensembl_gene_id.y" = "ensembl_gene_id")) %>%  select(ensembl_gene_id.y, Gene, contains("AB") | contains("OHH"), -contains("padj")) %>% rename_with(~ gsub("_log2FC", "", .x)) %>% gather(-ensembl_gene_id.y, -Gene, key = sample, value = log2FC) %>% na.omit() %>% unique() %>% 
+  mutate(RP = ifelse(ensembl_gene_id.y %in% ribo_Genes, "True", "False"), 
+         ETC = ifelse(ensembl_gene_id.y %in% ETCgenes, "True", "False"),
+         Nuc = ifelse(ensembl_gene_id.y %in% nucleargenes, "True", "False"),
+         ER = ifelse(ensembl_gene_id.y %in% ERgenes, "True", "False"),
+         Mito_mat = ifelse(ensembl_gene_id.y %in% Mito_Mat, "True", "False"),
+         Mito_tx = ifelse(ensembl_gene_id.y %in% Mito_tx, "True", "False"),
+         SS = ifelse(ensembl_gene_id.y %in% signalseqgenes, "True", "False"),
+         TJ = ifelse(ensembl_gene_id.y %in% TJgenes$x, "True", "False"),
+         apicalPM = ifelse(ensembl_gene_id.y %in% apicalPM$x, "True", "False"),
+         apical_poc = ifelse(ensembl_gene_id.y %in% apical_poc$x, "True", "False"),
+         basalPM = ifelse(ensembl_gene_id.y %in% basalPM$x, "True", "False"),
+         basal_poc = ifelse(ensembl_gene_id.y %in% basal_poc$x, "True", "False"),
+         PM = ifelse(ensembl_gene_id.y %in% PM$x, "True", "False"),
+         BB = ifelse(ensembl_gene_id.y %in% BB$x, "True", "False"),)
+
+
+p %>% ggplot(aes(x = RP, y = log2FC, color = RP)) + geom_boxplot(outlier.shape = NA) + theme_cowplot() + stat_compare_means(comparisons = list(c("True", "False")), label.y = 1, method = "wilcox.test") + facet_grid(.~sample) + scale_x_discrete(limits = c("True", "False")) + guides(color = FALSE) + scale_color_manual(values = c("Black", "Red")) + coord_cartesian(ylim = c(-1.5,1.5))
+
+p %>% ggplot(aes(x = ETC, y = log2FC, color = ETC)) + geom_boxplot(outlier.shape = NA) + theme_cowplot() + stat_compare_means(comparisons = list(c("True", "False")), label.y = 1, method = "wilcox.test") + facet_grid(.~sample) + scale_x_discrete(limits = c("True", "False")) + guides(color = FALSE) + scale_color_manual(values = c("Black", "Red")) + coord_cartesian(ylim = c(-1.5,1.5))
+
+p %>% ggplot(aes(x = Mito_mat, y = log2FC, color = Mito_mat)) + geom_boxplot(outlier.shape = NA) + theme_cowplot() + stat_compare_means(comparisons = list(c("True", "False")), label.y = 1, method = "wilcox.test") + facet_grid(.~sample) + scale_x_discrete(limits = c("True", "False")) + guides(color = FALSE) + scale_color_manual(values = c("Black", "Red")) + coord_cartesian(ylim = c(-1.5,1.5))
+
+p %>% ggplot(aes(x = Nuc, y = log2FC, color = Nuc)) + geom_boxplot(outlier.shape = NA) + theme_cowplot() + stat_compare_means(comparisons = list(c("True", "False")), label.y = 1, method = "wilcox.test") + facet_grid(.~sample) + scale_x_discrete(limits = c("True", "False")) + guides(color = FALSE) + scale_color_manual(values = c("Black", "Red")) + coord_cartesian(ylim = c(-1.5,1.5))
+
+p %>% ggplot(aes(x = ER, y = log2FC, color = ER)) + geom_boxplot(outlier.shape = NA) + theme_cowplot() + stat_compare_means(comparisons = list(c("True", "False")), label.y = 1, method = "wilcox.test") + facet_grid(.~sample) + scale_x_discrete(limits = c("True", "False")) + guides(color = FALSE) + scale_color_manual(values = c("Black", "Red")) + coord_cartesian(ylim = c(-1.5,1.5))
+
+p %>% ggplot(aes(x = SS, y = log2FC, color = SS)) + geom_boxplot(outlier.shape = NA) + theme_cowplot() + stat_compare_means(comparisons = list(c("True", "False")), label.y = 1, method = "wilcox.test") + facet_grid(.~sample) + scale_x_discrete(limits = c("True", "False")) + guides(color = FALSE) + scale_color_manual(values = c("Black", "Red")) + coord_cartesian(ylim = c(-1.5,1.5))
+
+p %>% ggplot(aes(x = apicalPM, y = log2FC, color = apicalPM)) + geom_boxplot(outlier.shape = NA) + theme_cowplot() + stat_compare_means(comparisons = list(c("True", "False")), label.y = 1, method = "wilcox.test") + facet_grid(.~sample) + scale_x_discrete(limits = c("True", "False")) + guides(color = FALSE) + scale_color_manual(values = c("Black", "Red")) + coord_cartesian(ylim = c(-1.5,1.5))
+
+p %>% ggplot(aes(x = apical_poc, y = log2FC, color = apical_poc)) + geom_boxplot(outlier.shape = NA) + theme_cowplot() + stat_compare_means(comparisons = list(c("True", "False")), label.y = 1, method = "wilcox.test") + facet_grid(.~sample) + scale_x_discrete(limits = c("True", "False")) + guides(color = FALSE) + scale_color_manual(values = c("Black", "Red")) + coord_cartesian(ylim = c(-1.5,1.5))
+
+p %>% ggplot(aes(x = basalPM, y = log2FC, color = basalPM)) + geom_boxplot(outlier.shape = NA) + theme_cowplot() + stat_compare_means(comparisons = list(c("True", "False")), label.y = 1, method = "wilcox.test") + facet_grid(.~sample) + scale_x_discrete(limits = c("True", "False")) + guides(color = FALSE) + scale_color_manual(values = c("Black", "Red")) + coord_cartesian(ylim = c(-1.5,1.5))
+
+p %>% ggplot(aes(x = basal_poc, y = log2FC, color = basal_poc)) + geom_boxplot(outlier.shape = NA) + theme_cowplot() + stat_compare_means(comparisons = list(c("True", "False")), label.y = 1, method = "wilcox.test") + facet_grid(.~sample) + scale_x_discrete(limits = c("True", "False")) + guides(color = FALSE) + scale_color_manual(values = c("Black", "Red")) + coord_cartesian(ylim = c(-1.5,1.5))
+
+p %>% ggplot(aes(x = PM, y = log2FC, color = PM)) + geom_boxplot(outlier.shape = NA) + theme_cowplot() + stat_compare_means(comparisons = list(c("True", "False")), label.y = 1, method = "wilcox.test") + facet_grid(.~sample) + scale_x_discrete(limits = c("True", "False")) + guides(color = FALSE) + scale_color_manual(values = c("Black", "Red")) + coord_cartesian(ylim = c(-1.5,1.5))
+
+p %>% ggplot(aes(x = BB, y = log2FC, color = BB)) + geom_boxplot(outlier.shape = NA) + theme_cowplot() + stat_compare_means(comparisons = list(c("True", "False")), label.y = 1, method = "wilcox.test") + facet_grid(.~sample) + scale_x_discrete(limits = c("True", "False")) + guides(color = FALSE) + scale_color_manual(values = c("Black", "Red")) + coord_cartesian(ylim = c(-1.5,1.5))
+
+p %>% ggplot(aes(x = TJ, y = log2FC, color = TJ)) + geom_boxplot(outlier.shape = NA) + theme_cowplot() + stat_compare_means(comparisons = list(c("True", "False")), label.y = 1, method = "wilcox.test") + facet_grid(.~sample) + scale_x_discrete(limits = c("True", "False")) + guides(color = FALSE) + scale_color_manual(values = c("Black", "Red")) + coord_cartesian(ylim = c(-1.5,1.5))
+
+```
+
+# just the significant genes
+
+```{r, }
+# apical
+v <- fit(filter(q, padj < 0.05, log2FC > 0, sample == "LCM_AB")$ensembl_gene_id.y,
+         filter(q, padj < 0.05, log2FC > 0, sample == "AB_7dfilt")$ensembl_gene_id.y,
+         "na", "AB_LCM_Apical", "AB_7dfilt_Apical", "")
+pval <- phyper(as.numeric(v$original["A&B"]),
+       as.numeric(v$original["A&B"]+v$original["A"]),
+       as.numeric(length(unique(filter(p,sample %in% c("LCM_AB", "AB_7dfilt"))$ensembl_gene_id.y))-v$original["A&B"]+v$original["A"]),
+       as.numeric(v$original["A&B"]+v$original["B"]),  lower.tail = FALSE)
+plot(v, quantities = TRUE, labels = v$labels, main = paste("AB Apical significant genes \n p =", format(pval, digits = 3)))
+
+v <- fit(filter(q, padj < 0.05, log2FC > 0, sample == "LCM_AB")$ensembl_gene_id.y,
+         filter(q, padj < 0.05, log2FC > 0, sample == "AB_21d")$ensembl_gene_id.y,
+         "na", "AB_LCM_Apical", "AB_21d_Apical", "")
+pval <- phyper(as.numeric(v$original["A&B"]),
+       as.numeric(v$original["A&B"]+v$original["A"]),
+       as.numeric(length(unique(filter(p,sample %in% c("LCM_AB", "AB_21d"))$ensembl_gene_id.y))-v$original["A&B"]+v$original["A"]),
+       as.numeric(v$original["A&B"]+v$original["B"]),  lower.tail = FALSE)
+plot(v, quantities = TRUE, labels = v$labels, main = paste("AB Apical significant genes \n p =", format(pval, digits = 3)))
+
+v <- fit(filter(q, padj < 0.05, log2FC > 0, sample == "LCM_AB")$ensembl_gene_id.y,
+         filter(q, padj < 0.05, log2FC > 0, sample == "AB_7d")$ensembl_gene_id.y,
+         "na", "AB_LCM_Apical", "AB_7d_Apical", "")
+pval <- phyper(as.numeric(v$original["A&B"]),
+       as.numeric(v$original["A&B"]+v$original["A"]),
+       as.numeric(length(unique(filter(p,sample %in% c("LCM_AB", "AB_7d"))$ensembl_gene_id.y))-v$original["A&B"]+v$original["A"]),
+       as.numeric(v$original["A&B"]+v$original["B"]),  lower.tail = FALSE)
+plot(v, quantities = TRUE, labels = v$labels, main = paste("AB Apical significant genes \n p =", format(pval, digits = 3)))
+
+# basal
+
+v <- fit(filter(q, padj < 0.05, log2FC < 0, sample == "LCM_AB")$ensembl_gene_id.y,
+         filter(q, padj < 0.05, log2FC < 0, sample == "AB_7dfilt")$ensembl_gene_id.y,
+         "na", "AB_LCM_Basal", "AB_7dfilt_Basal", "")
+pval <- phyper(as.numeric(v$original["A&B"]),
+       as.numeric(v$original["A&B"]+v$original["A"]),
+       as.numeric(length(unique(filter(p,sample %in% c("LCM_AB", "AB_7dfilt"))$ensembl_gene_id.y))-v$original["A&B"]+v$original["A"]),
+       as.numeric(v$original["A&B"]+v$original["B"]),  lower.tail = FALSE)
+plot(v, quantities = TRUE, labels = v$labels, main = paste("AB Basal significant genes \n p =", format(pval, digits = 3)))
+
+v <- fit(filter(q, padj < 0.05, log2FC < 0, sample == "LCM_AB")$ensembl_gene_id.y,
+         filter(q, padj < 0.05, log2FC < 0, sample == "AB_21d")$ensembl_gene_id.y,
+         "na", "AB_LCM_Basal", "AB_21d_Basal", "")
+pval <- phyper(as.numeric(v$original["A&B"]),
+       as.numeric(v$original["A&B"]+v$original["A"]),
+       as.numeric(length(unique(filter(p,sample %in% c("LCM_AB", "AB_21d"))$ensembl_gene_id.y))-v$original["A&B"]+v$original["A"]),
+       as.numeric(v$original["A&B"]+v$original["B"]),  lower.tail = FALSE)
+plot(v, quantities = TRUE, labels = v$labels, main = paste("AB Basal significant genes \n p =", format(pval, digits = 3)))
+
+v <- fit(filter(q, padj < 0.05, log2FC < 0, sample == "LCM_AB")$ensembl_gene_id.y,
+         filter(q, padj < 0.05, log2FC < 0, sample == "AB_7d")$ensembl_gene_id.y,
+         "na", "AB_LCM_Basal", "AB_7d_Basal", "")
+pval <- phyper(as.numeric(v$original["A&B"]),
+       as.numeric(v$original["A&B"]+v$original["A"]),
+       as.numeric(length(unique(filter(p,sample %in% c("LCM_AB", "AB_7d"))$ensembl_gene_id.y))-v$original["A&B"]+v$original["A"]),
+       as.numeric(v$original["A&B"]+v$original["B"]),  lower.tail = FALSE)
+plot(v, quantities = TRUE, labels = v$labels, main = paste("AB Basal significant genes \n p =", format(pval, digits = 3)))
+
+# A v B
+
+v <- fit(filter(q, padj < 0.05, log2FC < 0, sample == "LCM_AB")$ensembl_gene_id.y,
+         filter(q, padj < 0.05, log2FC > 0, sample == "AB_7dfilt")$ensembl_gene_id.y,
+         "na", "AB_LCM_Basal", "AB_7dfilt_Apical", "")
+pval <- phyper(as.numeric(v$original["A&B"]),
+       as.numeric(v$original["A&B"]+v$original["A"]),
+       as.numeric(length(unique(filter(p,sample %in% c("LCM_AB", "AB_7dfilt"))$ensembl_gene_id.y))-v$original["A&B"]+v$original["A"]),
+       as.numeric(v$original["A&B"]+v$original["B"]),  lower.tail = FALSE)
+plot(v, quantities = TRUE, labels = v$labels, main = paste("A v B significant genes \n p =", format(pval, digits = 3)))
+
+v <- fit(filter(q, padj < 0.05, log2FC < 0, sample == "LCM_AB")$ensembl_gene_id.y,
+         filter(q, padj < 0.05, log2FC > 0, sample == "AB_21d")$ensembl_gene_id.y,
+         "na", "AB_LCM_Basal", "AB_21d_Apical", "")
+pval <- phyper(as.numeric(v$original["A&B"]),
+       as.numeric(v$original["A&B"]+v$original["A"]),
+       as.numeric(length(unique(filter(p,sample %in% c("LCM_AB", "AB_21d"))$ensembl_gene_id.y))-v$original["A&B"]+v$original["A"]),
+       as.numeric(v$original["A&B"]+v$original["B"]),  lower.tail = FALSE)
+plot(v, quantities = TRUE, labels = v$labels, main = paste("A v B significant genes \n p =", format(pval, digits = 3)))
+
+v <- fit(filter(q, padj < 0.05, log2FC < 0, sample == "LCM_AB")$ensembl_gene_id.y,
+         filter(q, padj < 0.05, log2FC > 0, sample == "AB_7d")$ensembl_gene_id.y,
+         "na", "AB_LCM_Basal", "AB_7d_Apical", "")
+pval <- phyper(as.numeric(v$original["A&B"]),
+       as.numeric(v$original["A&B"]+v$original["A"]),
+       as.numeric(length(unique(filter(p,sample %in% c("LCM_AB", "AB_7d"))$ensembl_gene_id.y))-v$original["A&B"]+v$original["A"]),
+       as.numeric(v$original["A&B"]+v$original["B"]),  lower.tail = FALSE)
+plot(v, quantities = TRUE, labels = v$labels, main = paste("A vB significant genes \n p =", format(pval, digits = 3)))
+
+
+```
+
+```{r, LARP stuff}
+med_dat <- all_tpms %>% as_tibble(rownames = "ensembl_gene_id") %>% left_join(., ens2gene) %>% filter(grepl("LARP", Gene) == TRUE) %>% gather(-ensembl_gene_id, -Gene, key = sample, value = tpm) %>% 
+  mutate(sample = ifelse(grepl(sample, pattern = "_7d_") | 
+                           grepl(sample, pattern = "_21d_"), sample, paste("C2bbe1_7dfilter_", substr(sample, 8,nchar(sample)), sep = ""))) %>% separate(sample, into = c("C2bbe1","day", "halo", "fraction", "rep"), sep = "_") %>% filter(fraction == "input") %>% group_by(Gene,day) %>% summarize(med = median(tpm, na.rm =TRUE)) %>% mutate(med = round(med, digits = 1))
+
+all_tpms %>% as_tibble(rownames = "ensembl_gene_id") %>% left_join(., ens2gene) %>% filter(grepl("LARP", Gene) == TRUE) %>% gather(-ensembl_gene_id, -Gene, key = sample, value = tpm) %>% 
+  mutate(sample = ifelse(grepl(sample, pattern = "_7d_") | 
+                           grepl(sample, pattern = "_21d_"), sample, paste("C2bbe1_7dfilter_", substr(sample, 8,nchar(sample)), sep = ""))) %>% separate(sample, into = c("C2bbe1","day", "halo", "fraction", "rep"), sep = "_") %>% filter(fraction == "input") %>% ggplot(aes(x = Gene, y = tpm, fill = Gene)) + geom_violin() + geom_boxplot(width = 0.25) + geom_point(position = "jitter") + theme_cowplot() + guides(fill = FALSE) + facet_wrap(.~day,nrow = 3) + geom_text(data = med_dat, aes(x = Gene, y = -25, label = med), size = 3)
+
+
+all_DE_comps %>% left_join(., ens2gene) %>% filter(grepl("LARP", Gene) == TRUE) %>% select(ensembl_gene_id, Gene, contains("AB")) %>% unite(3,4,col = "AB_7d", sep = "_") %>% unite(4,5,col = "AB_21d",sep = "_") %>% unite(5,6,col = "AB_7dfilt",sep = "_") %>% gather(contains("AB"), key = sample, value = log2FC_padj) %>% separate(log2FC_padj, into = c("log2FC", "padj"), sep = "_") %>% mutate(log2FC = as.numeric(log2FC), padj = as.numeric(padj)) %>% ggplot(aes(x = Gene, y = log2FC, col = -log10(padj))) + geom_point(size = 5) + theme_cowplot() + guides(fill = FALSE) + facet_wrap(.~sample, nrow = 3) + geom_hline(yintercept = 0, linetype = "dashed")
+```
+
+```{r, }
+library(topGO)
+
+GEA <- function(interesting_genes, ontology, genelist = FALSE){
+ 
+   topDiffGenes <- function(allScore) {
+   return(allScore < 0.01)
+  }
+  
+  gene_universe_FDR <- all_DE_comps %>% dplyr::select(ensembl_gene_id, contains("AB"), -contains("padj")) %>% gather(-ensembl_gene_id, key = sample, value = padj) %>% dplyr::pull(padj)
+  names(gene_universe_FDR) <- all_DE_comps %>% dplyr::select(ensembl_gene_id, contains("AB"), -contains("padj")) %>% gather(-ensembl_gene_id, key = sample, value = padj)  %>% dplyr::pull(ensembl_gene_id) 
+  
+
+  gene_universe_int <- factor(as.integer(names(gene_universe_FDR) %in% interesting_genes))
+  names(gene_universe_int) <- names(gene_universe_FDR)
+  
+  go_data <- new("topGOdata",
+                 ontology = ontology,
+                 allGenes = gene_universe_int,
+                 nodeSize = 5,
+                 annotationFun = annFUN.org,
+                 mapping = "org.Hs.eg",
+                 ID = "ensembl")
+  
+  test.stat <- new("classicCount", testStatistic = GOFisherTest, name = "Fisher test")
+  resultFisher <- getSigGroups(go_data, test.stat)
+  allGO <- usedGO(go_data)
+  if(genelist == FALSE) {
+   table <- GenTable(go_data, pval = resultFisher, orderBy = "weight", ranksOf = "classic", topNodes = length(allGO)) %>% as_tibble()
+    return(table)
+  } 
+  if(genelist == TRUE){
+    return(sigGenes(go_data))
+  }
+  #print(knitr::kable(GenTable(go_data, pval = resultFisher, orderBy = "weight", ranksOf = "classic", topNodes = 20), caption = title))
+  #showSigOfNodes(go_data, score(resultFisher), firstSigNodes = 5, useInfo = 'all')
+  #return(table)
+  
+}
+
+
+```
+
+For GO enrichment analyses we can either consider the "positive genes" which use more distal APA under hypoxic conditions (76), "negative genes" which use more distal APA under hypoxic conditions (50), or disregard the direction and consider all genes with changing APA (126). Each of these are compared against a "gene universe" of sufficiently expressed genes within the Parental dataset.
+
+```{r, eval = FALSE}
+# apical_all_genes <- q %>% filter(sample != "LCM_AB", log2FC > 0, padj < 0.05) %>% dplyr::pull(ensembl_gene_id.y) %>% unique()
+# apical_2_3_genes <- q %>% filter(sample != "LCM_AB", log2FC > 0, padj < 0.05) %>% group_by(ensembl_gene_id.y) %>% summarise(sigcnt = sum(sig == "<0.05")) %>% filter(sigcnt > 1) %>% pull(ensembl_gene_id.y) %>% unique()
+# basal_all_genes <- q %>% filter(sample != "LCM_AB", log2FC < 0, padj < 0.05) %>% dplyr::pull(ensembl_gene_id.y) %>% unique()
+# basal_2_3_genes <- q %>% filter(sample != "LCM_AB", log2FC < 0, padj < 0.05) %>% group_by(ensembl_gene_id.y) %>% summarise(sample != "LCM_AB", sigcnt = sum(sig == "<0.05")) %>% filter(sigcnt > 1) %>% pull(ensembl_gene_id.y) %>% unique()
+# 
+# 
+# apical_all_genes_BP <- GEA(apical_all_genes, "BP")
+# apical_all_genes_MF <- GEA(apical_all_genes, "MF")
+# apical_all_genes_CC <- GEA(apical_all_genes, "CC")
+# apical_all_genes_GO <- bind_rows(list("BP" = apical_all_genes_BP, "MF" = apical_all_genes_MF, "CC" = apical_all_genes_CC), .id = "ontology")
+# write.table(apical_all_genes_GO, "apical_all_genes_GO.txt")
+# 
+# apical_2_3_genes_BP <- GEA(apical_2_3_genes, "BP")
+# apical_2_3_genes_MF <- GEA(apical_2_3_genes, "MF")
+# apical_2_3_genes_CC <- GEA(apical_2_3_genes, "CC")
+# apical_2_3_genes_GO <- bind_rows(list("BP" = apical_2_3_genes_BP, "MF" = apical_2_3_genes_MF, "CC" = apical_2_3_genes_CC), .id = "ontology")
+# write.table(apical_2_3_genes_GO, "apical_2_3_genes_GO.txt")
+# 
+# basal_all_genes_BP <- GEA(basal_all_genes, "BP")
+# basal_all_genes_MF <- GEA(basal_all_genes, "MF")
+# basal_all_genes_CC <- GEA(basal_all_genes, "CC")
+# basal_all_genes_GO <- bind_rows(list("BP" = basal_all_genes_BP, "MF" = basal_all_genes_MF, "CC" = basal_all_genes_CC), .id = "ontology")
+# write.table(basal_all_genes_GO, "basal_all_genes_GO.txt")
+# 
+# basal_2_3_genes_BP <- GEA(basal_2_3_genes, "BP")
+# basal_2_3_genes_MF <- GEA(basal_2_3_genes, "MF")
+# basal_2_3_genes_CC <- GEA(basal_2_3_genes, "CC")
+# basal_2_3_genes_GO <- bind_rows(list("BP" = basal_2_3_genes_BP, "MF" = basal_2_3_genes_MF, "CC" = basal_2_3_genes_CC), .id = "ontology")
+# write.table(basal_2_3_genes_GO, "basal_2_3_genes_GO.txt")
+
+```
+
+For each I have plotted the top 20 significant gene ontologies. Color indicates significance, while size of dot indicates the proportion of enriched genes within the GO.
+
+
+```{r, }
+apical_all_genes_GO <- as_tibble(read.table("apical_all_genes_GO.txt", header = TRUE))
+apical_2_3_genes_GO <- as_tibble(read.table("apical_2_3_genes_GO.txt", header = TRUE))
+basal_all_genes_GO <- as_tibble(read.table("basal_all_genes_GO.txt", header = TRUE))
+basal_2_3_genes_GO <- as_tibble(read.table("basal_2_3_genes_GO.txt", header = TRUE))
+
+```
+
+```{r, fig.width = 10, fig.height=10, echo = FALSE}
+sig_num <- filter(apical_all_genes_GO, pval < 0.05) %>% nrow()
+filter(apical_all_genes_GO, pval < 0.05) %>% 
+  arrange(pval) %>% 
+  head(20) %>% 
+  ggplot(aes(x = -log10(pval), 
+             y = factor(Term, levels = rev(Term)),
+             col = pval, 
+             size = Significant/Annotated)) +
+  geom_point() + 
+  theme_minimal_grid() +
+  labs(y = "", title = paste("All significant apical gene GO terms (top 20 of ", sig_num, ")", sep = ""))
+```
+
+<details>
+  <summary>Click for full Table</summary>
+```{r, echo = FALSE}
+knitr::kable(arrange(filter(apical_all_genes_GO, pval < 0.05),pval), caption = "All significant apical GOs")
+```
+</details> 
+
+```{r, fig.width = 10, fig.height=10, echo = FALSE}
+sig_num <- filter(apical_2_3_genes_GO, pval < 0.05) %>% nrow()
+filter(apical_2_3_genes_GO, pval < 0.05) %>% 
+  arrange(pval) %>% 
+  head(20) %>% 
+  ggplot(aes(x = -log10(pval), 
+             y = factor(Term, levels = rev(Term)),
+             col = pval, 
+             size = Significant/Annotated)) +
+  geom_point() + 
+  theme_minimal_grid() +
+  labs(y = "", title = paste("2/3 significant apical gene GO terms (top 20 of ", sig_num, ")", sep = ""))
+```
+
+<details>
+  <summary>Click for full Table</summary>
+```{r, echo = FALSE}
+knitr::kable(arrange(filter(apical_all_genes_GO, pval < 0.05),pval), caption = "2/3 significant apical GOs")
+```
+</details> 
+
+```{r, fig.width = 10, fig.height=10, echo = FALSE}
+sig_num <- filter(basal_all_genes_GO, pval < 0.05) %>% nrow()
+filter(basal_all_genes_GO, pval < 0.05) %>% 
+  arrange(pval) %>% 
+  head(20) %>% 
+  ggplot(aes(x = -log10(pval), 
+             y = factor(Term, levels = rev(Term)),
+             col = pval, 
+             size = Significant/Annotated)) +
+  geom_point() + 
+  theme_minimal_grid() +
+  labs(y = "", title = paste("All significant basal gene GO terms (top 20 of ", sig_num, ")", sep = ""))
+```
+
+<details>
+  <summary>Click for full Table</summary>
+```{r, echo = FALSE}
+knitr::kable(arrange(filter(basal_all_genes_GO, pval < 0.05),pval), caption = "All significant basal GOs")
+```
+</details> 
+
+```{r, fig.width = 10, fig.height=10, echo = FALSE}
+sig_num <- filter(basal_2_3_genes_GO, pval < 0.05) %>% nrow()
+filter(basal_2_3_genes_GO, pval < 0.05) %>% 
+  arrange(pval) %>% 
+  head(20) %>% 
+  ggplot(aes(x = -log10(pval), 
+             y = factor(Term, levels = rev(Term)),
+             col = pval, 
+             size = Significant/Annotated)) +
+  geom_point() + 
+  theme_minimal_grid() +
+  labs(y = "", title = paste("2/3 significant basal gene GO terms (top 20 of ", sig_num, ")", sep = ""))
+```
+
+<details>
+  <summary>Click for full Table</summary>
+```{r, echo = FALSE}
+knitr::kable(arrange(filter(basal_all_genes_GO, pval < 0.05),pval), caption = "2/3 significant basal GOs")
+```
+</details> 

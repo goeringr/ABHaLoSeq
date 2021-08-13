@@ -1,0 +1,78 @@
+---
+title: "LongestLastExonBed"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(FeatureReachR)
+library(GenomicFeatures)
+library(rtracklayer)
+library(tidyverse)
+```
+
+```{r, }
+hs_filtered_TxDb <- filter_Tx(system.file("extdata", "gencode.v33.annotation.gff3.gz", package = "FeatureReachR"), filter = TRUE)
+longest_hs <- make_longest_df(hs_filtered_TxDb)
+
+# longest 3'UTR transcript / gene (limits to only protein coding 28321 genes)
+exonsBy(hs_filtered_TxDb, by = "tx", use.names = TRUE)[names(exonsBy(hs_filtered_TxDb, by = "tx", use.names = TRUE)) %in% longest_hs$UTR3]
+
+tidyexons <- tidyExons(hs_filtered_TxDb)
+
+exonicparts <- exonicParts(hs_filtered_TxDb, linked.to.single.gene.only = TRUE)
+
+#makeGRangesList
+
+tidyexons_list <- split(tidyexons, tidyexons$gene_id)
+
+lastexoningRanges <- function(Grange) {
+  p <- 1:length(elementMetadata(Grange)[,"exon_rank"]) #length of Granges
+  q <- unlist(lapply(p, function(p) max(elementMetadata(Grange)[,"exon_rank"]) %in% elementMetadata(Grange)[,"exon_rank"][[p]]))
+  return(Grange[q])
+}
+
+x <- 1:length(tidyexons_list)
+last_tidyexons_list <- lapply(x, lastexoningRanges(tidyexons_list[[x]]))
+
+#then for each gRanges with more than 1 last exon, make 1 entry with the combination of all ranges minstart - maxend
+
+```
+
+```{r, }
+
+tx_exons <- exonsBy(hs_filtered_TxDb, by = "tx", use.names = TRUE)
+
+#x <- 1:length(tx_exons)
+#last_txexons_list <- lapply(x, function(x) lastexoningRanges(tx_exons[[x]]))
+#last_txexons <- do.call(c, last_txexons_list)
+#saveRDS(last_txexons, "last_txexons")
+
+last_txexons <- readRDS("last_txexons")
+
+t2g <- readRDS(file = "t2g.txt")
+
+bed  <- as.data.frame(last_txexons) %>% as_tibble() %>% rowwise() %>%  mutate(chr = paste("chr",seqnames, sep = ""), score = 0, name = paste(str_split(exon_name, "\\.")[[1]][1],"_lastexon", sep = ""), transcript_id = str_split(exon_name, "\\.")[[1]][1]) %>% left_join(t2g, by = c("transcript_id" = "target_id")) %>% filter(!grepl(exon_name,pattern = "PAR_Y")) %>% dplyr::select(-exon_name, -exon_rank, -exon_id, -refseq_mrna) %>% dplyr::select(chr,start,end,name,score,strand)
+
+write.table(bed, "gencode.v33.lastexon.bed", quote = FALSE, col.names = F, row.names = F, sep = "\t")
+
+#export.bed(last_txexons, file='gencode.v33.lastexon.bed')
+```
+
+```{r, duplicate tx?}
+double_tx <- as.data.frame(last_txexons) %>% as_tibble() %>% rowwise() %>%  mutate(chr = paste("chr",seqnames, sep = ""), score = 0, name = paste(str_split(exon_name, "\\.")[[1]][1],"_lastexon", sep = ""), transcript_id = str_split(exon_name, "\\.")[[1]][1]) %>% group_by(name) %>% summarise(n=n()) %>% filter(n>1) %>% mutate(tx = substr(name,1,15)) %>% pull(tx)
+
+bed2  <- as.data.frame(last_txexons) %>% as_tibble() %>% rowwise() %>%  mutate(chr = paste("chr",seqnames, sep = ""), score = 0, name = paste(str_split(exon_name, "\\.")[[1]][1],"_lastexon", sep = ""), transcript_id = str_split(exon_name, "\\.")[[1]][1]) %>% left_join(t2g, by = c("transcript_id" = "target_id")) %>% filter(transcript_id %in% double_tx)
+
+
+```
+
+```{r, meta last exon bed}
+library(valr)
+
+metabed <- as.data.frame(last_txexons) %>% as_tibble() %>% rowwise() %>%  mutate(chr = paste("chr",seqnames, sep = ""), score = 0, name = paste(str_split(exon_name, "\\.")[[1]][1],"_lastexon", sep = ""), transcript_id = str_split(exon_name, "\\.")[[1]][1]) %>% left_join(t2g, by = c("transcript_id" = "target_id")) %>% filter(!grepl(exon_name,pattern = "PAR_Y")) %>% dplyr::select(-exon_name, -exon_rank, -exon_id, -refseq_mrna, -seqnames) %>% group_by(ensembl_gene_id, strand) %>% dplyr::select(chr,start,end,ensembl_gene_id,score,strand) %>% rename("chrom" = "chr") %>% bed_merge()  #%>% dplyr::select(chr,start,end,name,score,strand)
+
+metabed <- metabed %>% arrange(chrom, start) %>% group_by(ensembl_gene_id) %>% summarize(n=n(),id = c(1:n),chr = chrom, start = start, end = end, strand = strand) %>% unite(ensembl_gene_id, id,col = name, sep = "_") %>% mutate(score = 0) %>% dplyr::select(chr,start,end,name,score,strand)
+
+write.table(metabed, "gencode.v33.metalastexon.bed", quote = FALSE, col.names = F, row.names = F, sep = "\t")
+

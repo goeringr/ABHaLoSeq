@@ -1,0 +1,244 @@
+---
+title: "ProjectionRNAseq"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tximport)
+library(biomaRt)
+library(stringr)
+library(ggfortify)
+library(DESeq2)
+library(pheatmap)
+library(ggpubr)
+library(tidyverse)
+library(cowplot)
+```
+
+```{r, }
+files <- list.files("./quants/projections")
+samples <- str_sub(files, 1, str_length(files)-9)
+salm_dirs <- sapply(samples, function(id) file.path(paste("./quants/projections/",id,".quant.sf",sep = "")))
+
+
+t2g <- readRDS(file = "t2g.txt")
+tx2gene <- t2g[,c(1,2)]
+colnames(tx2gene) <- c('TXNAME', 'GENEID')
+
+txi <- tximport(salm_dirs, 
+                type = 'salmon', 
+                tx2gene = tx2gene,
+                dropInfReps = TRUE, 
+                countsFromAbundance = 'lengthScaledTPM')
+tpms <- data.frame(txi$abundance) 
+tpms <- tpms[apply(tpms, MARGIN = 1, function(x) any(x > 5)), ] 
+
+```
+
+```{r, }
+dat <- t(tpms) %>% 
+    as_tibble() %>% 
+    mutate(sample = colnames(tpms))
+
+dat_all <- dat %>%
+    separate(sample, into = c("cell", "fraction"), sep = "_") %>% 
+    mutate(rep = substr(fraction, nchar(fraction), nchar(fraction)),
+           fraction = substr(fraction,1,nchar(fraction)-1)) %>% 
+    select(cell, fraction, rep, everything())
+
+autoplot(prcomp(log(dat_all[4:ncol(dat_all)]+1)), 
+         data = dat_all,
+         colour = "cell", 
+         shape = "fraction",
+         size = 5) +
+    ggtitle("PCA of log(TPMs)") +
+    theme_cowplot()
+
+```
+
+```{r, }
+conditions <- substr(samples, 1,nchar(samples)-1)
+type <- rep("paired-end", 40)
+
+colData <- data.frame("sample" = samples, "Conditions" = conditions, "Type" = type)
+rownames(colData) <- colData$sample
+
+dds <- DESeqDataSetFromTximport(txi, colData = colData, design = ~Conditions)
+dds <- dds[rowMins(counts(dds)) > 10, ]
+dds <- DESeq(dds)
+
+```
+
+```{r, }
+
+norm_counts <- counts(dds, normalized = TRUE)
+#norm_counts <- norm_counts[apply(norm_counts, MARGIN = 1, function(x) all(x > 100)), ]
+
+norm_counts_PCAdat <- t(norm_counts) %>%
+  as_tibble() %>%
+  mutate(sample = colnames(norm_counts)) %>%
+    separate(sample, into = c("cell", "fraction"), sep = "_") %>% 
+    mutate(rep = substr(fraction, nchar(fraction), nchar(fraction)),
+           fraction = substr(fraction,1,nchar(fraction)-1)) %>% 
+    select(cell, fraction, rep, everything())
+
+#PC1 and 2
+autoplot(prcomp(log(norm_counts_PCAdat[4:ncol(norm_counts_PCAdat)]+1)),
+         data = norm_counts_PCAdat,
+         colour = "cell", 
+         shape = "fraction",
+         size = 5) +
+  ggtitle("PCA of log(normalized counts)") +
+  theme_cowplot()
+
+```
+
+```{r, PCA on LR values}
+LR_tidy <- norm_counts %>% 
+  as_tibble() %>%
+  mutate(ensembl_gene_id = rownames(norm_counts),
+         LR_BJ_rep1 = log2(BJ_protrusions1 / BJ_body1),
+         LR_BJ_rep2 = log2(BJ_protrusions2 / BJ_body2),
+         LR_BJ_rep3 = log2(BJ_protrusions3 / BJ_body3),
+         LR_BJ_rep4 = log2(BJ_protrusions4 / BJ_body4),
+         LR_PC3M_rep1 = log2(`PC-3M_protrusions1` / `PC-3M_body1`),
+         LR_PC3M_rep2 = log2(`PC-3M_protrusions2` / `PC-3M_body2`),
+         LR_PC3M_rep3 = log2(`PC-3M_protrusions3` / `PC-3M_body3`),
+         LR_PC3M_rep4 = log2(`PC-3M_protrusions4` / `PC-3M_body4`),
+         LR_RPE1_rep1 = log2(`RPE-1_protrusions1` / `RPE-1_body1`),
+         LR_RPE1_rep2 = log2(`RPE-1_protrusions2` / `RPE-1_body2`),
+         LR_RPE1_rep3 = log2(`RPE-1_protrusions3` / `RPE-1_body3`),
+         LR_RPE1_rep4 = log2(`RPE-1_protrusions4` / `RPE-1_body4`),
+         LR_U87_rep1 = log2(`U-87_protrusions1` / `U-87_body1`),
+         LR_U87_rep2 = log2(`U-87_protrusions2` / `U-87_body2`),
+         LR_U87_rep3 = log2(`U-87_protrusions3` / `U-87_body3`),
+         LR_U87_rep4 = log2(`U-87_protrusions4` / `U-87_body4`),
+         LR_WM266_rep1 = log2(`WM-266.4_protrusions1` / `WM-266.4_body1`),
+         LR_WM266_rep2 = log2(`WM-266.4_protrusions2` / `WM-266.4_body2`),
+         LR_WM266_rep3 = log2(`WM-266.4_protrusions3` / `WM-266.4_body3`),
+         LR_WM266_rep4 = log2(`WM-266.4_protrusions4` / `WM-266.4_body4`)) %>%
+  dplyr::select(ensembl_gene_id, contains("LR")) 
+
+is.na(LR_tidy) <- sapply(LR_tidy, is.infinite)
+LR_tidy[is.na(LR_tidy)] <- 0
+```
+
+```{r, }
+ribo_Genes <- readRDS("hs_RPgenes.txt")
+
+LR_tidy %>% mutate(RP = ifelse(ensembl_gene_id %in% ribo_Genes, T, F)) %>% 
+    gather(-ensembl_gene_id, -RP, key = sample, value = LR) %>% 
+    separate(sample, into = c("x", "cell", "rep"), sep = "_") %>% 
+    ggplot(aes(x = RP, y = LR, col = RP)) +
+    geom_point(position = "jitter", alpha = 0.1) +
+    geom_violin() +
+    geom_boxplot(width = 0.25, outlier.shape = NA) +
+    theme_cowplot() +
+    scale_color_manual(values = c("black", "red")) +
+    facet_grid(.~cell) +
+    stat_compare_means(comparisons = list(c("TRUE", "FALSE")), method = "wilcox.test", label.y = 1.75) +
+    ylim(-1.5,2) +
+    guides(col = FALSE)
+
+```
+
+```{r, }
+h2m <- readRDS("human2mousegeneid.txt") %>% as_tibble()
+h2m <- h2m %>% filter(ensembl_gene_id != "ENSG00000147604") %>% rbind(., c("ENSG00000147604", "ENSMUSG00000043716"))
+
+AB_LR <- readRDS("All_AB_LRs.rds") %>% left_join(h2m)
+
+LCM_AB <- readRDS(file = "LCM_apical_basal_dds_results_filtered.txt") %>% as_tibble(rownames = "ensembl_gene_id") %>% dplyr::select(ensembl_gene_id, log2FoldChange, padj) %>% na.omit() %>% left_join(h2m, by = c("ensembl_gene_id" = "mouse_gene")) %>% dplyr::rename("hs_gene" = "ensembl_gene_id.y")
+
+N_LR <- read.table("FractionationLR_z.txt", header = TRUE) %>% as_tibble()
+N_LR_ave <- N_LR %>% gather(-ensembl_gene_id, -Gene, -ribo, -mito, key = fractionation, value = LR) %>% group_by(ensembl_gene_id, Gene, ribo,mito) %>% summarize(med_LR = median(LR, na.rm =TRUE)) %>% na.omit() %>% left_join(h2m, by = c("ensembl_gene_id" = "mouse_gene")) %>% dplyr::rename("hs_gene" = "ensembl_gene_id.y") %>% ungroup()
+
+```
+
+```{r, }
+all_LR <- LR_tidy %>% 
+    gather(-ensembl_gene_id, key = sample, value = LR) %>% 
+    separate(sample, into = c("x", "cell", "rep"), sep = "_") %>% 
+    group_by(ensembl_gene_id,cell) %>% 
+    summarize(med_LR = median(LR,na.rm = TRUE)) %>% 
+    spread(cell,med_LR)  %>% 
+    full_join(unique(na.omit(dplyr::select(AB_LR,ensembl_gene_id,AB_FC)))) %>% 
+    full_join(unique(na.omit(dplyr::select(LCM_AB, hs_gene,log2FoldChange))), by = c("ensembl_gene_id" = "hs_gene")) %>% 
+    dplyr::rename("LCM_AB" = "log2FoldChange") %>% 
+    full_join(unique(na.omit(dplyr::select(N_LR_ave, hs_gene, med_LR))), by = c("ensembl_gene_id" = "hs_gene")) %>%
+    dplyr::rename("Neuron_LR" = "med_LR")
+
+#write.table(all_LR, "prj_AB_neuronal_LRs.txt")
+
+RP_LR <- all_LR %>% 
+    filter(ensembl_gene_id %in% ribo_Genes) 
+
+all_LR %>% mutate(RP = ifelse(ensembl_gene_id %in% ribo_Genes, "RP", "All Genes")) %>% 
+    gather(-ensembl_gene_id, -RP, key = sample, value = LR) %>% 
+    ggplot(aes(x = RP, y = LR, col = RP)) +
+    geom_point(position = "jitter", alpha = 0.05) +
+    geom_violin() +
+    geom_boxplot(width = 0.25, outlier.shape = NA) +
+    theme_cowplot() +
+    scale_color_manual(values = c("black", "red")) +
+    facet_grid(.~factor(sample, levels = c("AB_FC", "LCM_AB", "Neuron_LR", "BJ", "PC3M", "RPE1", "U87", "WM266"), labels = c("C2bbe1", "MouseLCM", "Neuron", "BJ", "PC-3M", "RPE-1", "U-87", "WM-266.4"))) +
+    stat_compare_means(comparisons = list(c("TRUE", "FALSE")), method = "wilcox.test", label.y = 1.75) +
+    ylim(-1.5,2) +
+    guides(col = FALSE) +
+  theme(strip.background = element_rect(color = "white", fill = "white"),
+        strip.text.x = element_text(size = 12, color = "Black", face = "bold"))
+
+
+##8 genes in top 0.4 most localized in at least 4 cell types
+loc_RP_genes <- RP_LR %>% 
+    ungroup() %>% 
+    mutate(AB_FC = -AB_FC, LCM_AB = -LCM_AB) %>% 
+    gather(-ensembl_gene_id, key = cell, value = LR) %>% 
+    na.omit() %>% 
+    unique() %>% 
+    top_frac(0.25, wt = LR) %>% 
+    group_by(ensembl_gene_id) %>%
+    summarise(n = n()) %>% 
+    arrange(desc(n)) %>% 
+    filter(n >= 4) %>% 
+    pull(ensembl_gene_id)
+
+RP_LR %>% mutate(RP = ifelse(ensembl_gene_id %in% loc_RP_genes, T, F)) %>% 
+    gather(-ensembl_gene_id, -RP, key = sample, value = LR) %>% 
+    ggplot(aes(x = sample, y = LR)) +
+    geom_point(aes(col = RP, alpha = RP),position = "jitter") +
+    geom_violin() +
+    geom_boxplot(width = 0.25) +
+    theme_cowplot() +
+    scale_color_manual(values = c("black", "red")) +
+    ylim(-1.5,2) 
+
+RP_LR %>% mutate(RP = ifelse(ensembl_gene_id %in% loc_RP_genes, T, F)) %>% 
+    left_join(select(N_LR_ave,hs_gene, Gene), by = c("ensembl_gene_id" = "hs_gene")) %>% 
+    gather(-ensembl_gene_id, -RP, -Gene, key = sample, value = LR) %>% 
+    mutate(RP_col = ifelse(RP == T, toupper(Gene), NA)) %>% 
+    ggplot(aes(x = sample, y = LR)) +
+    geom_point(aes(col = RP_col, alpha = RP),position = "jitter") +
+    geom_violin() +
+    geom_boxplot(width = 0.25) +
+    theme_cowplot()  +
+    ylim(-1.5,2) 
+
+```
+
+```{r, }
+#cool plot?
+RP_LR %>% ungroup() %>% dplyr::select(-ensembl_gene_id) %>% GGally::ggpairs()
+
+#get ranks?
+LR_tidy %>% filter(ensembl_gene_id %in% ribo_Genes)%>% 
+    gather(-ensembl_gene_id, key = sample, value = LR) %>% 
+    separate(sample, into = c("x", "cell", "rep"), sep = "_") %>% 
+    group_by(ensembl_gene_id,cell, rep) %>% 
+    summarize(med_LR = median(LR,na.rm = TRUE)) %>% 
+    group_by(cell) %>% 
+    mutate(LR_rank = order(order(med_LR, decreasing = TRUE)))
+
+```
+

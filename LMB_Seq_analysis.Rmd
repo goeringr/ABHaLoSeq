@@ -1,0 +1,252 @@
+---
+title: "LMB_seqAnalysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(FeatureReachR)
+library(tidyverse)
+library(cowplot)
+library(ggpubr)
+library(Biostrings)
+```
+
+## This analysis is of transcripts sensitive in their localization in response to Leptomycin B.
+### Case genes remained in the nucleus upon Leptomycin B treatment and control genes are all other expressed genes
+### These gene lists were received from Matt Taliaferro / Krysta Engel
+
+```{r, reading in data, prepping to write fastas, eval = FALSE}
+case_genes <- read.table("LMB_analysis/LMBaffectedgenes2.txt")$V1
+ctrl_genes <- read.table("LMB_analysis/LMBcontrolgenes2.txt")$V1
+
+hs_filtered_TxDb <- filter_Tx(system.file("extdata", "gencode.v33.annotation.gff3.gz", package = "FeatureReachR"))
+longest_hs <- make_longest_df(hs_filtered_TxDb)
+
+#longest 5'UTRs
+case_5pUTR_tx <- gene2Tx(longest_hs, case_genes, "UTR5")
+ctrl_5pUTR_tx <- gene2Tx(longest_hs, ctrl_genes, "UTR5")
+
+write_Sequence(hs_filtered_TxDb, case_5pUTR_tx, "UTR5", "LMB_analysis/LMB_case_longest_UTR5", "both")
+write_Sequence(hs_filtered_TxDb, ctrl_5pUTR_tx, "UTR5", "LMB_analysis/LMB_ctrl_longest_UTR5", "both")
+
+#longest CDS
+case_CDS_tx <- gene2Tx(longest_hs, case_genes, "CDS")
+ctrl_CDS_tx <- gene2Tx(longest_hs, ctrl_genes, "CDS")
+
+write_Sequence(hs_filtered_TxDb, case_CDS_tx, "CDS", "LMB_analysis/LMB_case_longest_CDS", "both")
+write_Sequence(hs_filtered_TxDb, ctrl_CDS_tx, "CDS", "LMB_analysis/LMB_ctrl_longest_CDS", "both")
+
+#longest 3'UTR
+case_3pUTR_tx <- gene2Tx(longest_hs, case_genes, "UTR3")
+ctrl_3pUTR_tx <- gene2Tx(longest_hs, ctrl_genes, "UTR3")
+
+write_Sequence(hs_filtered_TxDb, case_3pUTR_tx, "UTR3", "LMB_analysis/LMB_case_longest_UTR3", "both")
+write_Sequence(hs_filtered_TxDb, ctrl_3pUTR_tx, "UTR3", "LMB_analysis/LMB_ctrl_longest_UTR3", "both")
+
+```
+
+---
+
+### Gene lists were converted to sequences of the longest 5'UTR, CDS and 3'UTR
+
+```{r, read the fastas back in}
+case_5UTR <- readDNAStringSet("LMB_analysis/LMB_case_longest_UTR5.fa")
+ctrl_5UTR <- readDNAStringSet("LMB_analysis/LMB_ctrl_longest_UTR5.fa")
+
+case_CDS <- readDNAStringSet("LMB_analysis/LMB_case_longest_CDS.fa")
+ctrl_CDS <- readDNAStringSet("LMB_analysis/LMB_ctrl_longest_CDS.fa")
+
+case_3UTR <- readDNAStringSet("LMB_analysis/LMB_case_longest_UTR3.fa")
+ctrl_3UTR <- readDNAStringSet("LMB_analysis/LMB_ctrl_longest_UTR3.fa")
+
+#this will help
+case_dat <- list("5UTR" = case_5UTR, "CDS" = case_CDS, "3UTR" = case_3UTR)
+ctrl_dat <- list("5UTR" = ctrl_5UTR, "CDS" = ctrl_CDS, "3UTR" = ctrl_3UTR)
+
+```
+
+```{r, reach the features}
+x <- c(1:3)
+
+all_GC <- lapply(x, function(x)  GC_compare(case_dat[[x]], ctrl_dat[[x]]))
+names(all_GC) <- lapply(x, function(x) paste(names(case_dat)[x], "_GC", sep = ""))
+
+all_length <- lapply(x, function(x)  length_compare(case_dat[[x]], ctrl_dat[[x]]))
+names(all_length) <- lapply(x, function(x) paste(names(case_dat)[x], "_length", sep = ""))
+
+#all_kmer <- lapply(x, function(x) assign(paste(names(case_dat)[x], "_kmer", sep = ""), kmer_compare(case_dat[[x]], ctrl_dat[[x]], 6)))
+#names(all_kmer) <- lapply(x, function(x) paste(names(case_dat)[x], "_kmer", sep = ""))
+#write.table(all_kmer$`5UTR_kmer`, "LMB_analysis/LMB_5UTR_6mercounts.txt")
+#write.table(all_kmer$`CDS_kmer`, "LMB_analysis/LMB_CDS_6mercounts.txt")
+#write.table(all_kmer$`3UTR_kmer`, "LMB_analysis/LMB_3UTR_6mercounts.txt")
+all_kmer <- list("5UTR_kmer" = tibble(read.table("LMB_analysis/LMB_5UTR_6mercounts.txt")),
+                 "CDS_kmer" = tibble(read.table("LMB_analysis/LMB_CDS_6mercounts.txt")),
+                 "3UTR_kmer" = tibble(read.table("LMB_analysis/LMB_3UTR_6mercounts.txt")))
+
+all_GC <- lapply(x, function(x)  GC_compare(case_dat[[x]], ctrl_dat[[x]]))
+names(all_GC) <- lapply(x, function(x) paste(names(case_dat)[x], "_GC", sep = ""))
+
+all_length <- lapply(x, function(x)  length_compare(case_dat[[x]], ctrl_dat[[x]]))
+names(all_length) <- lapply(x, function(x) paste(names(case_dat)[x], "_length", sep = ""))
+
+
+#CISBPRNA_hs_PWM_motif <- lapply(x, function(x) motif_compare(CISBPRNA_hs_PWM, case_dat[[x]], ctrl_dat[[x]]))
+#names(CISBPRNA_hs_PWM_motif) <- lapply(x, function(x) paste(names(case_dat)[x], "_cisbpRNA", sep = ""))
+#write.table(CISBPRNA_hs_PWM_motif$`5UTR_cisbpRNA`, "LMB_analysis/LMB_5UTR_CISBPRNA_hs_PWM_motifcts.txt")
+#write.table(CISBPRNA_hs_PWM_motif$`CDS_cisbpRNA`, "LMB_analysis/LMB_CDS_CISBPRNA_hs_PWM_motifcts.txt")
+#write.table(CISBPRNA_hs_PWM_motif$`3UTR_cisbpRNA`, "LMB_analysis/LMB_3UTR_CISBPRNA_hs_PWM_motifcts.txt")
+all_cisbpRNA <- list("5UTR_cisbpRNA" = tibble(read.table("LMB_analysis/LMB_5UTR_CISBPRNA_hs_PWM_motifcts.txt")),
+                     "CDS_cisbpRNA" = tibble(read.table("LMB_analysis/LMB_CDS_CISBPRNA_hs_PWM_motifcts.txt")),
+                     "3UTR_cisbpRNA" = tibble(read.table("LMB_analysis/LMB_3UTR_CISBPRNA_hs_PWM_motifcts.txt")))
+
+#RBNS_PWM_motif <- lapply(x, function(x) motif_compare(RBNS_PWM, case_dat[[x]], ctrl_dat[[x]]))
+#names(RBNS_PWM_motif) <- lapply(x, function(x) paste(names(case_dat)[x], "_RBNS", sep = ""))
+#write.table(RBNS_PWM_motif$`5UTR_RBNS`, "LMB_analysis/LMB_5UTR_RBNS_PWM_motifcts.txt")
+#write.table(RBNS_PWM_motif$`CDS_RBNS`, "LMB_analysis/LMB_CDS_RBNS_PWM_motifcts.txt")
+#write.table(RBNS_PWM_motif$`3UTR_RBNS`, "LMB_analysis/LMB_3UTR_RBNS_PWM_motifcts.txt")
+all_RBNS <- list("5UTR_RBNS" = tibble(read.table("LMB_analysis/LMB_5UTR_RBNS_PWM_motifcts.txt")),
+                 "CDS_RBNS" = tibble(read.table("LMB_analysis/LMB_CDS_RBNS_PWM_motifcts.txt")),
+                 "3UTR_RBNS" = tibble(read.table("LMB_analysis/LMB_3UTR_RBNS_PWM_motifcts.txt")))
+```
+
+---
+
+## GC and Length plots
+
+```{r, length and GC plots}
+#GC
+bind_rows(all_GC, .id = "seqs") %>% 
+  separate(seqs, into = c("feature", "GC"), sep = "_") %>% 
+  ggplot(aes(x = feature, y = CliffDelta, fill = wilcox.p)) + 
+  geom_bar(stat = "identity") +
+  theme_cowplot() +
+  scale_fill_gradient(name = "pval", low = "red", high = "grey", limits = c(0, 0.05)) +
+  scale_x_discrete(limits=c("5UTR", "CDS", "3UTR")) + 
+  labs(title = "GC content")
+
+lapply(x, function(x)  bind_rows(get_GC(case_dat[[x]]), get_GC(ctrl_dat[[x]]), .id = "group")) %>% 
+  bind_rows(.id = "feature") %>%
+  mutate(group = ifelse(group == 1, "case", "control"), 
+         feature = ifelse(feature == 1, "UTR5", ifelse(feature == 2, "CDS", "UTR3"))) %>% 
+  ggplot(aes(x = group, y = GC, fill = group)) +
+  geom_point(alpha = 0.01, position = "jitter") +
+  geom_violin() + geom_boxplot(width = 0.25) + 
+  theme_cowplot() + 
+  guides(fill = FALSE) + 
+  stat_compare_means(comparisons = list(c("case", "control")), method = "wilcox.test") +
+  facet_grid(.~factor(feature, levels = c("UTR5", "CDS", "UTR3"))) + 
+  theme(strip.background = element_rect(color = "white", fill = "white"), 
+        strip.text.x = element_text(size = 12, color = "Black", face = "bold")) + 
+  labs(x = "", y = "GC content")
+
+#Length
+bind_rows(all_length, .id = "seqs") %>% 
+  separate(seqs, into = c("feature", "length"), sep = "_") %>% 
+  ggplot(aes(x = feature, y = CliffDelta, fill = wilcox.p)) + 
+  geom_bar(stat = "identity") + 
+  theme_cowplot() + 
+  scale_fill_gradient(name = "pval", low = "red", high = "grey", limits = c(0,0.05)) +
+  scale_x_discrete(limits=c( "5UTR", "CDS", "3UTR")) +
+  labs(title = "length")
+
+lapply(x, function(x)  bind_rows(get_length(case_dat[[x]]), get_length(ctrl_dat[[x]]), .id = "group")) %>%
+  bind_rows(.id = "feature") %>% mutate(group = ifelse(group == 1, "case", "control"),
+                                        feature = ifelse(feature == 1, "UTR5", ifelse(feature == 2, "CDS", "UTR3"))) %>% 
+  ggplot(aes(x = group, y = length, fill = group)) + 
+  geom_point(alpha = 0.01, position = "jitter") +
+  geom_violin() +
+  geom_boxplot(width = 0.25) + 
+  theme_cowplot() +
+  guides(fill = FALSE) + 
+  stat_compare_means(comparisons = list(c("case", "control")), method = "wilcox.test", label.y = 9000) +
+  facet_grid(.~factor(feature, levels = c("UTR5", "CDS", "UTR3"))) + 
+  theme(strip.background = element_rect(color = "white", fill = "white"),
+        strip.text.x = element_text(size = 12, color = "Black", face = "bold")) + 
+  labs(x = "", y = "Length") +
+  ylim(0,10000)
+
+```
+
+### Leptomycin B Nuclear Retained targets have GC poor CDS and 3'UTRs
+### Leptomycin B Nuclear Retained targets have longer CDS and 3'UTRs
+
+---
+
+## Enriched and Depleted Kmers
+
+```{r, kmer plots}
+kmer_plot(all_kmer$`5UTR_kmer`) + labs(title = "5'UTR")
+kmer_plot(all_kmer$`CDS_kmer`, sig_cutoff = 0.01) + labs(title = "CDS")
+kmer_plot(all_kmer$`3UTR_kmer`, sig_cutoff = 0.01) + labs(title = "3'UTR")
+
+CDS_enriched_kmer <- all_kmer$`CDS_kmer` %>% filter(p_adj < 0.01, log2FC > 0) %>% pull(kmer)
+CDS_depleted_kmer <- all_kmer$`CDS_kmer` %>% filter(p_adj < 0.01, log2FC < 0) %>% pull(kmer)
+
+kmer2tree(CDS_enriched_kmer)
+kmer2logo(CDS_enriched_kmer) + ggtitle("CDS enriched")
+kmer2tree(CDS_depleted_kmer)
+kmer2logo(CDS_depleted_kmer) + ggtitle("CDS depleted")
+
+UTR3_enriched_kmer <- all_kmer$`3UTR_kmer` %>% filter(p_adj < 0.01, log2FC > 0) %>% pull(kmer)
+UTR3_depleted_kmer <- all_kmer$`3UTR_kmer` %>% filter(p_adj < 0.01, log2FC < 0) %>% pull(kmer)
+
+kmer2tree(UTR3_enriched_kmer)
+kmer2logo(UTR3_enriched_kmer) + ggtitle("3'UTR enriched")
+kmer2tree(UTR3_depleted_kmer)
+kmer2logo(UTR3_depleted_kmer) + ggtitle("3'UTR depleted")
+```
+
+---
+
+## Enriched and Depleted RBP binding sites
+
+```{r, motif plots}
+
+#ELAV1 enriched in CDS
+motif_plot(all_cisbpRNA$`5UTR_cisbpRNA`, sig_cutoff = 0.01) + ggtitle("5'UTR cisbpRNA")
+motif_plot(all_cisbpRNA$`CDS_cisbpRNA`, sig_cutoff = 0.01) + ggtitle("CDS cisbpRNA")
+motif_plot(all_cisbpRNA$`3UTR_cisbpRNA`, sig_cutoff = 0.01) +  ggtitle("3'UTR cisbpRNA")
+
+#ELAV4 enriched in CDS and 3'UTR
+motif_plot(all_RBNS$`5UTR_RBNS`, sig_cutoff = 0.01) + ggtitle("5'UTR RBNS")
+motif_plot(all_RBNS$`CDS_RBNS`, sig_cutoff = 0.01) + ggtitle("CDS RBNS")
+motif_plot(all_RBNS$`3UTR_RBNS`, sig_cutoff = 0.01) + ggtitle("3'UTR RBNS")
+```
+
+---
+
+## Focusing on ELAVL1/HuR
+### only significant in CDS
+
+```{r, just ELAVL1}
+p <- bind_rows(all_cisbpRNA$`5UTR_cisbpRNA`,all_RBNS$`5UTR_RBNS`) %>% 
+  mutate(`ELAVL1 motif` = ifelse(grepl(pattern = "ELAVL1", x = motif), "True", "False")) 
+p %>% ggplot(aes(x = log2FC, y = -log(p_adj), col = `ELAVL1 motif`, alpha = `ELAVL1 motif`)) +
+  geom_point() + ggtitle("5'UTR") + 
+  theme_cowplot() + 
+  scale_color_manual(values = c("Black", "Red")) + 
+  scale_alpha_manual(values = c(0.1,1)) + 
+  geom_hline(yintercept = -log(0.05), typetype = "dashed")
+
+#only sig in CDS!
+p <- bind_rows(all_cisbpRNA$`CDS_cisbpRNA`,all_RBNS$`CDS_RBNS`) %>% 
+  mutate(`ELAVL1 motif` = ifelse(grepl(pattern = "ELAVL1", x = motif), "True", "False")) 
+p %>% ggplot(aes(x = log2FC, y = -log(p_adj), col = `ELAVL1 motif`, alpha = `ELAVL1 motif`)) +
+  geom_point() + 
+  ggtitle("CDS") +
+  theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + 
+  scale_alpha_manual(values = c(0.1,1)) + 
+  geom_hline(yintercept = -log(0.05), typetype = "dashed")
+
+p <- bind_rows(all_cisbpRNA$`3UTR_cisbpRNA`,all_RBNS$`3UTR_RBNS`) %>%
+  mutate(`ELAVL1 motif` = ifelse(grepl(pattern = "ELAVL1", x = motif), "True", "False")) 
+p %>% ggplot(aes(x = log2FC, y = -log(p_adj), col = `ELAVL1 motif`, alpha = `ELAVL1 motif`)) +
+  geom_point() +
+  ggtitle("3'UTR") + 
+  theme_cowplot() + 
+  scale_color_manual(values = c("Black", "Red")) + 
+  scale_alpha_manual(values = c(0.1,1)) + 
+  geom_hline(yintercept = -log(0.05), typetype = "dashed")
+
+```

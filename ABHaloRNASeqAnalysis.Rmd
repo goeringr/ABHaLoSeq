@@ -55,10 +55,10 @@ colnames(tx2gene) <- c('TXNAME', 'GENEID')
 
 ##create TXI with filtered salmon alignments
 
-files_f <- list.files()
+files_f <- list.files("./quants/ABHaLo_12.19_filtered")
 files_f <- files_f %>% as_tibble() %>% filter(str_detect(value, "filtered.quant.sf")) %>% pull()
 samples_f <- str_sub(files_f, 1, str_length(files_f)-18)
-salm_dirs_f <- sapply(samples_f, function(id) file.path(paste(id,"_filtered.quant.sf",sep = "")))
+salm_dirs_f <- sapply(samples_f, function(id) file.path(paste("./quants/ABHaLo_12.19_filtered/",id,"_filtered.quant.sf",sep = "")))
 txi <- tximport(salm_dirs_f, 
                 type = 'salmon', 
                 tx2gene = tx2gene,
@@ -78,9 +78,9 @@ dat <- t(tpms) %>%
 
 dat_all <- dat %>%
   separate(sample, into = c("c2bbe1", "Halo", "fraction", "rep"), sep = "_") %>% 
-  select(Halo, fraction, rep, everything(), -c2bbe1)
+  dplyr::select(Halo, fraction, rep, everything(), -c2bbe1)
 
-autoplot(prcomp(log(dat_all[4:ncol(dat_all)]+1)), 
+autoplot(prcomp(log10(dat_all[4:ncol(dat_all)]+1)), 
          data = dat_all,
          colour = "Halo", 
          shape = "fraction",
@@ -96,7 +96,7 @@ autoplot(prcomp(log(dat_all[4:ncol(dat_all)]+1)),
 conditions <- c("GP135_enriched", "GP135_enriched", "GP135_enriched", "GP135_input", "GP135_input", "GP135_input", "NaKATPase_enriched", "NaKATPase_enriched", "NaKATPase_enriched", "NaKATPase_input", "NaKATPase_input", "NaKATPase_input", "P65_enriched", "P65_enriched", "P65_enriched", "P65_input", "P65_input", "P65_input")
 type <- c("paired-end", "paired-end", "paired-end", "paired-end", "paired-end", "paired-end", "paired-end", "paired-end", "paired-end", "paired-end","paired-end", "paired-end", "paired-end", "paired-end", "paired-end", "paired-end", "paired-end", "paired-end")
 
-#colData <- data.frame("sample" = samples, "Conditions" = conditions, "Type" = type)
+#colData <- data.frame("sample" = samples_f, "Conditions" = conditions, "Type" = type)
 #write.table(colData, file = "coldata.txt")
 colData <- read.table("coldata.txt", header = TRUE)
 rownames(colData) <- colData$sample
@@ -117,19 +117,20 @@ norm_counts_PCAdat <- t(norm_counts) %>%
   as_tibble() %>%
   mutate(sample = colnames(norm_counts)) %>%
   separate(sample, into = c("c2bbe1", "Halo", "fraction", "rep"), sep = "_") %>% 
-  select(Halo, fraction, rep, everything(), -c2bbe1)
+  dplyr::select(Halo, fraction, rep, everything(), -c2bbe1)
 
 #PC1 and 2
-autoplot(prcomp(log(norm_counts_PCAdat[4:ncol(norm_counts_PCAdat)]+1)),
+autoplot(prcomp(log10(norm_counts_PCAdat[4:ncol(norm_counts_PCAdat)]+1)),
          data = norm_counts_PCAdat,
          colour = "Halo", 
          shape = "fraction",
          size = 5) +
   ggtitle("PCA of log(normalized counts)") +
-  theme_cowplot()
+  theme_cowplot() +
+  scale_color_manual(values = c("#59d0a3", "#ce7bd8", "#4d86ff"))
 
 #PC2 and 3
-autoplot(prcomp(log(norm_counts_PCAdat[6:ncol(norm_counts_PCAdat)]+1)),
+autoplot(prcomp(log10(norm_counts_PCAdat[6:ncol(norm_counts_PCAdat)]+1)),
          data = norm_counts_PCAdat,
          x = 2,
          y = 3,
@@ -137,20 +138,22 @@ autoplot(prcomp(log(norm_counts_PCAdat[6:ncol(norm_counts_PCAdat)]+1)),
          shape = "fraction",
          size = 5) +
   ggtitle("PCA of log(normalized counts)") +
-  theme_cowplot()
+  theme_cowplot() +
+  scale_color_manual(values = c("#59d0a3", "#ce7bd8", "#4d86ff"))
 
 
 #look at all PC contributions
-summary(prcomp(log(norm_counts_PCAdat[4:ncol(norm_counts_PCAdat)]+1)))
+summary(prcomp(log10(norm_counts_PCAdat[4:ncol(norm_counts_PCAdat)]+1)))
 
 ```
 
 ```{r, 3dpca}
 #3d PCA!
-library(pca3d)
-pca <- prcomp(log(norm_counts_PCAdat[6:ncol(norm_counts_PCAdat)]+1))
-gr <- factor(pull(norm_counts_PCAdat[,1:2] %>% unite(col = sample), sample))
-pca3d(pca, group = gr, col = c(1,1,1,1,1,1, 2,2,2,2,2,2, 3,3,3,3,3,3), shape = c("sphere","sphere","sphere", "tetrahedron","tetrahedron","tetrahedron", "sphere","sphere","sphere", "tetrahedron","tetrahedron","tetrahedron", "sphere","sphere","sphere", "tetrahedron","tetrahedron","tetrahedron"), legend = "topleft")
+# pca3d doesnt work with R 4.0??
+# library(pca3d)
+# pca <- prcomp(log10(norm_counts_PCAdat[6:ncol(norm_counts_PCAdat)]+1))
+# gr <- factor(pull(norm_counts_PCAdat[,1:2] %>% unite(col = sample), sample))
+# pca3d(pca, group = gr, col = c(1,1,1,1,1,1, 2,2,2,2,2,2, 3,3,3,3,3,3), shape = c("sphere","sphere","sphere", "tetrahedron","tetrahedron","tetrahedron", "sphere","sphere","sphere", "tetrahedron","tetrahedron","tetrahedron", "sphere","sphere","sphere", "tetrahedron","tetrahedron","tetrahedron"), legend = "topleft")
 
 ```
 
@@ -161,9 +164,9 @@ pca3d(pca, group = gr, col = c(1,1,1,1,1,1, 2,2,2,2,2,2, 3,3,3,3,3,3), shape = c
 
 temp <- norm_counts
 colnames(temp) <- substr(colnames(norm_counts),8, 31)
-#annoDF <- as.data.frame(colnames(temp)) %>% as_tibble() %>% separate("colnames(temp)",into = c("Halo", "Fraction", "rep"), sep = "_" ) %>% select(Halo, Fraction) %>% as.data.frame()
+annoDF <- as.data.frame(colnames(temp)) %>% as_tibble() %>% separate("colnames(temp)",into = c("Halo", "Fraction", "rep"), sep = "_" ) %>% dplyr::select(Halo, Fraction) %>% as.data.frame()
 #write.table(annoDF, file = "annoDF.txt")
-annoDF <- read.table("annoDF.txt")
+#annoDF <- read.table("annoDF.txt")
 rownames(annoDF) <- colnames(temp)
 cor_mat <- temp %>% cor(method = "spearman")
 pheatmap(cor_mat, annotation_col = annoDF)
@@ -209,20 +212,20 @@ LR_tidy <- norm_counts %>%
          LR_P65_rep1 = log2(C2bbe1_P65_enriched_rep1 / C2bbe1_P65_input_rep1),
          LR_P65_rep2 = log2(C2bbe1_P65_enriched_rep2 / C2bbe1_P65_input_rep2),
          LR_P65_rep3 = log2(C2bbe1_P65_enriched_rep3 / C2bbe1_P65_input_rep3)) %>%
-  select(ensembl_gene_id, contains("LR")) 
+  dplyr::select(ensembl_gene_id, contains("LR")) 
 
 is.na(LR_tidy) <- sapply(LR_tidy, is.infinite)
 LR_tidy[is.na(LR_tidy)] <- 0
 
 LRPCAdat <- LR_tidy %>% 
-  select(-ensembl_gene_id) %>% 
+  dplyr::select(-ensembl_gene_id) %>% 
   as.data.frame()
 
 rownames(LRPCAdat) <- LR_tidy$ensembl_gene_id
 
 LRPCAdat <- t(LRPCAdat) %>% 
     as_tibble() %>%
-    mutate(sample = colnames(LRPCAdat)) %>% separate(sample, into = c("LR", "Halo", "rep"), sep = "_") %>% select(Halo, rep, everything(), -LR) 
+    mutate(sample = colnames(LRPCAdat)) %>% separate(sample, into = c("LR", "Halo", "rep"), sep = "_") %>% dplyr::select(Halo, rep, everything(), -LR) 
 
 autoplot(prcomp(LRPCAdat[3:ncol(LRPCAdat)]),
          data = LRPCAdat,
@@ -252,12 +255,12 @@ norm_counts %>%
   as_tibble() %>% 
   mutate(ensembl_gene_id = rownames(norm_counts)) %>% 
   left_join(., as_tibble(ens2gene)) %>% 
-  select(ensembl_gene_id, Gene, everything()) %>% 
+  dplyr::select(ensembl_gene_id, Gene, everything()) %>% 
   filter(Gene %in% c("ATP1A1", "RELA", "PODXL")) %>% 
   gather(-ensembl_gene_id, - Gene, key = sample, value = norm_counts) %>% 
   separate(sample, into = c("C2bbe1", "Halo", "Fraction", "rep"), sep = "_") %>% 
-  select(-C2bbe1, - rep) %>% 
-  ggplot(aes(x = Halo, y = log(norm_counts), col = Fraction, fill = Fraction)) + 
+  dplyr::select(-C2bbe1, - rep) %>% 
+  ggplot(aes(x = Halo, y = log10(norm_counts), col = Fraction, fill = Fraction)) + 
   geom_violin() + 
   geom_boxplot(col = "Black", position = position_dodge(width = 0.9), width = 0.25) + 
   geom_point(col = "Black", position = position_jitterdodge()) + 
@@ -267,20 +270,22 @@ norm_counts %>%
 norm_counts %>% 
   as_tibble() %>% 
   mutate(ensembl_gene_id = rownames(norm_counts)) %>% 
-  left_join(., as_tibble(ens2gene)) %>% select(ensembl_gene_id, Gene, everything()) %>% 
+  left_join(., as_tibble(ens2gene)) %>%
+  dplyr::select(ensembl_gene_id, Gene, everything()) %>% 
   filter(Gene %in% c("ATP1A1", "RELA", "PODXL")) %>% 
   gather(-ensembl_gene_id, - Gene, key = sample, value = norm_counts) %>% 
   separate(sample, into = c("C2bbe1", "Halo", "Fraction", "rep"), sep = "_") %>% 
-  select(-C2bbe1) %>% 
+  dplyr::select(-C2bbe1) %>% 
   spread(key = Fraction, value = norm_counts) %>% 
   mutate(LR = log2(enriched/input)) %>% 
-  select(-rep,-enriched,-input) %>% 
+  dplyr::select(-rep,-enriched,-input) %>% 
   ggplot(aes(x = Halo, y = LR, fill = Halo, col = Halo)) + 
   geom_violin() + 
   geom_boxplot(col = "Black", width = 0.25) + 
   geom_point(col = "Black") + 
   facet_grid(.~Gene) + 
-  theme_cowplot()
+  theme_cowplot() +
+  guides(fill = FALSE)
 
 ```
 
@@ -305,32 +310,34 @@ res_AB <- results(dds,contrast = c("Conditions", "GP135_enriched", "NaKATPase_en
 ```
 
 ```{r, DEseq volcano}
-res_G_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_G_I), pval = ifelse(padj < 0.05, "< 0.05", "")) %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-2), y = c(40,40), label = c("Apical \n 498", "NL \n 1066"), size = 7) + labs(title = "GP135 enriched / input")
+res_G_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_G_I), pval = ifelse(padj < 0.05, "< 0.05", "")) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-2), y = c(40,40), label = c("Apical \n 498", "NL \n 1066"), size = 7) + labs(title = "GP135 enriched / input")
 
 res_G_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_G_I), col = ifelse(padj < 0.05, "< 0.05", ""), dir = ifelse(log2FoldChange > 0, "> 0", "< 0")) %>% group_by(col,dir) %>% summarise(n())
 
 
-res_N_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_N_I), pval = ifelse(padj < 0.05, "< 0.05", "")) %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-2), y = c(40,40), label = c("Basal \n 117", "NL \n 223"), size = 7) + labs(title = "NaK ATPase enriched / input")
+res_N_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_N_I), pval = ifelse(padj < 0.05, "< 0.05", "")) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-2), y = c(40,40), label = c("Basal \n 117", "NL \n 223"), size = 7) + labs(title = "NaK ATPase enriched / input")
 
 res_N_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_N_I), col = ifelse(padj < 0.05, "< 0.05", ""), dir = ifelse(log2FoldChange > 0, "> 0", "< 0")) %>% group_by(col,dir) %>% summarise(n())
 
 
-res_P_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_P_I), pval = ifelse(padj < 0.01, "< 0.01", "")) %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-2), y = c(40,40), label = c("Cyto \n 1194", "NL \n 717"), size = 7) + labs(title = "P65 enriched / input")
+res_P_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_P_I), pval = ifelse(padj < 0.01, "< 0.01", "")) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-2), y = c(20,20), label = c("Cyto \n 1194", "NL \n 717"), size = 7) + labs(title = "P65 enriched / input")
+
+res_P_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_P_I), pval = ifelse(padj < 0.01, "< 0.01", "")) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_pointdensity() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(1.5,-2), y = c(15,15), label = c("1192 \n enriched", "715 \n depleted"), size = 7) + labs(y = "FDR, -log10", x = "Cytoplasmic Bias")
 
 res_P_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_P_I), col = ifelse(padj < 0.01, "< 0.01", ""), dir = ifelse(log2FoldChange > 0, "> 0", "< 0")) %>% group_by(col,dir) %>% summarise(n())
 
 
-res_G_P %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_G_P), pval = ifelse(padj < 0.001, "< 0.001", "")) %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(2.5,-4), y = c(400,400), label = c("Apical \n 2616", "NL \n 3087"), size = 7) + labs(title = "GP135 enriched / P65 enriched")
+res_G_P %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_G_P), pval = ifelse(padj < 0.001, "< 0.001", "")) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(2.5,-4), y = c(400,400), label = c("Apical \n 2616", "NL \n 3087"), size = 7) + labs(title = "GP135 enriched / P65 enriched")
 
 res_G_P %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_G_P), col = ifelse(padj < 0.001, "< 0.001", ""), dir = ifelse(log2FoldChange > 0, "> 0", "< 0")) %>% group_by(col,dir) %>% summarise(n())
 
 
-res_N_P %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_N_P), pval = ifelse(padj < 0.01, "< 0.01", "")) %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(4,-4), y = c(400,400), label = c("Basal \n 2466", "NL \n 2708"), size = 7) + labs(title = "NaK ATPase enriched / P65 enriched")
+res_N_P %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_N_P), pval = ifelse(padj < 0.01, "< 0.01", "")) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(4,-4), y = c(400,400), label = c("Basal \n 2466", "NL \n 2708"), size = 7) + labs(title = "NaK ATPase enriched / P65 enriched")
 
 res_N_P %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_N_P), col = ifelse(padj < 0.01, "< 0.01", ""), dir = ifelse(log2FoldChange > 0, "> 0", "< 0")) %>% group_by(col,dir) %>% summarise(n())
 
 
-res_AB %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_AB), pval = ifelse(padj < 0.05, "< 0.05", "")) %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(2,-2), y = c(80,80), label = c("Apical \n 1059", "Basal \n 1205"), size = 7) + labs(title = "GP135 enriched / NaK ATPase enriched")
+res_AB %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_AB), pval = ifelse(padj < 0.05, "< 0.05", "")) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = pval, alpha = pval)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.1,1)) +  annotate("text", x = c(2,-2), y = c(80,80), label = c("Apical \n 1059", "Basal \n 1205"), size = 7) + labs(title = "GP135 enriched / NaK ATPase enriched")
 
 res_AB %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_AB), col = ifelse(padj < 0.05, "< 0.05", ""), dir = ifelse(log2FoldChange > 0, "> 0", "< 0")) %>% group_by(col,dir) %>% summarise(n())
 
@@ -344,36 +351,40 @@ norm_counts %>%
   as_tibble() %>% 
   mutate(ensembl_gene_id = rownames(norm_counts)) %>% 
   left_join(., as_tibble(ens2gene)) %>% 
-  select(ensembl_gene_id, Gene, everything()) %>% 
+  dplyr::select(ensembl_gene_id, Gene, everything()) %>% 
   filter(Gene %in% c("MALAT1", "GAPDH", "TUBA1B", "HIST1H2BD")) %>% 
   gather(-ensembl_gene_id, - Gene, key = sample, value = norm_counts) %>% 
   separate(sample, into = c("C2bbe1", "Halo", "Fraction", "rep"), sep = "_") %>% 
-  select(-C2bbe1, - rep) %>% 
+  dplyr::select(-C2bbe1, - rep) %>% 
   filter(Halo == "P65") %>% 
-  ggplot(aes(x = Gene, y = log(norm_counts), col = Fraction, fill = Fraction)) + 
+  ggplot(aes(x = Gene, y = log10(norm_counts), col = Fraction, fill = Fraction)) + 
   geom_violin() + 
   geom_boxplot(col = "Black", position = position_dodge(width = 0.9), width = 0.25) + 
   geom_point(col = "Black", position = position_jitterdodge()) + 
   theme_cowplot()
+ 
 
 norm_counts %>% 
   as_tibble() %>% 
   mutate(ensembl_gene_id = rownames(norm_counts)) %>% 
   left_join(., as_tibble(ens2gene)) %>% 
-  select(ensembl_gene_id, Gene, everything()) %>% 
+  dplyr::select(ensembl_gene_id, Gene, everything()) %>% 
   filter(Gene %in% c("MALAT1", "GAPDH", "TUBA1B", "HIST1H2BD")) %>% 
   gather(-ensembl_gene_id, - Gene, key = sample, value = norm_counts) %>% 
   separate(sample, into = c("C2bbe1", "Halo", "Fraction", "rep"), sep = "_") %>% 
-  select(-C2bbe1) %>% 
+  dplyr::select(-C2bbe1) %>% 
   filter(Halo == "P65") %>% 
   spread(key = Fraction, value = norm_counts) %>% mutate(LR = log2(enriched/input)) %>% 
-  select(-rep,-enriched,-input) %>% 
+  dplyr::select(-rep,-enriched,-input) %>% 
   ggplot(aes(x = Gene, y = LR, fill = Gene, col = Gene)) + 
   geom_violin() + 
   geom_boxplot(col = "Black", width = 0.25) + 
   geom_point(col = "Black") + 
   theme_cowplot() +
-  guides(fill = FALSE, col = FALSE)
+  guides(fill = FALSE, col = FALSE) +
+  scale_fill_manual(values = c("#d84848", "#1885c7", "#8b0c0c")) +
+  scale_color_manual(values = c("#d84848", "#1885c7", "#8b0c0c"))
+  
 
 sno <- read.table(file = "snoRNAs.txt", header = TRUE, sep = "\t") %>% as_tibble() %>% mutate(Ensembl.gene.ID = as.character(Ensembl.gene.ID)) %>% filter(Ensembl.gene.ID != "") %>% pull(., Ensembl.gene.ID)  
 pro <- read.table(file = "Hs_GRCh38.proteincoding.txt", header = TRUE, sep = "\t") %>% as_tibble() %>% mutate(Gene.stable.ID = as.character(Gene.stable.ID)) %>% filter(Gene.stable.ID != "") %>% pull(., Gene.stable.ID)
@@ -386,8 +397,12 @@ P_I_simple <- res_P_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_
 
 P_I_type <- P_I_simple %>% mutate(type = "All Genes")
 P_I_simple %>% mutate(type = ifelse(ensembl_gene_id %in% pro, "mRNA", ifelse(ensembl_gene_id %in% lnc, "lncRNA", ""))) %>% filter(type != "") %>% rbind(., P_I_type) %>% ggplot(aes(x = type, y = log2FoldChange, fill = type)) + geom_point(position = "jitter", alpha = 0.01) + geom_violin() + geom_boxplot(outlier.shape = NA, width = 0.25) + theme_cowplot() +
-    geom_hline(yintercept = 0) +
-    stat_compare_means(comparisons = my_comparisons, method = "wilcox.test") + guides(fill = FALSE) + labs(x = "", y = "P65 enriched / input")
+    geom_hline(yintercept = 0, linetype = "dashed") +
+    stat_compare_means(comparisons = my_comparisons, method = "wilcox.test", label.y = c(1.45, 1.25)) + 
+  guides(fill = FALSE) + labs(x = "", y = "P65 enriched / input") +
+  scale_fill_manual(values = c("#d84848", "#1885c7", "#c72c2c")) +
+  scale_color_manual(values = c("#d84848", "#1885c7", "#c72c2c")) +
+  coord_cartesian(ylim = c(-2,1.5))
 
 
 ```
@@ -570,7 +585,7 @@ upset(fromList(basal_upset), order.by = "freq", empty.intersections = "on")
 ```
 
 ```{r, xtail volcano plots}
-GvP %>% mutate(color = ifelse(pvalue.adjust < .001, "FDR < 0.001", "ns")) %>% na.omit %>%  ggplot(aes(x = GP135_log2LR - P65_log2LR, y = -log(pvalue.adjust), col = color, alpha = color)) + 
+GvP %>% mutate(color = ifelse(pvalue.adjust < .001, "FDR < 0.001", "ns")) %>% na.omit %>%  ggplot(aes(x = GP135_log2LR - P65_log2LR, y = -log10(pvalue.adjust), col = color, alpha = color)) + 
   geom_point() + 
   scale_color_manual(values=c("Red", "Black")) + 
   scale_alpha_manual(values=c(1, 0.1)) +
@@ -582,7 +597,7 @@ GvP %>% mutate(color = ifelse(pvalue.adjust < .001, "FDR < 0.001", "ns")) %>% na
 GvP %>% filter(pvalue.adjust<0.001) %>% mutate(ratio = GP135_log2LR- P65_log2LR) %>% filter(ratio > 0) %>% nrow()
 GvP %>% filter(pvalue.adjust<0.001) %>% mutate(ratio = GP135_log2LR- P65_log2LR) %>% filter(ratio < 0) %>% nrow()
 
-NvP %>% mutate(color = ifelse(pvalue.adjust < .01, "FDR < 0.01", "ns")) %>% na.omit %>%  ggplot(aes(x = NaKATPase_log2LR - P65_log2LR, y = -log(pvalue.adjust), col = color, alpha = color)) + 
+NvP %>% mutate(color = ifelse(pvalue.adjust < .01, "FDR < 0.01", "ns")) %>% na.omit %>%  ggplot(aes(x = NaKATPase_log2LR - P65_log2LR, y = -log10(pvalue.adjust), col = color, alpha = color)) + 
   geom_point() + 
   scale_color_manual(values=c("Red", "Black")) + 
   scale_alpha_manual(values=c(1, 0.1)) +
@@ -594,7 +609,7 @@ NvP %>% mutate(color = ifelse(pvalue.adjust < .01, "FDR < 0.01", "ns")) %>% na.o
 NvP %>% filter(pvalue.adjust<0.01) %>% mutate(ratio = NaKATPase_log2LR- P65_log2LR) %>% filter(ratio > 0) %>% nrow()
 NvP %>% filter(pvalue.adjust<0.01) %>% mutate(ratio = NaKATPase_log2LR- P65_log2LR) %>% filter(ratio < 0) %>% nrow()
 
-GvN %>% mutate(color = ifelse(pvalue.adjust < .05, "FDR < 0.05", "ns")) %>% na.omit %>%  ggplot(aes(x = GP135_log2LR - NaKATPase_log2LR, y = -log(pvalue.adjust), col = color, alpha = color)) + 
+GvN %>% mutate(color = ifelse(pvalue.adjust < .05, "FDR < 0.05", "ns")) %>% na.omit %>%  ggplot(aes(x = GP135_log2LR - NaKATPase_log2LR, y = -log10(pvalue.adjust), col = color, alpha = color)) + 
   geom_point() + 
   scale_color_manual(values=c("Red", "Black")) + 
   scale_alpha_manual(values=c(1, 0.1)) +
@@ -715,15 +730,15 @@ basal4_genes[["GO_Molecular_Function_2018"]] %>% as_tibble() %>% filter(Adjusted
 ###My method
 
 ```{r, my method of finding h2m orthologs}
-res_AB_simple <- res_AB %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_AB)) %>% select(ensembl_gene_id, log2FoldChange, padj)
-GvN_simple <- GvN %>%  select(ensembl_gene_id, log2FC_LR_final, pvalue.adjust)
-LCM_AB <- readRDS(file = "LCM_apical_basal_dds_results.txt")
-LCM_AB <- LCM_AB %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(LCM_AB)) %>% select(ensembl_gene_id, log2FoldChange, padj) %>% na.omit()
-LCM_AB_f <- readRDS(file = "LCM_apical_basal_dds_results_filtered.txt")
-LCM_AB_f <- LCM_AB_f %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(LCM_AB_f)) %>% select(ensembl_gene_id, log2FoldChange, padj) %>% na.omit()
+res_AB_simple <- res_AB %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_AB)) %>% dplyr::select(ensembl_gene_id, log2FoldChange, padj)
+GvN_simple <- GvN %>%  dplyr::select(ensembl_gene_id, log2FC_LR_final, pvalue.adjust)
+#LCM_AB <- readRDS(file = "LCM_apical_basal_dds_results.txt")
+#LCM_AB <- LCM_AB %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(LCM_AB)) %>% dplyr::select(ensembl_gene_id, log2FoldChange, padj) %>% na.omit()
+LCM_AB <- readRDS(file = "LCM_apical_basal_dds_results_filtered.txt")
+LCM_AB <- LCM_AB %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(LCM_AB)) %>% dplyr::select(ensembl_gene_id, log2FoldChange, padj) %>% na.omit()
 
 mouse = useMart("ensembl", dataset = "mmusculus_gene_ensembl")
-human = mart
+human = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
 
 genesV2 = getLDS(attributes = "ensembl_gene_id", filters = "ensembl_gene_id", values = pull(LCM_AB, ensembl_gene_id), mart = mouse, attributesL = "ensembl_gene_id", martL = human, uniqueRows=T)
 
@@ -731,9 +746,9 @@ LCM_AB %>% left_join(., genesV2, by = c("ensembl_gene_id" = "Gene.stable.ID")) %
 
 LCM_AB %>% left_join(., genesV2, by = c("ensembl_gene_id" = "Gene.stable.ID")) %>% left_join(., GvN_simple, by = c("Gene.stable.ID.1" = "ensembl_gene_id")) %>% na.omit() %>% ggplot(aes(x = log2FoldChange, y = log2FC_LR_final)) + geom_point() + geom_smooth(aes(x = log2FoldChange, y = log2FC_LR_final), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman") + labs(x = "A/B mouse LR", y = "A/B C2bbe1 LR (xtail)")
 
-LCM_AB_f %>% left_join(., genesV2, by = c("ensembl_gene_id" = "Gene.stable.ID")) %>% left_join(., res_AB_simple, by = c("Gene.stable.ID.1" = "ensembl_gene_id")) %>% na.omit() %>% ggplot(aes(x = log2FoldChange.x, y = log2FoldChange.y)) + geom_point() + geom_smooth(aes(x = log2FoldChange.x, y = log2FoldChange.y), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman") + labs(x = "A/B mouse LR", y = "A/B C2bbe1 LR")
+LCM_AB %>% left_join(., genesV2, by = c("ensembl_gene_id" = "Gene.stable.ID")) %>% left_join(., res_AB_simple, by = c("Gene.stable.ID.1" = "ensembl_gene_id")) %>% na.omit() %>% ggplot(aes(x = log2FoldChange.x, y = log2FoldChange.y)) + geom_point() + geom_smooth(aes(x = log2FoldChange.x, y = log2FoldChange.y), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman") + labs(x = "A/B mouse LR", y = "A/B C2bbe1 LR")
 
-LCM_AB_f %>% left_join(., genesV2, by = c("ensembl_gene_id" = "Gene.stable.ID")) %>% left_join(., GvN_simple, by = c("Gene.stable.ID.1" = "ensembl_gene_id")) %>% na.omit() %>% ggplot(aes(x = log2FoldChange, y = log2FC_LR_final)) + geom_point() + geom_smooth(aes(x = log2FoldChange, y = log2FC_LR_final), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman") + labs(x = "A/B mouse LR", y = "A/B C2bbe1 LR (xtail)")
+LCM_AB %>% left_join(., genesV2, by = c("ensembl_gene_id" = "Gene.stable.ID")) %>% left_join(., GvN_simple, by = c("Gene.stable.ID.1" = "ensembl_gene_id")) %>% na.omit() %>% ggplot(aes(x = log2FoldChange, y = log2FC_LR_final)) + geom_point() + geom_smooth(aes(x = log2FoldChange, y = log2FC_LR_final), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman") + labs(x = "A/B mouse LR", y = "A/B C2bbe1 LR (xtail)")
 
 ```
 
@@ -755,21 +770,21 @@ LCM_AB %>% left_join(., h2m, by = c("ensembl_gene_id" = "mouse_gene")) %>% left_
 ###What about just the significant genes
 
 ```{r, do at least the significant genes agree}
-LCM_AB %>% mutate(col = ifelse(padj < 0.05 & log2FoldChange > 2, "A", ifelse(padj < 0.05 & log2FoldChange < -2, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = col, alpha = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + labs(title = "Mouse A/B sig genes on Mouse data")
+LCM_AB %>% mutate(col = ifelse(padj < 0.05 & log2FoldChange > 2, "A", ifelse(padj < 0.05 & log2FoldChange < -2, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = col, alpha = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + labs(title = "Mouse A/B sig genes on Mouse data")
 
 mouse_apical_genes <- LCM_AB %>% filter(padj < 0.05 & log2FoldChange > 2) %>% left_join(., h2m, by = c("ensembl_gene_id" = "mouse_gene")) %>% na.omit() %>% pull(., ensembl_gene_id.y)
 
 mouse_basal_genes <- LCM_AB %>% filter(padj < 0.05 & log2FoldChange < -2) %>% left_join(., h2m, by = c("ensembl_gene_id" = "mouse_gene")) %>% na.omit() %>% pull(., ensembl_gene_id.y)
 
-res_AB_simple %>% na.omit() %>%  mutate(col = ifelse(ensembl_gene_id %in% mouse_apical_genes, "A", ifelse(ensembl_gene_id %in% mouse_basal_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = col, alpha = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + labs(title = "Mouse A/B sig genes on DESeq A/B data")
+res_AB_simple %>% na.omit() %>%  mutate(col = ifelse(ensembl_gene_id %in% mouse_apical_genes, "A", ifelse(ensembl_gene_id %in% mouse_basal_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = col, alpha = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + labs(title = "Mouse A/B sig genes on DESeq A/B data")
 
-GvN_simple %>% mutate(col = ifelse(ensembl_gene_id %in% mouse_apical_genes, "A", ifelse(ensembl_gene_id %in% mouse_basal_genes, "B", ""))) %>% ggplot(aes(x = log2FC_LR_final, y = -log(pvalue.adjust), col = col, alpha = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + labs(title = "Mouse A/B sig genes on xtail A/B data")
+GvN_simple %>% mutate(col = ifelse(ensembl_gene_id %in% mouse_apical_genes, "A", ifelse(ensembl_gene_id %in% mouse_basal_genes, "B", ""))) %>% ggplot(aes(x = log2FC_LR_final, y = -log10(pvalue.adjust), col = col, alpha = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + labs(title = "Mouse A/B sig genes on xtail A/B data")
 
-G_I_simple <- res_G_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_G_I)) %>% select(ensembl_gene_id, log2FoldChange, padj) 
-G_I_simple %>% mutate(col = ifelse(ensembl_gene_id %in% mouse_apical_genes, "A", ifelse(ensembl_gene_id %in% mouse_basal_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = col, alpha = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + labs(title = "Mouse A/B sig genes on DESeq A/Input data")
+G_I_simple <- res_G_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_G_I)) %>% dplyr::select(ensembl_gene_id, log2FoldChange, padj) 
+G_I_simple %>% mutate(col = ifelse(ensembl_gene_id %in% mouse_apical_genes, "A", ifelse(ensembl_gene_id %in% mouse_basal_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = col, alpha = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + labs(title = "Mouse A/B sig genes on DESeq A/Input data")
 
-N_I_simple <- res_N_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_N_I)) %>% select(ensembl_gene_id, log2FoldChange, padj)
-N_I_simple %>% mutate(col = ifelse(ensembl_gene_id %in% mouse_apical_genes, "A", ifelse(ensembl_gene_id %in% mouse_basal_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = col, alpha = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + labs(title = "Mouse A/B sig genes on DESeq B/Input data")
+N_I_simple <- res_N_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_N_I)) %>% dplyr::select(ensembl_gene_id, log2FoldChange, padj)
+N_I_simple %>% mutate(col = ifelse(ensembl_gene_id %in% mouse_apical_genes, "A", ifelse(ensembl_gene_id %in% mouse_basal_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = col, alpha = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + labs(title = "Mouse A/B sig genes on DESeq B/Input data")
 
 
 ```
@@ -792,11 +807,11 @@ G_I_simple %>% full_join(N_I_simple, by = "ensembl_gene_id") %>% na.omit() %>% g
 
 G_I_simple %>% full_join(N_I_simple, by = "ensembl_gene_id") %>% na.omit() %>% filter(padj.x < 0.05 | padj.y < 0.05) %>% ggplot(aes(x = log2FoldChange.x, y = log2FoldChange.y)) + geom_point() + geom_smooth(aes(x = log2FoldChange.x, y = log2FoldChange.y), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman") + labs(title = "Input normalized significant genes", x = "G_I DESEQ", y = "N_I DESEQ")
 
-G_P_simple <- res_G_P %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_G_P)) %>% select(ensembl_gene_id, log2FoldChange, padj)
-N_P_simple <- res_N_P %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_N_P)) %>% select(ensembl_gene_id, log2FoldChange, padj)
+G_P_simple <- res_G_P %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_G_P)) %>% dplyr::select(ensembl_gene_id, log2FoldChange, padj)
+N_P_simple <- res_N_P %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_N_P)) %>% dplyr::select(ensembl_gene_id, log2FoldChange, padj)
 G_P_simple %>% full_join(N_P_simple, by = "ensembl_gene_id") %>% na.omit() %>% ggplot(aes(x = log2FoldChange.x, y = log2FoldChange.y)) + geom_point() + geom_smooth(aes(x = log2FoldChange.x, y = log2FoldChange.y), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman") + labs(title = "P65 normalized", x = "G_P DESEQ", y = "N_P DESEQ")
 
-GvP %>% select(ensembl_gene_id, log2FC_LR_final) %>% full_join((NvP %>% select(ensembl_gene_id, log2FC_LR_final)), by = "ensembl_gene_id") %>% na.omit() %>% ggplot(aes(x = log2FC_LR_final.x, y = log2FC_LR_final.y)) + geom_point() + geom_smooth(aes(x = log2FC_LR_final.x, y = log2FC_LR_final.y), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman") + labs(title = "P65 normalized significant genes", x = "G_P xtail", y = "N_P xtail")
+GvP %>% dplyr::select(ensembl_gene_id, log2FC_LR_final) %>% full_join((NvP %>% dplyr::select(ensembl_gene_id, log2FC_LR_final)), by = "ensembl_gene_id") %>% na.omit() %>% ggplot(aes(x = log2FC_LR_final.x, y = log2FC_LR_final.y)) + geom_point() + geom_smooth(aes(x = log2FC_LR_final.x, y = log2FC_LR_final.y), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman") + labs(title = "P65 normalized significant genes", x = "G_P xtail", y = "N_P xtail")
 
 G_P_simple %>% full_join(G_I_simple, by = "ensembl_gene_id") %>% na.omit() %>% ggplot(aes(x = log2FoldChange.x, y = log2FoldChange.y)) + geom_point() + geom_smooth(aes(x = log2FoldChange.x, y = log2FoldChange.y), method = lm, se = FALSE, inherit.aes = FALSE) + theme_cowplot() + stat_cor(method = "spearman") + labs(title = "P65 normalized", x = "G_P DESEQ", y = "G_I DESEQ")
 
@@ -825,17 +840,17 @@ N_I_simple %>% full_join(P_I_simple, by = "ensembl_gene_id") %>% na.omit() %>% g
 
 ##volcano plots
 
-#LCM_AB %>% mutate(col = ifelse(ensembl_gene_id %in% tri_A_mouse_genes, "A", ifelse(ensembl_gene_id %in% bi_B_mouse_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand ortho genes on Mouse data")
+#LCM_AB %>% mutate(col = ifelse(ensembl_gene_id %in% tri_A_mouse_genes, "A", ifelse(ensembl_gene_id %in% bi_B_mouse_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand ortho genes on Mouse data")
 
-#res_AB_simple %>% na.omit() %>%  mutate(col = ifelse(ensembl_gene_id %in% tri_A_genes, "A", ifelse(ensembl_gene_id %in% bi_B_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand genes on DESeq A/B data")
+#res_AB_simple %>% na.omit() %>%  mutate(col = ifelse(ensembl_gene_id %in% tri_A_genes, "A", ifelse(ensembl_gene_id %in% bi_B_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand genes on DESeq A/B data")
 
-#GvN_simple %>% mutate(col = ifelse(ensembl_gene_id %in% tri_A_genes, "A", ifelse(ensembl_gene_id %in% bi_B_genes, "B", ""))) %>% ggplot(aes(x = log2FC_LR_final, y = -log(pvalue.adjust), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand genes on xtail A/B data")
+#GvN_simple %>% mutate(col = ifelse(ensembl_gene_id %in% tri_A_genes, "A", ifelse(ensembl_gene_id %in% bi_B_genes, "B", ""))) %>% ggplot(aes(x = log2FC_LR_final, y = -log10(pvalue.adjust), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand genes on xtail A/B data")
 
 #G_I_simple <- res_G_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_G_I)) %>% select(ensembl_gene_id, log2FoldChange, padj) 
-#G_I_simple %>% mutate(col = ifelse(ensembl_gene_id %in% tri_A_genes, "A", ifelse(ensembl_gene_id %in% bi_B_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand genes on DESeq A/Input data")
+#G_I_simple %>% mutate(col = ifelse(ensembl_gene_id %in% tri_A_genes, "A", ifelse(ensembl_gene_id %in% bi_B_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand genes on DESeq A/Input data")
 
 #N_I_simple <- res_N_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_N_I)) %>% select(ensembl_gene_id, log2FoldChange, padj)
-#N_I_simple %>% mutate(col = ifelse(ensembl_gene_id %in% tri_A_genes, "A", ifelse(ensembl_gene_id %in% bi_B_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand genes on DESeq B/Input data")
+#N_I_simple %>% mutate(col = ifelse(ensembl_gene_id %in% tri_A_genes, "A", ifelse(ensembl_gene_id %in% bi_B_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand genes on DESeq B/Input data")
 
 ##what are these genes?
 #GvN %>% mutate(loc = ifelse(ensembl_gene_id %in% tri_A_genes, "A", ifelse(ensembl_gene_id %in% bi_B_genes, "B", ""))) %>% filter(loc != "") %>% select(ensembl_gene_id, Gene_name, loc, log2FC_LR_final, pvalue.adjust)
@@ -850,8 +865,8 @@ N_I_simple %>% full_join(P_I_simple, by = "ensembl_gene_id") %>% na.omit() %>% g
 ```{r, megadat for cand gene selection, fig.width = 25}
 ave_tpm <- tpms %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(tpms)) %>% gather(-ensembl_gene_id,key = sample, value = tpm) %>% group_by(ensembl_gene_id) %>% summarise(ave_tpm = mean(tpm))
 
-GvP_simple <- GvP %>% select(ensembl_gene_id, Gene_name, log2FC_LR_final, pvalue.adjust)
-NvP_simple <- NvP %>% select(ensembl_gene_id, Gene_name, log2FC_LR_final, pvalue.adjust)
+GvP_simple <- GvP %>% dplyr::select(ensembl_gene_id, Gene_name, log2FC_LR_final, pvalue.adjust)
+NvP_simple <- NvP %>% dplyr::select(ensembl_gene_id, Gene_name, log2FC_LR_final, pvalue.adjust)
 
 all_Dat_simple <- ave_tpm %>% full_join(GvN_simple) %>% dplyr::rename(GvN_LR = log2FC_LR_final, GvN_pval = pvalue.adjust) %>% full_join(G_I_simple) %>% dplyr::rename(G_I_FC = log2FoldChange, G_I_pval = padj) %>% full_join(N_I_simple) %>% dplyr::rename(N_I_FC = log2FoldChange, N_I_pval = padj) %>% full_join(res_AB_simple) %>% dplyr::rename(AB_FC = log2FoldChange, AB_pval = padj) %>% full_join(G_P_simple) %>% dplyr::rename(G_P_FC = log2FoldChange, G_P_pval = padj) %>% full_join(N_P_simple) %>% dplyr::rename(N_P_FC = log2FoldChange, N_P_pval = padj) %>% full_join(GvP_simple) %>% dplyr::rename(GvP_LR = log2FC_LR_final, GvP_pval = pvalue.adjust) %>% full_join(NvP_simple) %>% dplyr::rename(NvP_LR = log2FC_LR_final, NvP_pval = pvalue.adjust)
 
@@ -869,35 +884,38 @@ b_mouse_genes <- h2m %>% filter(ensembl_gene_id %in% b_genes) %>% pull(., mouse_
 
 ##volcano plots
 
-LCM_AB %>% mutate(col = ifelse(ensembl_gene_id %in% a_mouse_genes, "A", ifelse(ensembl_gene_id %in% b_mouse_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand ortho genes on Mouse data") 
+LCM_AB %>% mutate(col = ifelse(ensembl_gene_id %in% a_mouse_genes, "A", ifelse(ensembl_gene_id %in% b_mouse_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand ortho genes on Mouse data") 
 
 
-all_Dat_tidy_FC <- all_Dat_simple %>% gather(-ensembl_gene_id,-Gene_name, -ave_tpm, -contains(match = "pval"), key = sample, value = FC) %>% mutate(sample = substr(sample, 0, nchar(sample)-3)) %>% select(ensembl_gene_id, Gene_name, ave_tpm, sample, FC)
+all_Dat_tidy_FC <- all_Dat_simple %>% gather(-ensembl_gene_id,-Gene_name, -ave_tpm, -contains(match = "pval"), key = sample, value = FC) %>% mutate(sample = substr(sample, 0, nchar(sample)-3)) %>% dplyr::select(ensembl_gene_id, Gene_name, ave_tpm, sample, FC)
 
-all_Dat_tidy_pval <- all_Dat_simple %>% gather(contains(match = "pval"), key = sample, value = pval) %>% mutate(sample = str_remove(sample, pattern = "_pval"))  %>% select(ensembl_gene_id, Gene_name, ave_tpm, sample, pval)
+all_Dat_tidy_pval <- all_Dat_simple %>% gather(contains(match = "pval"), key = sample, value = pval) %>% mutate(sample = str_remove(sample, pattern = "_pval"))  %>% dplyr::select(ensembl_gene_id, Gene_name, ave_tpm, sample, pval)
 
 all_Dat_tidy <- left_join(all_Dat_tidy_FC, all_Dat_tidy_pval)
 
 
 p <- all_Dat_tidy %>% mutate(col = ifelse(ensembl_gene_id %in% a_genes, "A", ifelse(ensembl_gene_id %in% b_genes, "B", ""))) 
-p %>% ggplot(aes(x = FC, y = -log(as.numeric(pval)), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + facet_grid(.~sample, scales = "free") + scale_x_continuous(limits = c(-7.5, 7.5)) + scale_y_continuous(limits = c(0, 55)) + geom_text(data = subset(p, col != ""), aes(label = Gene_name), size = 5, position = position_jitter(width = .5, height = .75)) + geom_hline(yintercept = -log(0.05))
+p %>% ggplot(aes(x = FC, y = -log10(as.numeric(pval)), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + facet_grid(.~sample, scales = "free") + scale_x_continuous(limits = c(-7.5, 7.5)) + scale_y_continuous(limits = c(0, 55)) + geom_text(data = subset(p, col != ""), aes(label = Gene_name), size = 5, position = position_jitter(width = .5, height = .75)) + geom_hline(yintercept = -log10(0.05))
 
 
-q <- res_AB_simple %>% mutate(col = ifelse(ensembl_gene_id %in% a_genes, "A", ifelse(ensembl_gene_id %in% b_genes, "B", ""))) %>% full_join(., ens2gene)
-q %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "#808080", "#808080", "#c551ee", "#9840e3", "#48c8db", "#66f2e0")) + scale_alpha_manual(values = c(0.075, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand genes on DESeq A/B data", y = "FDR", x = "Apical Bias") + ggrepel::geom_label_repel(data = subset(q, col != ""), aes(label = Gene, col = Gene), size = 5, direction = "y") + geom_hline(yintercept = -log(0.05), size = 1, linetype = "dashed") + coord_cartesian(ylim = c(0,50)) + guides(col = FALSE)
+q <- res_AB_simple %>% mutate(col = ifelse(ensembl_gene_id %in% a_genes, "A", ifelse(ensembl_gene_id %in% b_genes, "B", ""))) %>% full_join(., ens2gene) %>% filter(Gene != "SDC2")
+q %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "#808080", "#808080", "#c551ee", "#9840e3", "#48c8db")) + scale_alpha_manual(values = c(0.075, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand genes on DESeq A/B data", y = "FDR", x = "Apical Bias") + ggrepel::geom_label_repel(data = subset(q, col != ""), aes(label = Gene, col = Gene), size = 5, direction = "y") + geom_hline(yintercept = -log10(0.05), size = 1, linetype = "dashed") + coord_cartesian(ylim = c(0,50)) + guides(col = FALSE)
 
 q <- GvN_simple %>% mutate(col = ifelse(ensembl_gene_id %in% a_genes, "A", ifelse(ensembl_gene_id %in% b_genes, "B", ""))) %>% full_join(., ens2gene) 
-q %>% ggplot(aes(x = log2FC_LR_final, y = -log(pvalue.adjust), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand genes on xtail A/B data") + geom_text(data = subset(q, col != ""), aes(label = Gene), position = position_jitter(width = .5, height = 1.5))
+q %>% ggplot(aes(x = log2FC_LR_final, y = -log10(pvalue.adjust), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand genes on xtail A/B data") + geom_text(data = subset(q, col != ""), aes(label = Gene), position = position_jitter(width = .5, height = 1.5))
+
+#TPMS of the genes
+tpms %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(tpms)) %>% gather(-ensembl_gene_id,key = sample, value = tpm) %>% filter(ensembl_gene_id %in% c(a_genes, b_genes)) %>% mutate(col = ifelse(ensembl_gene_id %in% a_genes, "A", ifelse(ensembl_gene_id %in% b_genes, "B", ""))) %>% separate(sample, into = c("C2bbe1", "halo", "fraction","rep")) %>%  left_join(., ens2gene) %>% filter(Gene != "SDC2", fraction == "input") %>% ggplot(aes(x = Gene, y = tpm,fill = Gene)) + geom_point(position = "jitter")  + geom_boxplot(width = 0.25) + theme_cowplot() + guides(fill = FALSE) + labs(x = "", y = "transcripts per million") + scale_fill_manual(values = c("#c551ee", "#9840e3", "#48c8db"))
 
 #G_I_simple <- res_G_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_G_I)) %>% select(ensembl_gene_id, Gene_name, log2FoldChange, padj) 
-#G_I_simple %>% mutate(col = ifelse(ensembl_gene_id %in% a_genes, "A", ifelse(ensembl_gene_id %in% b_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand genes on DESeq A/Input data") + geom_text(data = subset(q, col != ""), aes(label = Gene_name), position = position_jitter(width = .5, height = 1.5)) 
+#G_I_simple %>% mutate(col = ifelse(ensembl_gene_id %in% a_genes, "A", ifelse(ensembl_gene_id %in% b_genes, "B", ""))) %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand genes on DESeq A/Input data") + geom_text(data = subset(q, col != ""), aes(label = Gene_name), position = position_jitter(width = .5, height = 1.5)) 
 
 #q <- N_I_simple <- res_N_I %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(res_N_I)) %>% select(ensembl_gene_id, log2FoldChange, padj)
 #N_I_simple %>% mutate(col = ifelse(ensembl_gene_id %in% a_genes, "A", ifelse(ensembl_gene_id %in% b_genes, "B", ""))) 
-#q %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand genes on DESeq B/Input data") + geom_text(data = subset(q, col != ""), aes(label = Gene_name), position = position_jitter(width = .5, height = 1.5))
+#q %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + labs(title = "SmiFISH cand genes on DESeq B/Input data") + geom_text(data = subset(q, col != ""), aes(label = Gene_name), position = position_jitter(width = .5, height = 1.5))
 
 ##what are these genes?
-GvN %>% mutate(loc = ifelse(ensembl_gene_id %in% a_genes, "A", ifelse(ensembl_gene_id %in% b_genes, "B", ""))) %>% filter(loc != "") %>% select(ensembl_gene_id, Gene_name, loc, log2FC_LR_final, pvalue.adjust)
+GvN %>% mutate(loc = ifelse(ensembl_gene_id %in% a_genes, "A", ifelse(ensembl_gene_id %in% b_genes, "B", ""))) %>% filter(loc != "") %>% dplyr::select(ensembl_gene_id, Gene_name, loc, log2FC_LR_final, pvalue.adjust)
 
 ##tpm check
 
@@ -922,13 +940,13 @@ ensemblid <- readRDS(file = "ensembl_transcript_id_mart.txt")
 
 #cdnaseq <- getSequence(id = ensemblid, type="ensembl_transcript_id", seqType="cdna", mart=mart)
 #saveRDS(cdnaseq, file = "humancdnaseq.txt")
-cdnaseq <- readRDS(file = "humancdnaseq.txt")
-
-cdnalength <- cdnaseq %>% as_tibble() %>% mutate(length = nchar(cdna)) %>% select(-cdna)
-
-ave_enst_tpm %>% mutate(loc = ifelse(GENEID %in% a_genes, "A", ifelse(GENEID %in% b_genes, "B", "")), ave_tpm = round(ave_tpm)) %>% filter(loc != "") %>% group_by(TXNAME) %>% top_n(n = 3, wt = ave_tpm) %>% arrange(Gene, desc(ave_tpm)) %>% left_join(., cdnalength, by = c("TXNAME" = "ensembl_transcript_id"))
-
-tpms %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(tpms), loc = ifelse(ensembl_gene_id %in% a_genes, "A", ifelse(ensembl_gene_id %in% b_genes, "B", ""))) %>% filter(loc == "A" | loc == "B") %>% select(ensembl_gene_id, contains("input"), - loc) %>% gather(-ensembl_gene_id, key = "sample", value = "TPM") %>% ggplot(aes(x = ensembl_gene_id, y = TPM)) + geom_boxplot() + theme_cowplot()
+# cdnaseq <- readRDS(file = "humancdnaseq.txt")
+# 
+# cdnalength <- cdnaseq %>% as_tibble() %>% mutate(length = nchar(cdna)) %>% select(-cdna)
+# 
+# ave_enst_tpm %>% mutate(loc = ifelse(GENEID %in% a_genes, "A", ifelse(GENEID %in% b_genes, "B", "")), ave_tpm = round(ave_tpm)) %>% filter(loc != "") %>% group_by(TXNAME) %>% top_n(n = 3, wt = ave_tpm) %>% arrange(Gene, desc(ave_tpm)) %>% left_join(., cdnalength, by = c("TXNAME" = "ensembl_transcript_id"))
+# 
+# tpms %>% as_tibble() %>% mutate(ensembl_gene_id = rownames(tpms), loc = ifelse(ensembl_gene_id %in% a_genes, "A", ifelse(ensembl_gene_id %in% b_genes, "B", ""))) %>% filter(loc == "A" | loc == "B") %>% select(ensembl_gene_id, contains("input"), - loc) %>% gather(-ensembl_gene_id, key = "sample", value = "TPM") %>% ggplot(aes(x = ensembl_gene_id, y = TPM)) + geom_boxplot() + theme_cowplot()
 
 ```
 
@@ -939,10 +957,10 @@ LCM_sm_B <- c("PIGR", "CYB5R3", "NET1")
 
 
 p <- all_Dat_tidy %>% mutate(col = ifelse(Gene_name %in% LCM_sm_A, "A", ifelse(Gene_name %in% LCM_sm_B, "B", ""))) 
-p %>% ggplot(aes(x = FC, y = -log(as.numeric(pval)), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + facet_grid(.~sample, scales = "free") + scale_x_continuous(limits = c(-7.5, 7.5)) + scale_y_continuous(limits = c(0, 90)) + geom_text(data = subset(p, col != ""), aes(label = Gene_name), position = position_jitter(width = .5, height = .75)) + geom_hline(yintercept = -log(0.05))
+p %>% ggplot(aes(x = FC, y = -log10(as.numeric(pval)), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + facet_grid(.~sample, scales = "free") + scale_x_continuous(limits = c(-7.5, 7.5)) + scale_y_continuous(limits = c(0, 90)) + geom_text(data = subset(p, col != ""), aes(label = Gene_name), position = position_jitter(width = .5, height = .75)) + geom_hline(yintercept = -log10(0.05))
 
-L <- LCM_AB_f %>% left_join(h2m, by = c("ensembl_gene_id" = "mouse_gene")) %>% left_join(ens2gene, by = c("ensembl_gene_id.y" = "ensembl_gene_id")) %>% mutate(col = ifelse(Gene %in% LCM_sm_A, "A", ifelse(Gene %in% LCM_sm_B, "B", ""))) 
-L %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + geom_text(data = subset(L, col != ""), aes(label = Gene), position = position_jitter(width = .5, height = .75)) + geom_hline(yintercept = -log(0.05))
+L <- LCM_AB %>% left_join(h2m, by = c("ensembl_gene_id" = "mouse_gene")) %>% left_join(ens2gene, by = c("ensembl_gene_id.y" = "ensembl_gene_id")) %>% mutate(col = ifelse(Gene %in% LCM_sm_A, "A", ifelse(Gene %in% LCM_sm_B, "B", ""))) 
+L %>% ggplot(aes(x = log2FoldChange, y = -log10(padj), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red", "Blue")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + geom_text(data = subset(L, col != ""), aes(label = Gene), position = position_jitter(width = .5, height = .75)) + geom_hline(yintercept = -log10(0.05))
 
 ```
 
@@ -955,7 +973,7 @@ L %>% ggplot(aes(x = log2FoldChange, y = -log(padj), col = col, alpha = col, siz
 
 #ERgenes <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0005783'), mart = mart) %>% as_tibble() %>% mutate(GO = "nuclear") %>% left_join(.,all_Dat_simple, by = "ensembl_gene_id") %>% na.omit() %>% pull(.,ensembl_gene_id)
 
-signalseqgenes <- read.table(file = "AllSignalSequences.txt") %>% as_tibble() %>% filter(V10 == "Y") %>% separate(V1, into = c("ensembl_gene_id", "ensembl_transcript_id"), sep = "_") %>% mutate(ensembl_gene_id = substr(ensembl_gene_id, 0, 15)) %>% select(ensembl_gene_id) %>% unique() %>% pull(., ensembl_gene_id)
+signalseqgenes <- read.table(file = "AllSignalSequences.txt") %>% as_tibble() %>% filter(V10 == "Y") %>% separate(V1, into = c("ensembl_gene_id", "ensembl_transcript_id"), sep = "_") %>% mutate(ensembl_gene_id = substr(ensembl_gene_id, 0, 15)) %>% dplyr::select(ensembl_gene_id) %>% unique() %>% pull(., ensembl_gene_id)
 
 Mito_Mat <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0005759'), mart = mart) %>% as_tibble() %>% mutate(GO = "nuclear") %>% left_join(.,all_Dat_simple, by = "ensembl_gene_id") %>% na.omit() %>% pull(.,ensembl_gene_id)
 
@@ -1039,11 +1057,12 @@ all_GO_plot %>%
     geom_boxplot(outlier.shape = NA, width = 0.25) + 
     theme_cowplot() +
     geom_hline(yintercept = 0) +
-    stat_compare_means(comparisons = EZ_comparisons, method = "wilcox.test", label.y = c(2,2.25)) + 
+    stat_compare_means(comparisons = EZ_comparisons, method = "wilcox.test", label.y = c(1.5,1.75)) + 
     labs(x = "", y = "Human Apical Bias") + 
     guides(fill = FALSE) +
     coord_cartesian(ylim = c(-1.5,2.5)) +
-    scale_fill_manual(values = c("#808080","#247ea7","#09921d"))
+    scale_fill_manual(values = c("#808080","#247ea7","#09921d")) +
+    coord_cartesian(ylim = c(-1.5,2))
 
 all_GO_plot %>%
     filter(GO %in% c("All Genes", "RP")) %>% 
@@ -1069,7 +1088,7 @@ all_GO_plot %>% ggplot(aes(x = GO, y = N_I_FC, fill = GO)) + geom_point(position
     geom_hline(yintercept = 0) +
     stat_compare_means(comparisons = my_comparisons, method = "wilcox.test") 
 
-all_LCM_GO <- LCM_AB_f %>% mutate(GO = "All Genes")
+all_LCM_GO <- LCM_AB %>% mutate(GO = "All Genes")
 nuclear_LCM_GO <- all_LCM_GO %>% mutate(GO = ifelse(ensembl_gene_id %in% nucleargenes_mm, "Nuclear", "")) %>% filter(GO != "")
 RP_LCM_GO <- all_LCM_GO %>% mutate(GO = ifelse(ensembl_gene_id %in% RPgenes_mm, "RP", "")) %>% filter(GO != "")
 ETC_LCM_GO <- all_LCM_GO %>% mutate(GO = ifelse(ensembl_gene_id %in% ETCgenes_mm, "ETC", "")) %>% filter(GO != "")
@@ -1093,28 +1112,27 @@ cmp <- list(c("All Genes", "Nuclear"),
                     c("All Genes" , "RP"),
                     c("All Genes", "SignalSeq"))
  
-all_GO_plot %>% mutate(log2FoldChange = AB_FC) %>% select(ensembl_gene_id, log2FoldChange,GO) %>% rbind(., select(all_LCM_plot, -padj)) %>% mutate(species = ifelse(startsWith(ensembl_gene_id, "ENSG"), "Human", "Mouse"))  %>% ggplot(aes(x = factor(GO, levels = c("All Genes", "Nuclear", "ETC", "RP", "SignalSeq")), y = log2FoldChange, fill = GO)) + geom_point(position = position_jitterdodge(), alpha = 0.01) + geom_violin(position = "dodge") + geom_boxplot(position = "dodge", width = 0.25,outlier.shape = NA)  + theme_cowplot() +geom_hline(yintercept = 0) + scale_y_continuous(limits = c(-2.5, 2.5)) + facet_grid(.~species) + guides(fill = FALSE) + labs(x = "", y = "Apical Bias")
+all_GO_plot %>% mutate(log2FoldChange = AB_FC) %>% dplyr::select(ensembl_gene_id, log2FoldChange,GO) %>% rbind(., dplyr::select(all_LCM_plot, -padj)) %>% mutate(species = ifelse(startsWith(ensembl_gene_id, "ENSG"), "Human", "Mouse"))  %>% ggplot(aes(x = factor(GO, levels = c("All Genes", "Nuclear", "ETC", "RP", "SignalSeq")), y = log2FoldChange, fill = GO)) + geom_point(position = position_jitterdodge(), alpha = 0.01) + geom_violin(position = "dodge") + geom_boxplot(position = "dodge", width = 0.25,outlier.shape = NA)  + theme_cowplot() +geom_hline(yintercept = 0) + scale_y_continuous(limits = c(-2.5, 2.5)) + facet_grid(.~species) + guides(fill = FALSE) + labs(x = "", y = "Apical Bias")
 
-all_GO_plot %>% mutate(log2FoldChange = AB_FC) %>% select(ensembl_gene_id, log2FoldChange,GO) %>% rbind(., select(all_LCM_plot, -padj)) %>% mutate(species = ifelse(startsWith(ensembl_gene_id, "ENSG"), "Human", "Mouse"))  %>% ggplot(aes(x = factor(GO, levels = c("All Genes", "Nuclear", "ETC", "RP", "SignalSeq")), y = log2FoldChange, fill = GO)) + geom_point(position = position_jitterdodge(), alpha = 0.01) + geom_violin(position = "dodge") + geom_boxplot(position = "dodge", width = 0.25,outlier.shape = NA)  + theme_cowplot() + geom_hline(yintercept = 0)  + facet_grid(.~species) + stat_compare_means(method = "wilcox.test", comparisons = cmp)+ guides(fill = FALSE) + labs(x = "", y = "Apical Bias")
+all_GO_plot %>% mutate(log2FoldChange = AB_FC) %>% dplyr::select(ensembl_gene_id, log2FoldChange,GO) %>% rbind(., dplyr::select(all_LCM_plot, -padj)) %>% mutate(species = ifelse(startsWith(ensembl_gene_id, "ENSG"), "Human", "Mouse"))  %>% ggplot(aes(x = factor(GO, levels = c("All Genes", "Nuclear", "ETC", "RP", "SignalSeq")), y = log2FoldChange, fill = GO)) + geom_point(position = position_jitterdodge(), alpha = 0.01) + geom_violin(position = "dodge") + geom_boxplot(position = "dodge", width = 0.25,outlier.shape = NA)  + theme_cowplot() + geom_hline(yintercept = 0)  + facet_grid(.~species) + stat_compare_means(method = "wilcox.test", comparisons = cmp)+ guides(fill = FALSE) + labs(x = "", y = "Apical Bias")
 
 
 
 ####This is based on Protein localization!!
 
-#apicalPM <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0016324'), mart = mart) %>% as_tibble() %>% mutate(GO = "apicalPM") %>% left_join(.,all_Dat_simple, by = "ensembl_gene_id") %>% na.omit() %>% pull(., ensembl_gene_id) 
-#apical_poc <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0045177'), mart = mart) %>% as_tibble() %>% mutate(GO = "apicalPOC") %>% left_join(.,all_Dat_simple, by = "ensembl_gene_id") %>% na.omit() %>% pull(., ensembl_gene_id) 
-#basalPM <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0009925'), mart = mart) %>% as_tibble() %>% mutate(GO = "basalPM") %>% left_join(.,all_Dat_simple, by = "ensembl_gene_id") %>% na.omit() %>% pull(., ensembl_gene_id) 
-#basal_poc <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0045178'), mart = mart) %>% as_tibble() %>% mutate(GO = "basalPOC") %>% left_join(.,all_Dat_simple, by = "ensembl_gene_id") %>% na.omit() %>% pull(., ensembl_gene_id) 
-#PM <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0005886'), mart = mart) %>% as_tibble() %>% mutate(GO = "PM") %>% left_join(.,all_Dat_simple, by = "ensembl_gene_id") %>% na.omit() %>% pull(., ensembl_gene_id)
-#BB <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0031526'), mart = mart) %>% as_tibble() %>% mutate(GO = "PM") %>% left_join(.,all_Dat_simple, by = "ensembl_gene_id") %>% na.omit() %>% pull(., ensembl_gene_id)
-
-
-#saveRDS(apicalPM, file = "hs_apicalPMgenes.txt")
-#saveRDS(apical_poc, file = "hs_apicalPOCgenes.txt")
-#saveRDS(basalPM, file = "hs_basalPMgenes.txt")
-#saveRDS(basal_poc, file = "hs_basalPOCgenes.txt")
-#saveRDS(PM, file = "hs_PMgenes.txt")
-#saveRDS(BB, file = "hs_BBgenes.txt")
+# apicalPM <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0016324'), mart = mart) %>% as_tibble() %>% mutate(GO = "apicalPM") %>% left_join(.,all_Dat_simple, by = "ensembl_gene_id") %>% na.omit() %>% pull(., ensembl_gene_id)
+# apical_poc <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0045177'), mart = mart) %>% as_tibble() %>% mutate(GO = "apicalPOC") %>% left_join(.,all_Dat_simple, by = "ensembl_gene_id") %>% na.omit() %>% pull(., ensembl_gene_id)
+# basalPM <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0009925'), mart = mart) %>% as_tibble() %>% mutate(GO = "basalPM") %>% left_join(.,all_Dat_simple, by = "ensembl_gene_id") %>% na.omit() %>% pull(., ensembl_gene_id)
+# basal_poc <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0045178'), mart = mart) %>% as_tibble() %>% mutate(GO = "basalPOC") %>% left_join(.,all_Dat_simple, by = "ensembl_gene_id") %>% na.omit() %>% pull(., ensembl_gene_id)
+# PM <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0005886'), mart = mart) %>% as_tibble() %>% mutate(GO = "PM") %>% left_join(.,all_Dat_simple, by = "ensembl_gene_id") %>% na.omit() %>% pull(., ensembl_gene_id)
+# BB <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0031526'), mart = mart) %>% as_tibble() %>% mutate(GO = "PM") %>% left_join(.,all_Dat_simple, by = "ensembl_gene_id") %>% na.omit() %>% pull(., ensembl_gene_id)
+# 
+# saveRDS(apicalPM, file = "hs_apicalPMgenes.txt")
+# saveRDS(apical_poc, file = "hs_apicalPOCgenes.txt")
+# saveRDS(basalPM, file = "hs_basalPMgenes.txt")
+# saveRDS(basal_poc, file = "hs_basalPOCgenes.txt")
+# saveRDS(PM, file = "hs_PMgenes.txt")
+# saveRDS(BB, file = "hs_BBgenes.txt")
 
 apicalPM <- readRDS(file = "hs_apicalPMgenes.txt")
 apical_poc <- readRDS(file = "hs_apicalPOCgenes.txt")
@@ -1124,19 +1142,19 @@ PM <- readRDS(file = "hs_PMgenes.txt")
 BB <- readRDS(file = "hs_BBgenes.txt")
 
 
-#apicalPM_mm <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0016324'), mart = mouse) %>% as_tibble() %>% mutate(GO = "apicalPM") %>% pull(., ensembl_gene_id) 
-#apical_poc_mm <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0045177'), mart = mouse) %>% as_tibble() %>% mutate(GO = "apicalPOC") %>% pull(., ensembl_gene_id) 
-#basalPM_mm <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0009925'), mart = mouse) %>% as_tibble() %>% mutate(GO = "basalPM") %>% pull(., ensembl_gene_id) 
-#basal_poc_mm <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0045178'), mart = mouse) %>% as_tibble() %>% mutate(GO = "basalPOC") %>% pull(., ensembl_gene_id) 
-#PM_mm <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0005886'), mart = mouse) %>% as_tibble() %>% mutate(GO = "PM") %>% pull(., ensembl_gene_id)
-#BB_mm <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0031526'), mart = mouse) %>% as_tibble() %>% mutate(GO = "PM") %>% pull(., ensembl_gene_id)
-
-#saveRDS(apicalPM_mm, file = "mm_apicalPMgenes.txt")
-#saveRDS(apical_poc_mm, file = "mm_apicalPOCgenes.txt")
-#saveRDS(basalPM_mm, file = "mm_basalPMgenes.txt")
-#saveRDS(basal_poc_mm, file = "mm_basalPOCgenes.txt")
-#saveRDS(PM_mm, file = "mm_PMgenes.txt")
-#saveRDS(BB_mm, file = "mm_BBgenes.txt")
+# apicalPM_mm <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0016324'), mart = mouse) %>% as_tibble() %>% mutate(GO = "apicalPM") %>% pull(., ensembl_gene_id) 
+# apical_poc_mm <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0045177'), mart = mouse) %>% as_tibble() %>% mutate(GO = "apicalPOC") %>% pull(., ensembl_gene_id) 
+# basalPM_mm <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0009925'), mart = mouse) %>% as_tibble() %>% mutate(GO = "basalPM") %>% pull(., ensembl_gene_id) 
+# basal_poc_mm <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0045178'), mart = mouse) %>% as_tibble() %>% mutate(GO = "basalPOC") %>% pull(., ensembl_gene_id) 
+# PM_mm <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0005886'), mart = mouse) %>% as_tibble() %>% mutate(GO = "PM") %>% pull(., ensembl_gene_id)
+# BB_mm <- getBM(attributes = c('ensembl_gene_id'), filters = c('go_parent_term'), values = c('GO:0031526'), mart = mouse) %>% as_tibble() %>% mutate(GO = "PM") %>% pull(., ensembl_gene_id)
+# 
+# saveRDS(apicalPM_mm, file = "mm_apicalPMgenes.txt")
+# saveRDS(apical_poc_mm, file = "mm_apicalPOCgenes.txt")
+# saveRDS(basalPM_mm, file = "mm_basalPMgenes.txt")
+# saveRDS(basal_poc_mm, file = "mm_basalPOCgenes.txt")
+# saveRDS(PM_mm, file = "mm_PMgenes.txt")
+# saveRDS(BB_mm, file = "mm_BBgenes.txt")
 
 apicalPM_mm <- readRDS(file = "mm_apicalPMgenes.txt")
 apical_poc_mm <- readRDS(file = "mm_apicalPOCgenes.txt")
@@ -1205,12 +1223,12 @@ all_memGO_plot %>% ggplot(aes(x = GO, y = GvN_LR, fill = GO)) + geom_point(posit
     geom_hline(yintercept = 0) +
     stat_compare_means(comparisons = my_comparisons, method = "wilcox.test")
 
-apicalpoc_LCM_GO <- LCM_AB_f %>% mutate(GO = ifelse(ensembl_gene_id %in% apical_poc_mm, "apicalPOC", "")) %>% filter(GO != "")
-basalpoc_LCM_GO <- LCM_AB_f %>% mutate(GO = ifelse(ensembl_gene_id %in% basal_poc_mm, "basalPOC", "")) %>% filter(GO != "")
-apicalPM_LCM_GO <- LCM_AB_f %>% mutate(GO = ifelse(ensembl_gene_id %in% apicalPM_mm, "apicalPM", "")) %>% filter(GO != "")
-basalPM_LCM_GO <- LCM_AB_f %>% mutate(GO = ifelse(ensembl_gene_id %in% basalPM_mm, "basalPM", "")) %>% filter(GO!= "")               
-PM_LCM_GO <- LCM_AB_f %>% mutate(GO = ifelse(ensembl_gene_id %in% PM_mm, "PM", "")) %>% filter(GO!= "") 
-BB_LCM_GO <- LCM_AB_f %>% mutate(GO = ifelse(ensembl_gene_id %in% BB_mm, "BB", "")) %>% filter(GO!= "") 
+apicalpoc_LCM_GO <- LCM_AB %>% mutate(GO = ifelse(ensembl_gene_id %in% apical_poc_mm, "apicalPOC", "")) %>% filter(GO != "")
+basalpoc_LCM_GO <- LCM_AB %>% mutate(GO = ifelse(ensembl_gene_id %in% basal_poc_mm, "basalPOC", "")) %>% filter(GO != "")
+apicalPM_LCM_GO <- LCM_AB %>% mutate(GO = ifelse(ensembl_gene_id %in% apicalPM_mm, "apicalPM", "")) %>% filter(GO != "")
+basalPM_LCM_GO <- LCM_AB %>% mutate(GO = ifelse(ensembl_gene_id %in% basalPM_mm, "basalPM", "")) %>% filter(GO!= "")               
+PM_LCM_GO <- LCM_AB %>% mutate(GO = ifelse(ensembl_gene_id %in% PM_mm, "PM", "")) %>% filter(GO!= "") 
+BB_LCM_GO <- LCM_AB %>% mutate(GO = ifelse(ensembl_gene_id %in% BB_mm, "BB", "")) %>% filter(GO!= "") 
 
 LCM_memGO_plot <- rbind(all_LCM_GO, apicalpoc_LCM_GO) %>% rbind(., basalpoc_LCM_GO) %>% rbind(apicalPM_LCM_GO) %>% rbind(basalPM_LCM_GO) %>% rbind(PM_LCM_GO) %>% rbind(BB_LCM_GO)
 
@@ -1223,7 +1241,7 @@ LCM_memGO_plot %>% ggplot(aes(x = GO, y = log2FoldChange, fill = GO)) + geom_poi
 
 ```
 
-```{r, cDNA length trends}
+```{r, cDNA length trends, warning = FALSE, eval = FALSE}
 
 ##get most expressed transcript lenth for each gene
 common_tx_length <- ave_enst_tpm %>% group_by(GENEID, Gene) %>% filter(ave_tpm == max(ave_tpm, na.rm = TRUE)) %>% left_join(cdnalength, by = c("TXNAME" = "ensembl_transcript_id")) 
@@ -1280,16 +1298,16 @@ all_Dat_simple %>% left_join(common_tx_length, by = c("ensembl_gene_id" = "GENEI
 ```
 
 
-```{r, RPloc}
+```{r, RPloc, eval = FALSE}
 
 RP_cand <- c("RPL8","RPL38", "RPL28", "RPS28", "RPL7", "RPLP2")
 
 #all RP on AB_FC dat
-all_Dat_simple %>% mutate(GO = ifelse(ensembl_gene_id %in% RPgenes, "RP", "")) %>% ggplot(aes(x = AB_FC, y = -log(as.numeric(AB_pval)), col = GO, alpha = GO, size = GO)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.01, 1), guide=F) + scale_size_manual(values = c(1, 2), guide=F) + geom_hline(yintercept = -log(0.05)) + scale_x_continuous(limits = c(-2, 2)) + scale_y_continuous(limits = c(0, 25))
+all_Dat_simple %>% mutate(GO = ifelse(ensembl_gene_id %in% RPgenes, "RP", "")) %>% ggplot(aes(x = AB_FC, y = -log10(as.numeric(AB_pval)), col = GO, alpha = GO, size = GO)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.01, 1), guide=F) + scale_size_manual(values = c(1, 2), guide=F) + geom_hline(yintercept = -log10(0.05)) + scale_x_continuous(limits = c(-2, 2)) + scale_y_continuous(limits = c(0, 25))
 
 #some RP_cand on all dat
 p <- all_Dat_tidy %>% mutate(col = ifelse(Gene_name %in% RP_cand, "RP", "")) 
-p %>% ggplot(aes(x = FC, y = -log(as.numeric(pval)), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + facet_grid(.~sample, scales = "free") + scale_x_continuous(limits = c(-4, 4)) + scale_y_continuous(limits = c(0, 30)) + geom_text(data = subset(p, col != ""), aes(label = Gene_name), position = position_jitter(width = .5, height = .75)) + geom_hline(yintercept = -log(0.05))
+p %>% ggplot(aes(x = FC, y = -log10(as.numeric(pval)), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.01, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F) + facet_grid(.~sample, scales = "free") + scale_x_continuous(limits = c(-4, 4)) + scale_y_continuous(limits = c(0, 30)) + geom_text(data = subset(p, col != ""), aes(label = Gene_name), position = position_jitter(width = .5, height = .75)) + geom_hline(yintercept = -log10(0.05))
 
 all_Dat_simple %>% mutate(GO = ifelse(ensembl_gene_id %in% RPgenes, "RP", "All Genes")) %>% ggplot(aes( AB_FC, fill = GO, alpha = GO)) + geom_density() + theme_cowplot() + scale_fill_manual(values = c("Black", "Red")) + scale_alpha_manual(values = c(0.5,0.5))
 
@@ -1310,18 +1328,20 @@ ave_enst_tpm %>% mutate(loc = ifelse(Gene %in% RP_cand, "RP"), ave_tpm = round(a
 RP_cand <- c("RPS28", "RPL7")
 
 p <- all_Dat_tidy %>% mutate(col = ifelse(Gene_name %in% RP_cand, "RP", "")) %>% filter(sample == "AB")
-p %>% ggplot(aes(x = FC, y = -log(as.numeric(pval)), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "#808080", "#e8c040", "#b82080")) + scale_alpha_manual(values = c(0.075, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F)  + ggrepel::geom_label_repel(data = subset(p, col != ""), aes(label = Gene_name, col = Gene_name), size = 5) + geom_hline(yintercept = -log(0.05), size = 1, linetype = "dashed") + coord_cartesian(xlim = c(-2,2), ylim = c(0,15)) + labs(x = "Apical Bias", y = "FDR") + guides(col = FALSE)
+p %>% ggplot(aes(x = FC, y = -log10(as.numeric(pval)), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "#808080", "#e8c040", "#b82080")) + scale_alpha_manual(values = c(0.075, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F)  + ggrepel::geom_label_repel(data = subset(p, col != ""), aes(label = Gene_name, col = Gene_name), size = 5) + geom_hline(yintercept = -log10(0.05), size = 1, linetype = "dashed") + coord_cartesian(xlim = c(-2,2), ylim = c(0,15)) + labs(x = "Apical Bias", y = "FDR") + guides(col = FALSE)
 
 RP_cand <- c("RPS28", "RPL7", "RPL8")
 
 p <- all_Dat_tidy %>% mutate(col = ifelse(Gene_name %in% RP_cand, "RP", "")) %>% filter(sample == "AB")
-p %>% ggplot(aes(x = FC, y = -log(as.numeric(pval)), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "#808080", "#e8c040", "#4888b8", "#b82080")) + scale_alpha_manual(values = c(0.075, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F)  + ggrepel::geom_label_repel(data = subset(p, col != ""), aes(label = Gene_name, col = Gene_name), size = 5) + geom_hline(yintercept = -log(0.05), size = 1, linetype = "dashed") + coord_cartesian(xlim = c(-2,2), ylim = c(0,15)) + labs(x = "Apical Bias", y = "FDR") + guides(col = FALSE)
+p %>% ggplot(aes(x = FC, y = -log10(as.numeric(pval)), col = col, alpha = col, size = col)) + geom_point() + theme_cowplot() + scale_color_manual(values = c("Black", "#808080", "#e8c040", "#4888b8", "#b82080")) + scale_alpha_manual(values = c(0.075, 1, 1), guide=F) + scale_size_manual(values = c(1, 2, 2), guide=F)  + ggrepel::geom_label_repel(data = subset(p, col != ""), aes(label = Gene_name, col = Gene_name), size = 5) + geom_hline(yintercept = -log10(0.05), size = 1, linetype = "dashed") + coord_cartesian(xlim = c(-2,2), ylim = c(0,15)) + labs(x = "Apical Bias", y = "FDR") + guides(col = FALSE)
 
 ```
 
 
 ```{r, Larp}
-norm_counts %>% as_tibble(rownames = "ensembl_gene_id") %>% left_join(., ens2gene) %>% filter(grepl("LARP", Gene) == TRUE) %>% gather(-ensembl_gene_id, -Gene, key = sample, value = norm_count) %>% separate(sample, into = c("C2bbe1", "halo", "fraction", "rep"), sep = "_") %>% filter(fraction == "input") %>% ggplot(aes(x = Gene, y = log(norm_count), fill = Gene)) + geom_violin() + geom_boxplot(width = 0.25) + geom_point(position = "jitter") + theme_cowplot() + guides(fill = FALSE)
+norm_counts %>% as_tibble(rownames = "ensembl_gene_id") %>% left_join(., ens2gene) %>% filter(grepl("LARP", Gene) == TRUE) %>% gather(-ensembl_gene_id, -Gene, key = sample, value = norm_count) %>% separate(sample, into = c("C2bbe1", "halo", "fraction", "rep"), sep = "_") %>% filter(fraction == "input") %>% ggplot(aes(x = Gene, y = log10(norm_count), fill = Gene)) + geom_violin() + geom_boxplot(width = 0.25) + geom_point(position = "jitter") + theme_cowplot() + guides(fill = FALSE)
 
+
+res_AB_simple %>% left_join(., ens2gene) %>% filter(grepl("LARP", Gene) == TRUE) %>% ggplot(aes(x = Gene, y = log2FoldChange, fill = Gene)) + geom_violin() + geom_boxplot(width = 0.25) + geom_point(position = "jitter") + theme_cowplot() + guides(fill = FALSE)
 ```
 
